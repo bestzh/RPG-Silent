@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ff5951b6c7464bf45812435907a0617c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Prefabs/DamageZone.prefab
+  uploadId: 735396

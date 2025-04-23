@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 8a55606cb3e46ab438e7d69dde63d70a
+timeCreated: 1479470104
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/Editor/CustomQuestPopUp.cs
+  uploadId: 193386

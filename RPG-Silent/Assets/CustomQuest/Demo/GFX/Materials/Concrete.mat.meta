@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fc443f4be53878c4c8762250c7ed5f0f
+timeCreated: 1479986995
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/GFX/Materials/Concrete.mat
+  uploadId: 193386

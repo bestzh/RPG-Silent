@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 7e02b62172a74ef18c79b7feb493be3d
+timeCreated: 1737129024
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSMoveModifierDrawer.cs
+  uploadId: 735396

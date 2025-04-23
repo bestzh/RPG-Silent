@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 9ffe27e70d6d4d10a251370cc671d847
+timeCreated: 1736699470
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Structs/SSVector3Drawer.cs
+  uploadId: 735396

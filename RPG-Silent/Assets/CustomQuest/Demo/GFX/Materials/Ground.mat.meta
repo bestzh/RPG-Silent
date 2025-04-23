@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 41ed37a8669fab3428cc564cea617186
+timeCreated: 1479910227
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/GFX/Materials/Ground.mat
+  uploadId: 193386

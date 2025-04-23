@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: d4af022c4ba58d249b5d8b1fafcfede5
+timeCreated: 1478599409
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/Criteria.cs
+  uploadId: 193386

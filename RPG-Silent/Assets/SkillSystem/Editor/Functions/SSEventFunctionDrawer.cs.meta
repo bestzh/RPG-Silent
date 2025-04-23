@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 90f555e9ce044acaa83a0fc1ec0025a5
+timeCreated: 1738191103
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSEventFunctionDrawer.cs
+  uploadId: 735396

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c1917e1d959aaf443b2820cd253caeea
+timeCreated: 1483619357
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/QuestSettings.asset
+  uploadId: 193386

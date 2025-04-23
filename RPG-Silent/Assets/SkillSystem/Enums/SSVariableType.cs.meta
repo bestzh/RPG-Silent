@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: fe6f5ce8c8f643b19e61d521e47bdeb9
+timeCreated: 1736686516
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Enums/SSVariableType.cs
+  uploadId: 735396

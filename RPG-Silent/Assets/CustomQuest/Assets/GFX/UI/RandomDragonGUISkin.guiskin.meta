@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: aa26754ab6c6f1540814986d48656e0e
+timeCreated: 1495791834
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/GFX/UI/RandomDragonGUISkin.guiskin
+  uploadId: 193386

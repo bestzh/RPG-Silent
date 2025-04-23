@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1d1d31e28cef19c439cb538bc0390a91
+timeCreated: 1481541191
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/Signpost.prefab
+  uploadId: 193386

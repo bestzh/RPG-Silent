@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2333229691774117421
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6952028911122075776}
+  - component: {fileID: 4145088345253650608}
+  m_Layer: 0
+  m_Name: Dash and Push
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6952028911122075776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2333229691774117421}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4145088345253650608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2333229691774117421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  skillName: Dash and Push
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 2
+  maxCharge: 1
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Dash and Push
+    actionDuration: 0.3
+    functions:
+    - rid: 240576995698933868
+    - rid: 240576995698933877
+    - rid: 240576995698933896
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576995698933868
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 3
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: -3000}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576995698933869
+          - rid: 240576995698933870
+          - rid: 240576995698933871
+    - rid: 240576995698933869
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576995698933872
+    - rid: 240576995698933870
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576995698933871
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -3000, y: 0, z: -3000}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933872
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933877
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: e1cc04d5aae4e0b4686cb0a90bb1e269, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers: []
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: pushZone
+    - rid: 240576995698933896
+      type: {class: SSDestroyFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetObject:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: pushZone
+        destroyDelay:
+          variableType: 0
+          variableValue: 0.3
+          dictionaryName: 
+          modifiers: []

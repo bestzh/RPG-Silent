@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fcdcf9ea8de360d4db3f29540fe62db4
+timeCreated: 1479206058
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/GFX/Materials/Yellow.mat
+  uploadId: 193386

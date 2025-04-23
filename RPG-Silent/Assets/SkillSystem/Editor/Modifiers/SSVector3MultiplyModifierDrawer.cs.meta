@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 2291a5a5ef9640978bc95c5abc707258
+timeCreated: 1737905202
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSVector3MultiplyModifierDrawer.cs
+  uploadId: 735396

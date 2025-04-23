@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 6b9a20a58c836b64dbe4dec79c81b556
+timeCreated: 1496754069
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/CQPlayerObject.cs
+  uploadId: 193386

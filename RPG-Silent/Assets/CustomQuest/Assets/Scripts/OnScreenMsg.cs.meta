@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9c0f2333691bdca4480e41413fd20f8c
+timeCreated: 1470051770
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/OnScreenMsg.cs
+  uploadId: 193386

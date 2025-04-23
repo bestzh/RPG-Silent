@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2a401fec3f4723345937a35611082d16
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/Prefabs/Bullet.prefab
+  uploadId: 735396

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f7e8e3d06cd7d3349916cba4d3a5028a
+timeCreated: 1479206041
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/GFX/Materials/Green.mat
+  uploadId: 193386

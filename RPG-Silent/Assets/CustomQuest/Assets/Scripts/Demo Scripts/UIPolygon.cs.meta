@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 486b0db22d1ff5742a83a099b7060cd8
+timeCreated: 1469625402
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/Demo Scripts/UIPolygon.cs
+  uploadId: 193386

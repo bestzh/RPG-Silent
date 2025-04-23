@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 017d34c663674b908ad9ed20198fa8c3
+timeCreated: 1722000805
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSMoveFunctionDrawer.cs
+  uploadId: 735396

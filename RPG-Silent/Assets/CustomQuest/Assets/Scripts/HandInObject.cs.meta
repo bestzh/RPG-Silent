@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: cc5e3f19dd6f1dd4bb3a69c896c2d155
+timeCreated: 1489749197
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/HandInObject.cs
+  uploadId: 193386

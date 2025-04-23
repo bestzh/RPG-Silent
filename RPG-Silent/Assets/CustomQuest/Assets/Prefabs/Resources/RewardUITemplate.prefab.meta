@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b01943d859ab86a4685a43a04707fe7b
+timeCreated: 1482138993
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/Resources/RewardUITemplate.prefab
+  uploadId: 193386

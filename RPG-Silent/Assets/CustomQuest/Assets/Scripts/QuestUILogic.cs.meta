@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 8418e4a8fcfab0941a027958c22a96c0
+timeCreated: 1479728136
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/QuestUILogic.cs
+  uploadId: 193386

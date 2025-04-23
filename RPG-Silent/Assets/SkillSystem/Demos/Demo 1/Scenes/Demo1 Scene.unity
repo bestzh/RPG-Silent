@@ -1,0 +1,4270 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 10
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogMode: 3
+  m_FogDensity: 0.01
+  m_LinearFogStart: 0
+  m_LinearFogEnd: 300
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 0
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 1
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 1
+    m_PVRDenoiserTypeIndirect: 1
+    m_PVRDenoiserTypeAO: 1
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 1
+    m_PVRFilteringGaussRadiusAO: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 3
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    buildHeightMesh: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &69315374
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69315377}
+  - component: {fileID: 69315376}
+  - component: {fileID: 69315375}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &69315375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69315374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &69315376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69315374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &69315377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69315374}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &236942029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 236942030}
+  - component: {fileID: 236942031}
+  m_Layer: 0
+  m_Name: Basic Attack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &236942030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236942029}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1643491634}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &236942031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236942029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 3
+  skillName: Basic Random Attack
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 0
+  maxCharge: 1
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Basic Attack Right
+    actionDuration: 0.5
+    functions:
+    - rid: 240576937531277406
+    - rid: 240576948822081630
+    - rid: 240576948822081650
+    resetActionIndexDelay: 0
+  - actionName: Basic Attack Left
+    actionDuration: 0.5
+    functions:
+    - rid: 240576948822081666
+    - rid: 240576948822081667
+    - rid: 240576948822081670
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576937531277406
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Basic Attack Right
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081630
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081634
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone
+    - rid: 240576948822081634
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 5, y: 0, z: 0}
+          dictionaryName: handPos
+          modifiers:
+          - rid: 240576948822081648
+    - rid: 240576948822081648
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0.5, y: 1, z: 1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081650
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: clone
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 12, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081663
+    - rid: 240576948822081663
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: handPos
+          modifiers: []
+    - rid: 240576948822081666
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Basic Attack Left
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081667
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081668
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone
+    - rid: 240576948822081668
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 5, y: 0, z: 0}
+          dictionaryName: handPos
+          modifiers:
+          - rid: 240576948822081669
+    - rid: 240576948822081669
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0.5, y: 1, z: 1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081670
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: clone
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 12, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081671
+    - rid: 240576948822081671
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: handPos
+          modifiers: []
+--- !u!1 &282509354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 282509355}
+  - component: {fileID: 282509357}
+  - component: {fileID: 282509356}
+  m_Layer: 5
+  m_Name: Health Bar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &282509355
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282509354}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 856905694}
+  m_Father: {fileID: 706121390}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.7}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -3, y: -0.79999995}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &282509356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282509354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9784f0dd29281ac4da97cb16ac4a58fd, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 0
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &282509357
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282509354}
+  m_CullTransparentMesh: 1
+--- !u!1 &316760788
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 316760789}
+  - component: {fileID: 316760790}
+  - component: {fileID: 316760791}
+  - component: {fileID: 316760794}
+  - component: {fileID: 316760792}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &316760789
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316760788}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2.95, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 922875801}
+  - {fileID: 1643491634}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &316760790
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316760788}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 2
+  m_AngularDamping: 0.05
+  m_GravityScale: 3
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!61 &316760791
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316760788}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2, y: 2}
+    newSize: {x: 2, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.7, y: 1.1}
+  m_EdgeRadius: 0
+--- !u!114 &316760792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316760788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d027ce412e63446b721e70a142d333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skill1: {fileID: 236942031}
+  skill2: {fileID: 2091910341}
+  skill3: {fileID: 1710213980}
+  skill4: {fileID: 938361836}
+--- !u!95 &316760794
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316760788}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6e82592259a64b545a971ee9495bfbd8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &644521162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 644521163}
+  - component: {fileID: 644521165}
+  - component: {fileID: 644521164}
+  m_Layer: 5
+  m_Name: Text (Legacy)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &644521163
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644521162}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2041689266}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 160, y: -110}
+  m_SizeDelta: {x: 300, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &644521164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644521162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 18
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Controls
+
+    AD - Move
+
+    Left Click - Use Skill 1
+
+    Right Click
+    - Use Skill 2
+
+    Space - Use Skill 3
+
+    Left Shift - Use Skill 4'
+--- !u!222 &644521165
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644521162}
+  m_CullTransparentMesh: 1
+--- !u!1 &706121389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 706121390}
+  - component: {fileID: 706121393}
+  - component: {fileID: 706121392}
+  - component: {fileID: 706121391}
+  m_Layer: 5
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &706121390
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706121389}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 282509355}
+  m_Father: {fileID: 1794580620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 5, y: 3}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &706121391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706121389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &706121392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706121389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 1
+--- !u!223 &706121393
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706121389}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!1 &856905693
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 856905694}
+  - component: {fileID: 856905696}
+  - component: {fileID: 856905695}
+  m_Layer: 5
+  m_Name: Fill
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &856905694
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856905693}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 282509355}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.7}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.035000086}
+  m_SizeDelta: {x: 0, y: 0.07000011}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &856905695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856905693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9784f0dd29281ac4da97cb16ac4a58fd, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 0
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &856905696
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856905693}
+  m_CullTransparentMesh: 1
+--- !u!1 &902647545
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 902647548}
+  - component: {fileID: 902647547}
+  - component: {fileID: 902647546}
+  m_Layer: 5
+  m_Name: Fill
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &902647546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902647545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9784f0dd29281ac4da97cb16ac4a58fd, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 0
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &902647547
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902647545}
+  m_CullTransparentMesh: 1
+--- !u!224 &902647548
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 902647545}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1072529143}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.7}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.035000086}
+  m_SizeDelta: {x: 0, y: 0.07000011}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &922875800
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 922875801}
+  - component: {fileID: 922875802}
+  m_Layer: 0
+  m_Name: Player Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &922875801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922875800}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 316760789}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &922875802
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922875800}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 3427114271967980436, guid: 72f1b12de6736aa40b45a3ac351335cd, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 0.13, y: 0.2}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!1 &938361834
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 938361835}
+  - component: {fileID: 938361836}
+  m_Layer: 0
+  m_Name: Dash
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &938361835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 938361834}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2007543037}
+  m_Father: {fileID: 1643491634}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &938361836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 938361834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  skillName: Dash
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 2
+  maxCharge: 3
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Dash
+    actionDuration: 0
+    functions:
+    - rid: 240576948822082059
+    - rid: 240576948822082123
+    - rid: 240576948822082080
+    - rid: 240576948822082060
+    - rid: 240576948822082094
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576948822082059
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Dash
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822082060
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 55, y: 0, z: 0}
+          dictionaryName: handPos
+          modifiers:
+          - rid: 240576948822082078
+    - rid: 240576948822082078
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 30, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822082080
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 2261371922865729075, guid: ff5951b6c7464bf45812435907a0617c, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: damageZone
+    - rid: 240576948822082094
+      type: {class: SSDestroyFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.3
+        targetObject:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: damageZone
+        destroyDelay:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822082123
+      type: {class: SSVisualFXFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        vfxType: 0
+        particleSystem:
+          variableType: 0
+          variableReference: {fileID: 2007543035}
+          dictionaryName: 
+--- !u!1 &970697612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 970697616}
+  - component: {fileID: 970697615}
+  - component: {fileID: 970697614}
+  - component: {fileID: 970697613}
+  m_Layer: 0
+  m_Name: Dummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &970697613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970697612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734c35c64bc70c64f9e46a566f3a1e38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  sprite: {fileID: 1527653710}
+  healthFillImage: {fileID: 902647546}
+--- !u!61 &970697614
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970697612}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.7, y: 1.1}
+  m_EdgeRadius: 0
+--- !u!50 &970697615
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970697612}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!4 &970697616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 970697612}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.5, y: -2.95, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1527653709}
+  - {fileID: 2125881225}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1072529142
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1072529143}
+  - component: {fileID: 1072529145}
+  - component: {fileID: 1072529144}
+  m_Layer: 5
+  m_Name: Health Bar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1072529143
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072529142}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 902647548}
+  m_Father: {fileID: 2125881225}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.7}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -3, y: -0.79999995}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1072529144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072529142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9784f0dd29281ac4da97cb16ac4a58fd, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 0
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1072529145
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072529142}
+  m_CullTransparentMesh: 1
+--- !u!1 &1158209729
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1158209732}
+  - component: {fileID: 1158209731}
+  - component: {fileID: 1158209730}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!81 &1158209730
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1158209729}
+  m_Enabled: 1
+--- !u!20 &1158209731
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1158209729}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.37989622, g: 0.3700605, b: 0.41509432, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 1
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &1158209732
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1158209729}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1294492343
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1294492344}
+  - component: {fileID: 1294492345}
+  - component: {fileID: 1294492346}
+  m_Layer: 0
+  m_Name: Ground
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1294492344
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294492343}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalScale: {x: 20, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1462772565}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1294492345
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294492343}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 0, g: 0.08235294, b: 0.08627451, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!61 &1294492346
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294492343}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!1001 &1372262131
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1710213979}
+    m_Modifications:
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1869512834090488575, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_Name
+      value: Dive Particle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: ShapeModule.m_Rotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: InitialModule.startSpeed.minScalar
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+--- !u!1001 &1375318123
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1710213979}
+    m_Modifications:
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1869512834090488575, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_Name
+      value: Jump Particle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: ShapeModule.m_Rotation.z
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: InitialModule.startSpeed.scalar
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: InitialModule.startSpeed.minScalar
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+--- !u!1 &1462772564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1462772565}
+  m_Layer: 0
+  m_Name: Environment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1462772565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462772564}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1294492344}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1521522978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1521522979}
+  - component: {fileID: 1521522980}
+  m_Layer: 0
+  m_Name: Dummy Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1521522979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521522978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1794580620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1521522980
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521522978}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: f08ca0db2cd9f7b4da1855dacb505a10, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!1 &1527653708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1527653709}
+  - component: {fileID: 1527653710}
+  m_Layer: 0
+  m_Name: Dummy Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1527653709
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1527653708}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 970697616}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1527653710
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1527653708}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: f08ca0db2cd9f7b4da1855dacb505a10, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!1 &1643491633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1643491634}
+  m_Layer: 0
+  m_Name: Skills
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1643491634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643491633}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 236942030}
+  - {fileID: 2091910340}
+  - {fileID: 1710213979}
+  - {fileID: 938361835}
+  m_Father: {fileID: 316760789}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1710213978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1710213979}
+  - component: {fileID: 1710213980}
+  m_Layer: 0
+  m_Name: Jump and Dive
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1710213979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710213978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1959119471}
+  - {fileID: 2104553382}
+  m_Father: {fileID: 1643491634}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1710213980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710213978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
+  skillName: Jump and Dive
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 5
+  maxCharge: 2
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Jump and Dive
+    actionDuration: 0.3
+    functions:
+    - rid: 240576948822081831
+    - rid: 240576973360070656
+    - rid: 240576948822081832
+    - rid: 240576948822081843
+    - rid: 240576948822081845
+    - rid: 240576948822081846
+    - rid: 240576948822081848
+    - rid: 240576948822081849
+    - rid: 240576948822081851
+    - rid: 240576973360070657
+    - rid: 240576948822081852
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576948822081831
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Jump and Dive
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081832
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 5
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1100, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081843
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.5
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081845
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081846
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081848
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081849
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 316760789}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081851
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 316760790}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -20, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081852
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.25
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 6135266180969603821, guid: 1380790b113647f4d922bc3b48560ecc, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576998639927371
+          - rid: 240576998639927373
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360070656
+      type: {class: SSVisualFXFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        vfxType: 0
+        particleSystem:
+          variableType: 0
+          variableReference: {fileID: 1959119473}
+          dictionaryName: 
+    - rid: 240576973360070657
+      type: {class: SSVisualFXFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        vfxType: 0
+        particleSystem:
+          variableType: 0
+          variableReference: {fileID: 2104553384}
+          dictionaryName: 
+    - rid: 240576998639927371
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576998639927373
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -3.5, z: 0}
+          dictionaryName: 
+          modifiers: []
+--- !u!1 &1794580617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1794580620}
+  - component: {fileID: 1794580621}
+  - component: {fileID: 1794580619}
+  - component: {fileID: 1794580618}
+  m_Layer: 0
+  m_Name: Dummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1794580618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794580617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734c35c64bc70c64f9e46a566f3a1e38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  sprite: {fileID: 1521522980}
+  healthFillImage: {fileID: 856905695}
+--- !u!61 &1794580619
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794580617}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.7, y: 1.1}
+  m_EdgeRadius: 0
+--- !u!4 &1794580620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794580617}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.5, y: -2.95, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1521522979}
+  - {fileID: 706121390}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1794580621
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794580617}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!4 &1959119471 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 1375318123}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &1959119473 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 1375318123}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &2007543035 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 4788515066570761305}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2007543037 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 4788515066570761305}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2041689262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2041689266}
+  - component: {fileID: 2041689265}
+  - component: {fileID: 2041689264}
+  - component: {fileID: 2041689263}
+  m_Layer: 5
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2041689263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041689262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &2041689264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041689262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!223 &2041689265
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041689262}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &2041689266
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041689262}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 644521163}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!1 &2091910339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2091910340}
+  - component: {fileID: 2091910341}
+  m_Layer: 0
+  m_Name: Spawn And Redirect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2091910340
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091910339}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1643491634}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2091910341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091910339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  skillName: Spawn and Redirect
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 3
+  maxCharge: 1
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Spawn Clone 1
+    actionDuration: 0.15
+    functions:
+    - rid: 240576948822081775
+    - rid: 240576948822081696
+    - rid: 240576948822081703
+    - rid: 240576948822081709
+    - rid: 240576948822081707
+    resetActionIndexDelay: 3
+  - actionName: Spawn Clone 2
+    actionDuration: 0.15
+    functions:
+    - rid: 240576948822081776
+    - rid: 240576948822081733
+    - rid: 240576948822081737
+    - rid: 240576948822081739
+    - rid: 240576948822081745
+    resetActionIndexDelay: 3
+  - actionName: Spawn Clone 3
+    actionDuration: 0.15
+    functions:
+    - rid: 240576948822081777
+    - rid: 240576948822081747
+    - rid: 240576948822081751
+    - rid: 240576948822081753
+    - rid: 240576948822081759
+    resetActionIndexDelay: 3
+  - actionName: Spawn Clone 4
+    actionDuration: 0.15
+    functions:
+    - rid: 240576948822081778
+    - rid: 240576948822081761
+    - rid: 240576948822081765
+    - rid: 240576948822081767
+    - rid: 240576948822081773
+    resetActionIndexDelay: 3
+  - actionName: Redirect
+    actionDuration: 0.7
+    functions:
+    - rid: 240576948822081806
+    - rid: 240576948822081780
+    - rid: 240576948822081790
+    - rid: 240576948822081795
+    - rid: 240576948822081800
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576948822081696
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081697
+          - rid: 240576948822081700
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone1
+    - rid: 240576948822081697
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081700
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081701
+    - rid: 240576948822081701
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081703
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 13, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081705
+    - rid: 240576948822081705
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 0.9
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.2
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081707
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.15
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081709
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 4
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 35}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081710
+        value:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081713
+          - rid: 240576948822081718
+          - rid: 240576948822081720
+    - rid: 240576948822081710
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081713
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081718
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081720
+      type: {class: SSMultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableValue: 60
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081730
+    - rid: 240576948822081730
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.5
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081733
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081734
+          - rid: 240576948822081735
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone2
+    - rid: 240576948822081734
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081735
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081736
+    - rid: 240576948822081736
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081737
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone2
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 13, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081738
+    - rid: 240576948822081738
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 0.9
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.2
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081739
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 4
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone2
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 35}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081740
+        value:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081741
+          - rid: 240576948822081742
+          - rid: 240576948822081743
+    - rid: 240576948822081740
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081741
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081742
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081743
+      type: {class: SSMultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableValue: 60
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081744
+    - rid: 240576948822081744
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.5
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081745
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.15
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone2
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081747
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081748
+          - rid: 240576948822081749
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone3
+    - rid: 240576948822081748
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081749
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081750
+    - rid: 240576948822081750
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081751
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone3
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 13, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081752
+    - rid: 240576948822081752
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 0.9
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.2
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081753
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 4
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone3
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 35}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081754
+        value:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081755
+          - rid: 240576948822081756
+          - rid: 240576948822081757
+    - rid: 240576948822081754
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081755
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081756
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081757
+      type: {class: SSMultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableValue: 60
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081758
+    - rid: 240576948822081758
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.5
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081759
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.15
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone3
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081761
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1483695980667035364, guid: 2e0ddc6f20684324484d08f3683d15c5, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 1
+          variableReference: {fileID: 316760789}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081762
+          - rid: 240576948822081763
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 1
+        dictionaryKeyName: clone4
+    - rid: 240576948822081762
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: -1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081763
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081764
+    - rid: 240576948822081764
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081765
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone4
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 13, z: 0}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081766
+    - rid: 240576948822081766
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 0.9
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.2
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081767
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 4
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone4
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 35}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081768
+        value:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081769
+          - rid: 240576948822081770
+          - rid: 240576948822081771
+    - rid: 240576948822081768
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081769
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081770
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081771
+      type: {class: SSMultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableValue: 60
+          dictionaryName: 
+          modifiers:
+          - rid: 240576948822081772
+    - rid: 240576948822081772
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1.5
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081773
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.15
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone4
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081775
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Spawn
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081776
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Spawn
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081777
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Spawn
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081778
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Spawn
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081780
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: mousePos
+          modifiers:
+          - rid: 240576948822081783
+          - rid: 240576948822081785
+          - rid: 240576948822081786
+    - rid: 240576948822081783
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: clone1
+          modifiers:
+          - rid: 240576948822081784
+    - rid: 240576948822081784
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081785
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081786
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 50, y: 50, z: 50}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081790
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.1
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone2
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: mousePos
+          modifiers:
+          - rid: 240576948822081791
+          - rid: 240576948822081792
+          - rid: 240576948822081793
+    - rid: 240576948822081791
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: clone2
+          modifiers:
+          - rid: 240576948822081794
+    - rid: 240576948822081792
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081793
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 50, y: 50, z: 50}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081794
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081795
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.1
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone3
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: mousePos
+          modifiers:
+          - rid: 240576948822081796
+          - rid: 240576948822081797
+          - rid: 240576948822081798
+    - rid: 240576948822081796
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: clone3
+          modifiers:
+          - rid: 240576948822081799
+    - rid: 240576948822081797
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081798
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 50, y: 50, z: 50}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081799
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081800
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.1
+        moveType: 4
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone1
+        targetRigidbody2D:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: clone4
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: mousePos
+          modifiers:
+          - rid: 240576948822081801
+          - rid: 240576948822081802
+          - rid: 240576948822081803
+    - rid: 240576948822081801
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: clone4
+          modifiers:
+          - rid: 240576948822081804
+    - rid: 240576948822081802
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576948822081803
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 50, y: 50, z: 50}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081804
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576948822081806
+      type: {class: SSAnimationFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        targetAnimator:
+          variableType: 0
+          variableReference: {fileID: 316760794}
+          dictionaryName: 
+        animateType: 0
+        parameterName:
+          variableType: 0
+          variableValue: Redirect
+          dictionaryName: 
+        crossFadeTime:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+        triggerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        boolValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        integerValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        floatValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+        speedValue:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+--- !u!4 &2104553382 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 1372262131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &2104553384 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7296311150187735720, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+  m_PrefabInstance: {fileID: 1372262131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2125881224
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2125881225}
+  - component: {fileID: 2125881228}
+  - component: {fileID: 2125881227}
+  - component: {fileID: 2125881226}
+  m_Layer: 5
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2125881225
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125881224}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1072529143}
+  m_Father: {fileID: 970697616}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 5, y: 3}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2125881226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125881224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &2125881227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125881224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 1
+--- !u!223 &2125881228
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2125881224}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!1001 &4788515066570761305
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 938361835}
+    m_Modifications:
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1810570352051844085, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1869512834090488575, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+      propertyPath: m_Name
+      value: Dash Particle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1db1f25c733a2f749ac061b6cfe0dbbd, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 1158209732}
+  - {fileID: 69315377}
+  - {fileID: 2041689266}
+  - {fileID: 1462772565}
+  - {fileID: 316760789}
+  - {fileID: 1794580620}
+  - {fileID: 970697616}

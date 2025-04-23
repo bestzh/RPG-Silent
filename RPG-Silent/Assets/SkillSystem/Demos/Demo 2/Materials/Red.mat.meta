@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 13dec38e90c89104e960b5f63ebff177
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/Materials/Red.mat
+  uploadId: 735396

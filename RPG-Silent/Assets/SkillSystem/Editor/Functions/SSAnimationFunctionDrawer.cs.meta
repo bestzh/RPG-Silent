@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: ccdb9a1391274703913279a2aa632a4a
+timeCreated: 1735912284
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSAnimationFunctionDrawer.cs
+  uploadId: 735396

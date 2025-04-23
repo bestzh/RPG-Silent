@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 1ec89e74919543a2b395c24038efc956
+timeCreated: 1738188708
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSRotateFunctionDrawer.cs
+  uploadId: 735396

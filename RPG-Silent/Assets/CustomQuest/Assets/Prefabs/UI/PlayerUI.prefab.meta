@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3c671ee4451a31147a2153a1715e42bc
+timeCreated: 1489661170
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/UI/PlayerUI.prefab
+  uploadId: 193386

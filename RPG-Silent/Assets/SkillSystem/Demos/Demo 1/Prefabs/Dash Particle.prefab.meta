@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1db1f25c733a2f749ac061b6cfe0dbbd
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Prefabs/Dash Particle.prefab
+  uploadId: 735396

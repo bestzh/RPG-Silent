@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: b71f1be3283ea8d46ab881676898a48e
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Structs/SSVariableWithReference.cs
+  uploadId: 735396

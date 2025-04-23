@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 0f136a4bac0648c99ef3574a0f61f696
+timeCreated: 1736689394
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Structs/SSTransform.cs
+  uploadId: 735396

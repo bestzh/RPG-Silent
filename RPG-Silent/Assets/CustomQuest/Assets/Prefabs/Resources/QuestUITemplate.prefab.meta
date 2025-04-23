@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 17a5a2cac7b25ab45a39412d430a3001
+timeCreated: 1479727298
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/Resources/QuestUITemplate.prefab
+  uploadId: 193386

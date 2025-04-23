@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 947926dc0f32419f8adeba1f7ad85f83
+timeCreated: 1738192222
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSDestroyFunctionDrawer.cs
+  uploadId: 735396

@@ -1,0 +1,370 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1755660112753040682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3381176760336695550}
+  - component: {fileID: 1792300651014473486}
+  m_Layer: 0
+  m_Name: Blink Behind and Hit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3381176760336695550
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755660112753040682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1792300651014473486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755660112753040682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  skillName: Blink Behind and Hit
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 5
+  maxCharge: 2
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Blink Behind
+    actionDuration: 0.3
+    functions:
+    - rid: 240576973360070895
+    - rid: 240576973360070904
+    resetActionIndexDelay: 1
+  - actionName: Hit
+    actionDuration: 0.2
+    functions:
+    - rid: 240576973360070907
+    - rid: 240576995698933939
+    - rid: 240576973360070977
+    - rid: 240576973360070930
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576973360070895
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 0
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576973360070987
+          - rid: 240576973360070988
+          - rid: 240576973360070994
+    - rid: 240576973360070904
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 1
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0, w: -0.00000004371139}
+          dictionaryName: 
+          modifiers: []
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+        value:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070907
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 1}
+          dictionaryName: targetPos
+          modifiers: []
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360070930
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.3
+        moveType: 2
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070977
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 3
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: -3000}
+          dictionaryName: targetPos
+          modifiers:
+          - rid: 240576973360070978
+          - rid: 240576973360070979
+          - rid: 240576973360070980
+    - rid: 240576973360070978
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576973360070981
+    - rid: 240576973360070979
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576973360070980
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -3000, y: 0, z: -3000}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070981
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070987
+      type: {class: SSSaveToDictionaryModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        key: targetPos
+    - rid: 240576973360070988
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576973360070989
+          - rid: 240576973360070991
+          - rid: 240576973360070993
+    - rid: 240576973360070989
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576973360070990
+    - rid: 240576973360070990
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070991
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576973360070993
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 2, y: 0, z: 2}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070994
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933939
+      type: {class: SSRotateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        rotateType: 0
+        targetTransform:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: Player Transform
+        targetRigidbody:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 1}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576995698933940
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: 
+          modifiers: []
+        value:
+          variableType: 0
+          variableValue: 0
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933940
+      type: {class: SSRotateTowardsVectorModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vectorForward:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0}
+          dictionaryName: targetPos
+          modifiers:
+          - rid: 240576995698933941
+          - rid: 240576995698933949
+        vectorUp:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933941
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576995698933942
+    - rid: 240576995698933942
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: 0, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933949
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aac94d338b266d24ba8832b81895365e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 13400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/No fric no bounce.physicMaterial
+  uploadId: 735396

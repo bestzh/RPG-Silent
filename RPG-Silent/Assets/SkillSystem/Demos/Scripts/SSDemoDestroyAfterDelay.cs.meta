@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 9352f82ef2778684dadde891128113a5
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Scripts/SSDemoDestroyAfterDelay.cs
+  uploadId: 735396

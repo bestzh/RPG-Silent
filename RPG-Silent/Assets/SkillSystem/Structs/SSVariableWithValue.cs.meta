@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 7c69e8c5765b48f48d93e1d0d89f6e01
+timeCreated: 1736696180
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Structs/SSVariableWithValue.cs
+  uploadId: 735396

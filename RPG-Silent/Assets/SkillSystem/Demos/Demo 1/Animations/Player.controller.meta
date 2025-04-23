@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6e82592259a64b545a971ee9495bfbd8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Animations/Player.controller
+  uploadId: 735396

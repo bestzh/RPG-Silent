@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 85aaa135f0814bae97de6d8e98f6bbdf
+timeCreated: 1737904229
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSRotateTowardsVectorModifierDrawer.cs
+  uploadId: 735396

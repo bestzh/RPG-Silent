@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: b0878ed957c1425fbd011f84ba410a22
+timeCreated: 1737388161
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSRotateModifierDrawer.cs
+  uploadId: 735396

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9a8edb28503ff9d4a8d6b5940a7e1ee0
+timeCreated: 1491381485
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/Editor/CriteriaPrefablDeleteWindow.cs
+  uploadId: 193386
