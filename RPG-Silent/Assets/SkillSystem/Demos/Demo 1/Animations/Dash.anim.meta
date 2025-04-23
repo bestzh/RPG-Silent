@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f77bbcc1809881a42b49ca787d3168f5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Animations/Dash.anim
+  uploadId: 735396

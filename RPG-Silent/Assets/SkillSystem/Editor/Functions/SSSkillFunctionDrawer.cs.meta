@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: fca7b5d7dc4e400c856f32eff3f6211b
+timeCreated: 1738074329
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSSkillFunctionDrawer.cs
+  uploadId: 735396

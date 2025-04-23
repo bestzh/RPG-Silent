@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 897e868512a95214e9e8c2cf5257d67c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/Prefabs/Skills/Jump and Lift.prefab
+  uploadId: 735396

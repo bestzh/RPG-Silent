@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: ec2d68a4f2674e0da60124032e4cd7ea
+timeCreated: 1737904744
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Modifiers/SSVector3MultiplyModifier.cs
+  uploadId: 735396

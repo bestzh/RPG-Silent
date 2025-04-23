@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 580609e7a4334ea794cd52bbfcde7d2e
+timeCreated: 1739625380
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Structs/SSFloat.cs
+  uploadId: 735396

@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: e9db26add7884adfa01d5b1dd90bc7d2
+timeCreated: 1736696312
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Structs/SSVariableWithValueDrawer.cs
+  uploadId: 735396

@@ -1,0 +1,505 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1755660112753040682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3381176760336695550}
+  - component: {fileID: 1792300651014473486}
+  m_Layer: 0
+  m_Name: Throw and Explode
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3381176760336695550
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755660112753040682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1792300651014473486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755660112753040682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8339f85c83d4a4e4187b2d9ad3badacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  skillName: Throw and Explode
+  autoPlayOnStart: 0
+  playOnRealtime: 0
+  skillSpeed: 1
+  skillCooldown: 3
+  maxCharge: 1
+  saveToDictionary: 0
+  dictionaryKeyName: 
+  currentCharge: 0
+  actions:
+  - actionName: Throw
+    actionDuration: 0.3
+    functions:
+    - rid: 240576973360070829
+    - rid: 240576973360070997
+    resetActionIndexDelay: 5
+  - actionName: Explode
+    actionDuration: 0.25
+    functions:
+    - rid: 240576973360071002
+    - rid: 240576973360071021
+    - rid: 240576973360071024
+    - rid: 240576973360071027
+    - rid: 240576973360071030
+    - rid: 240576973360071033
+    resetActionIndexDelay: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576973360070829
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 1601733593309243081, guid: 2a401fec3f4723345937a35611082d16, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers: []
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360070879
+        saveObjectToDictionary: 1
+        dictionaryKeyName: explosiveBullet
+    - rid: 240576973360070879
+      type: {class: SSRotateTowardsVectorModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vectorForward:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576973360070883
+        vectorUp:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070883
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576973360070884
+    - rid: 240576973360070884
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: 0, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360070997
+      type: {class: SSMoveFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        moveType: 2
+        targetTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        targetRigidbody:
+          variableType: 1
+          variableReference: {fileID: 0}
+          dictionaryName: explosiveBullet
+        targetRigidbody2D:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Target Transform
+          modifiers:
+          - rid: 240576973360070998
+          - rid: 240576973360071011
+          - rid: 240576973360071017
+          - rid: 240576973360071018
+    - rid: 240576973360070998
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576973360070999
+    - rid: 240576973360070999
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071002
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071019
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071011
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 1, z: 0}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071017
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576973360071018
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 10, y: 10, z: 10}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071019
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071020
+    - rid: 240576973360071020
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071021
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071022
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071022
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071023
+    - rid: 240576973360071023
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071024
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071025
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071025
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071026
+    - rid: 240576973360071026
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071027
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071028
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071028
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071029
+    - rid: 240576973360071029
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071030
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071031
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071031
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071032
+    - rid: 240576973360071032
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576973360071033
+      type: {class: SSInstantiateFunction, ns: SkillSystem.Functions, asm: Assembly-CSharp}
+      data:
+        delay: 0.05
+        objectToInstantiate:
+          variableType: 0
+          variableReference: {fileID: 685537857884180641, guid: f5422af1bf8adde4ba30d6e78617ae05, type: 3}
+          dictionaryName: 
+        parentTransform:
+          variableType: 0
+          variableReference: {fileID: 0}
+          dictionaryName: 
+        position:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: explosiveBullet
+          modifiers:
+          - rid: 240576973360071034
+        rotation:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0, w: 0}
+          dictionaryName: 
+          modifiers: []
+        saveObjectToDictionary: 0
+        dictionaryKeyName: 
+    - rid: 240576973360071034
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 1, y: 0, z: 1}
+          dictionaryName: 
+          modifiers:
+          - rid: 240576973360071035
+    - rid: 240576973360071035
+      type: {class: SSRandomizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        rangeMin:
+          variableType: 0
+          variableValue: -1
+          dictionaryName: 
+          modifiers: []
+        rangeMax:
+          variableType: 0
+          variableValue: 1
+          dictionaryName: 
+          modifiers: []

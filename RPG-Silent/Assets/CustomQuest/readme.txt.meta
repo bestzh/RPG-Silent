@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a064711a724797f4598f2b067bcde440
+timeCreated: 1501675307
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/readme.txt
+  uploadId: 193386

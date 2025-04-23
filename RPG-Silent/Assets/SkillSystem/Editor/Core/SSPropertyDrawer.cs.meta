@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 4f50e1fe88d947b8ad617916209811c1
+timeCreated: 1738074404
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Core/SSPropertyDrawer.cs
+  uploadId: 735396

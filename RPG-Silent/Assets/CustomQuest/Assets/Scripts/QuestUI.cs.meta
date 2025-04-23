@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 2a021d076e6a54044a1dc98ff3ba4dea
+timeCreated: 1487940174
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/QuestUI.cs
+  uploadId: 193386

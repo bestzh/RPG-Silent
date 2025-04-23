@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 4224d37c689f436f8458f873df56d23c
+timeCreated: 1736699209
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Structs/SSTransformDrawer.cs
+  uploadId: 735396

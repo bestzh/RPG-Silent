@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 18152098a2c2437e98a2ea6e7f6b082b
+timeCreated: 1737387199
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSNormalizeModifierDrawer.cs
+  uploadId: 735396

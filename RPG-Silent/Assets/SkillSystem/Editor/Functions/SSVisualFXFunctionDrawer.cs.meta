@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: d68ab799623544e1be0b3daba7962dda
+timeCreated: 1738430073
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSVisualFXFunctionDrawer.cs
+  uploadId: 735396

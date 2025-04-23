@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: d17f225e1477db343981edcf9125967b
+timeCreated: 1479728667
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/RewardUILogic.cs
+  uploadId: 193386

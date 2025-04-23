@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &685537857884180641
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5086086659329133022}
+  - component: {fileID: 510267345856417001}
+  - component: {fileID: 5652403140422723211}
+  - component: {fileID: -4933062951966916899}
+  m_Layer: 0
+  m_Name: Push Zone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5086086659329133022
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685537857884180641}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &510267345856417001
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685537857884180641}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5652403140422723211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685537857884180641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d423278c7365e824eb8b04df453b45cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  force:
+    variableType: 2
+    variableReference: {fileID: 0}
+    variableValue: {x: 0, y: 0, z: 0}
+    dictionaryName: Target Transform
+    modifiers:
+    - rid: 240576995698933857
+    - rid: 240576995698933860
+    - rid: 240576995698933861
+  references:
+    version: 2
+    RefIds:
+    - rid: 240576995698933857
+      type: {class: SSMoveModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        vector:
+          variableType: 2
+          variableReference: {fileID: 0}
+          variableValue: {x: 0, y: 0, z: 0}
+          dictionaryName: Player Transform
+          modifiers:
+          - rid: 240576995698933858
+    - rid: 240576995698933858
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: -1, y: -1, z: -1}
+          dictionaryName: 
+          modifiers: []
+    - rid: 240576995698933860
+      type: {class: SSNormalizeModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data: 
+    - rid: 240576995698933861
+      type: {class: SSVector3MultiplyModifier, ns: SkillSystem.Modifiers, asm: Assembly-CSharp}
+      data:
+        multiplier:
+          variableType: 0
+          variableReference: {fileID: 0}
+          variableValue: {x: 50000, y: 50000, z: 50000}
+          dictionaryName: 
+          modifiers: []
+--- !u!114 &-4933062951966916899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685537857884180641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9352f82ef2778684dadde891128113a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delay: 0.5

@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: f1efc48814664c63ac42399f35328146
+timeCreated: 1737045311
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSSaveToDictionaryModifierDrawer.cs
+  uploadId: 735396

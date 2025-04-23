@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 8ed8c0bbfe5e436fae6a7c479b926909
+timeCreated: 1736700631
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Structs/SSQuaternionDrawer.cs
+  uploadId: 735396

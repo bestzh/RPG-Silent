@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 9d565e2c63ed54f4880260e3a9f24e3d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Prefabs/Hit Effect.prefab
+  uploadId: 735396

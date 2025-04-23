@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: c05843335c1c41e2a424bbc783d8b1e3
+timeCreated: 1737386898
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSMultiplyModifierDrawer.cs
+  uploadId: 735396

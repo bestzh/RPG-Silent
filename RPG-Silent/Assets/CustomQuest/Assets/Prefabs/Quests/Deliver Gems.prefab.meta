@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 57588c7c2c0c43149ae86712c0da1d55
+timeCreated: 1495623917
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/Quests/Deliver Gems.prefab
+  uploadId: 193386

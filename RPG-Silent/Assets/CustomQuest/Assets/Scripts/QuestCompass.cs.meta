@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c2ef07233be16704bbffaa369c80a6b8
+timeCreated: 1483959177
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/QuestCompass.cs
+  uploadId: 193386

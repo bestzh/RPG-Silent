@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 95838e07575c2044bb10079bb34e0fd7
+timeCreated: 1481796203
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/UI/HudWheel.prefab
+  uploadId: 193386

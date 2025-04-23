@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 82c0456b29b546b4d9e129d905da2a3f
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Structs/SSVector3.cs
+  uploadId: 735396

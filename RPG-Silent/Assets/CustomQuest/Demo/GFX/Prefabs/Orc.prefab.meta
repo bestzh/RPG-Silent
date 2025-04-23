@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4df991a29780f8b41abcc961aaa0237b
+timeCreated: 1484215562
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/GFX/Prefabs/Orc.prefab
+  uploadId: 193386

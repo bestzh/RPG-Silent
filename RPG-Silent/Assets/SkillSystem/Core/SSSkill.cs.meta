@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8339f85c83d4a4e4187b2d9ad3badacb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Core/SSSkill.cs
+  uploadId: 735396

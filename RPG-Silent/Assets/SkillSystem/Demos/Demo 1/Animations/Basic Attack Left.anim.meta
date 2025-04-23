@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c1019d83ac13b2144af2cb5449890ac6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 1/Animations/Basic Attack Left.anim
+  uploadId: 735396

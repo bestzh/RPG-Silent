@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 9a618a4fa6c840af9936a62e47e8aa4b
+timeCreated: 1739625769
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Structs/SSFloatDrawer.cs
+  uploadId: 735396

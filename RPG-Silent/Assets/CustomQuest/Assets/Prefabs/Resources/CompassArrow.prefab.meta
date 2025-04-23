@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ab3b065e8e3eb5541976b2f2d349ce4e
+timeCreated: 1484058360
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Prefabs/Resources/CompassArrow.prefab
+  uploadId: 193386

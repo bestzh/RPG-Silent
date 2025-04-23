@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3c2f9345d9206884d85bcee91ffd51de
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Documentation.txt
+  uploadId: 735396

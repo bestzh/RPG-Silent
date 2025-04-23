@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 051f5fdc13b6b5d4d9dac6a06795866a
+timeCreated: 1481624057
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/Scripts/QuestNode.cs
+  uploadId: 193386

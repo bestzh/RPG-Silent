@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d1e6fcee0beace84e96b4dea97e1254a
+timeCreated: 1501577305
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Demo/Scenes/FirstQuestScene.unity
+  uploadId: 193386

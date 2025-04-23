@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ad11e249626ad92499369d712b83eb6f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/Prefabs/Skills/Throw and Explode.prefab
+  uploadId: 735396

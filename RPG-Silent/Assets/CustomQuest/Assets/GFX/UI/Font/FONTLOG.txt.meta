@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 30a5b12081796ea4fb5b8f463cae6fbf
+timeCreated: 1496739577
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 92594
+  packageName: Custom Quest - Quest System
+  packageVersion: 1.0
+  assetPath: Assets/CustomQuest/Assets/GFX/UI/Font/FONTLOG.txt
+  uploadId: 193386

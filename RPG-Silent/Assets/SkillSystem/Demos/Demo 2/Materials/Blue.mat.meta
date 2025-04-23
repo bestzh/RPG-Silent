@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0c6acbe2227963547b595c7857013969
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Demos/Demo 2/Materials/Blue.mat
+  uploadId: 735396

@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: e2a0879e736942d2a94cf2e924cc283a
+timeCreated: 1737387983
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Modifiers/SSRotateModifier.cs
+  uploadId: 735396

@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 88113e01d7fc499189277cc37155ea99
+timeCreated: 1737044223
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Core/SSModifier.cs
+  uploadId: 735396

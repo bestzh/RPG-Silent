@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 72dd0cb3f02846ff83de83eff6b8013b
+timeCreated: 1737666725
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Modifiers/SSRandomizeModifierDrawer.cs
+  uploadId: 735396

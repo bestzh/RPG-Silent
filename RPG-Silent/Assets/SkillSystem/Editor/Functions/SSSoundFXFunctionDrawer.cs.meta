@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: c47cad3c5f25465792e75809dc8d0a61
+timeCreated: 1738430260
+AssetOrigin:
+  serializedVersion: 1
+  productId: 309950
+  packageName: Skill System
+  packageVersion: 1.0.0
+  assetPath: Assets/SkillSystem/Editor/Functions/SSSoundFXFunctionDrawer.cs
+  uploadId: 735396
