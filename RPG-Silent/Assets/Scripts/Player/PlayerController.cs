@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour
     public Rigidbody rb;
     private bool isCursorVisible = true; 
 
+    private float yaw;   // 水平旋转
+    private float pitch; // 垂直旋转
+    public float mouseSensitivity = 3f;
+
     private void Awake()
     {
         StateMachine = new PlayerStateMachine();
@@ -50,8 +54,19 @@ public class PlayerController : MonoBehaviour
             ToggleCursorVisibility();
         }
         
-        float mouseX = Input.GetAxis("Mouse X");
-        this.transform.Rotate(Vector3.up, mouseX * RotationSpeed * Time.deltaTime);
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        yaw += mouseX;
+        pitch -= mouseY;
+        pitch = Mathf.Clamp(pitch, -35f, 60f); // 限制视角上下
+
+        // 控制摄像机目标点的角度（Pitch）
+        this.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+
+        // 控制角色本体朝向（Yaw）
+        this.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+        
     }
 
     public void TakeDamage(int damage)
