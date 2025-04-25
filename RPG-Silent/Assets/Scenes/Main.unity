@@ -644619,10 +644619,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2ae9cd6544866c45989674f3cc82525, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
   MoveSpeed: 5
   JumpForce: 5
   MaxHealth: 100
   rb: {fileID: 1609246994}
+  mouseSensitivity: 3
 --- !u!136 &1609246993
 CapsuleCollider:
   m_ObjectHideFlags: 0
