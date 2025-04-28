@@ -15,13 +15,19 @@ public class MoveState : PlayerState
             player.StateMachine.ChangeState(new IdleState(player));
             return;
         }
+
         Vector2 input = player.InputDir;
         Vector3 moveDir = player.transform.forward * input.y + player.transform.right * input.x;
-        player.transform.position += moveDir.normalized * player.MoveSpeed * Time.deltaTime;
+        player.rb.linearVelocity = new Vector3(moveDir.x * player.MoveSpeed, player.rb.linearVelocity.y, moveDir.z * player.MoveSpeed);
 
         // 设置动画参数（前进值、横向值）
-        player.animator.SetFloat("Horizontal", player.InputDir.x);
-        player.animator.SetFloat("Vertical", player.InputDir.y);
-        // player.animator.SetBool("IsRunning", player.IsRunning);
+        player.animator.SetFloat("Horizontal", input.x);
+        player.animator.SetFloat("Vertical", input.y);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
     }
 }
+

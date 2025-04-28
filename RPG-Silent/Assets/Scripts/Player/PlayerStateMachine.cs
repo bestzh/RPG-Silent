@@ -4,6 +4,10 @@ public class PlayerStateMachine
 
     public void ChangeState(PlayerState newState)
     {
+        if (newState.GetType() == currentState?.GetType())
+        {
+            return;
+        }
         currentState?.Exit();
         currentState = newState;
         currentState.Enter();

@@ -5,16 +5,25 @@ public class IdleState : PlayerState
 
     public override void Enter()
     {
-        Debug.Log("进入 Idle 状态");
+        base.Enter();
         player.animator.SetFloat("Horizontal", 0);
         player.animator.SetFloat("Vertical", 0);
+        player.animator.SetBool("IsIdle", true);
     }
 
     public override void Update()
     {
-        if (player.InputDir != Vector2.zero)
+        // 如果有输入，进入移动状态
+        if (player.InputDir.magnitude > 0.1f)
         {
-            player.StateMachine.ChangeState(new MoveState(player));
+            player.StateMachine.ChangeState(new MoveState(player)); // 切换到移动状态
         }
     }
+
+    public override void Exit()
+    {
+        base.Exit();
+        player.animator.SetBool("IsIdle", false); // 离开时清理动画状态
+    }
 }
+

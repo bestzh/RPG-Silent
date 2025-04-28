@@ -40,7 +40,7 @@ namespace SkillSystem.Demos.Demo1.Scripts
 
         private void Update()
         {
-            Attack();
+            //Attack();
         }
 
         private void Boundry()
