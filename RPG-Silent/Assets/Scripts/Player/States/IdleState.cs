@@ -8,7 +8,6 @@ public class IdleState : PlayerState
         base.Enter();
         player.animator.SetFloat("Horizontal", 0);
         player.animator.SetFloat("Vertical", 0);
-        player.animator.SetBool("IsIdle", true);
     }
 
     public override void Update()
@@ -23,7 +22,6 @@ public class IdleState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        player.animator.SetBool("IsIdle", false); // 离开时清理动画状态
     }
 }
 

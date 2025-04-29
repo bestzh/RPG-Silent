@@ -15,4 +15,7 @@ MonoBehaviour:
   AnimationName: JumpAll
   AnimatorStateName: JumpAll
   CanInterrupt: 0
-  Duration: 1.07
+  Duration: 1
+  NextComboName: 
+  IsSkill: 0
+  SkillCastTime: 0
