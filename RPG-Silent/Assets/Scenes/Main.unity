@@ -644645,7 +644645,7 @@ MonoBehaviour:
   MaxHealth: 100
   rb: {fileID: 1609246994}
   mouseSensitivity: 3
-  RollForce: 3
+  RollForce: 5
 --- !u!136 &1609246993
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -665742,6 +665742,7 @@ GameObject:
   - component: {fileID: 1662023444}
   - component: {fileID: 1662023449}
   - component: {fileID: 1662023448}
+  - component: {fileID: 1662023450}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -665907,6 +665908,20 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &1662023450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1662023441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33f7f36c3228b04dab5b95d461337e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  virtualCamera: {fileID: 948941152}
+  rotationSpeed: 1
 --- !u!1001 &1662031830
 PrefabInstance:
   m_ObjectHideFlags: 0
