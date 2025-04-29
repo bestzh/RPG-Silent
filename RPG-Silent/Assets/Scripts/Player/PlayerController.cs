@@ -15,14 +15,12 @@ public class PlayerController : MonoBehaviour
     public int CurrentHealth { get; private set; }
 
     public Rigidbody rb;
-    private bool isCursorVisible = true; 
+
 
     private float yaw;   // 水平旋转
     private float pitch; // 垂直旋转
     public float mouseSensitivity = 3f;
-    public float RollForce = 3f;
-    private float lastSpaceTime = -10f;
-    private float doubleTapThreshold = 0.3f; // 双击最大时间间隔
+    public float RollForce = 5f;
     public bool IsJumping { get; private set; } = false;
     public bool IsRolling { get; private set; } = false;
     public PlayerAnimationController AnimationController { get; private set; }
@@ -50,10 +48,7 @@ public class PlayerController : MonoBehaviour
             if (!IsRolling && !IsJumping) // 防止翻滚/跳跃中攻击
                 StateMachine.ChangeState(new AttackState(this));
         }
-        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
-        {
-            ToggleCursorVisibility();
-        }
+        
         if(Input.GetKeyDown(KeyCode.LeftShift))
         {
             StateMachine.ChangeState(new RollState(this));
@@ -103,21 +98,6 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void ToggleCursorVisibility()
-    {
-        if (isCursorVisible)
-        {
-            Cursor.visible = false; // 隐藏光标
-            Cursor.lockState = CursorLockMode.Locked; // 锁定光标
-        }
-        else
-        {
-            Cursor.visible = true; // 显示光标
-            Cursor.lockState = CursorLockMode.None; // 解锁光标
-        }
 
-        // 切换状态
-        isCursorVisible = !isCursorVisible;
-    }
 }
 
