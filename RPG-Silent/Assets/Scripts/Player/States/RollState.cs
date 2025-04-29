@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RollState : PlayerState
 {
-    private readonly string RollAnimationName = "Roll"; // 这里是你 AnimationData 里配置的名字
+    private readonly string RollAnimationName = "RollForward"; // 这里是你 AnimationData 里配置的名字
 
     public RollState(PlayerController player) : base(player) { }
 

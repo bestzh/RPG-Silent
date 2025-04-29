@@ -644724,6 +644724,7 @@ MonoBehaviour:
   animations:
   - {fileID: 11400000, guid: 590b6adc651d5914e94d907406c3f6de, type: 2}
   - {fileID: 11400000, guid: 09d81b3bcc4ee5041b362ddcbe11d250, type: 2}
+  - {fileID: 11400000, guid: 8b700e724329cc142902c5861233eef1, type: 2}
 --- !u!1001 &1609643620
 PrefabInstance:
   m_ObjectHideFlags: 0
