@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -9,38 +10,51 @@ public class SceneLoaderManager : MonoBehaviour
 {
     public static SceneLoaderManager Instance;
 
+    private bool isSceneLoading;
+
     private void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
-        else
-            Destroy(gameObject);
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+
+        Destroy(gameObject);
     }
 
     public void LoadScene(string sceneKey, bool additive = false, Action<float> onProgress = null, Action onComplete = null)
     {
-        var mode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-
-        Addressables.LoadSceneAsync(sceneKey, mode).Completed += (AsyncOperationHandle<SceneInstance> handle) =>
+        if (isSceneLoading)
         {
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            Debug.LogWarning($"Scene is already loading: {sceneKey}");
+            return;
+        }
+
+        LoadSceneMode mode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+        AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneKey, mode);
+        isSceneLoading = true;
+
+        handle.Completed += completedHandle =>
+        {
+            isSceneLoading = false;
+
+            if (completedHandle.Status == AsyncOperationStatus.Succeeded)
             {
                 onProgress?.Invoke(1f);
                 onComplete?.Invoke();
+                return;
             }
-            else
-            {
-                Debug.LogError($"场景加载失败：{sceneKey}");
-            }
+
+            Debug.LogError($"Scene load failed: {sceneKey}");
         };
 
-        // Progress 模拟处理（可选）
-        StartCoroutine(TrackProgressCoroutine(sceneKey, onProgress));
+        StartCoroutine(TrackProgressCoroutine(handle, onProgress));
     }
 
-    private System.Collections.IEnumerator TrackProgressCoroutine(string sceneKey, Action<float> onProgress)
+    private IEnumerator TrackProgressCoroutine(AsyncOperationHandle<SceneInstance> handle, Action<float> onProgress)
     {
-        AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneKey);
         while (!handle.IsDone)
         {
             onProgress?.Invoke(handle.PercentComplete);

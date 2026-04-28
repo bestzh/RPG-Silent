@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public PlayerStateMachine StateMachine { get; private set; }
-    public Vector2 InputDir => InputManager.Instance.MoveInput;
+    public Vector2 InputDir => InputManager.Instance != null ? InputManager.Instance.MoveInput : Vector2.zero;
 
     public Animator animator;
     public bool IsRunning => InputDir.magnitude > 0.5f;
@@ -16,9 +16,10 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody rb;
 
+    private float yaw;
+    private float pitch;
+    private PlayerSkillController skillController;
 
-    private float yaw;   // 水平旋转
-    private float pitch; // 垂直旋转
     public float mouseSensitivity = 3f;
     public float RollForce = 5f;
     public bool IsJumping { get; private set; } = false;
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         StateMachine = new PlayerStateMachine();
         AnimationController = GetComponent<PlayerAnimationController>();
+        skillController = GetComponent<PlayerSkillController>();
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         CurrentHealth = MaxHealth;
@@ -43,35 +45,37 @@ public class PlayerController : MonoBehaviour
     {
         StateMachine.Update();
 
-        if (Input.GetMouseButtonDown(0))
+        if (skillController == null && Input.GetMouseButtonDown(0))
         {
-            if (!IsRolling && !IsJumping) // 防止翻滚/跳跃中攻击
+            if (!IsRolling && !IsJumping)
+            {
                 StateMachine.ChangeState(new AttackState(this));
+            }
         }
-        
-        if(Input.GetKeyDown(KeyCode.LeftShift))
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !IsJumping)
         {
             StateMachine.ChangeState(new RollState(this));
         }
-        if (Input.GetKeyDown(KeyCode.Space))
+
+        if (Input.GetKeyDown(KeyCode.Space) && !IsRolling)
         {
             StateMachine.ChangeState(new JumpState(this));
         }
-
-        
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
         yaw += mouseX;
         pitch -= mouseY;
         pitch = Mathf.Clamp(pitch, -35f, 60f);
-        this.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-        
+        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
+
     public void SetIsJumping(bool jumping)
     {
         IsJumping = jumping;
     }
+
     public void SetIsRolling(bool rolling)
     {
         IsRolling = rolling;
@@ -92,12 +96,9 @@ public class PlayerController : MonoBehaviour
             StateMachine.ChangeState(new HurtState(this));
         }
     }
+
     private void OnGetHit()
     {
         GetComponent<SkillCastManager>()?.InterruptSkill();
     }
-
-
-
 }
-
