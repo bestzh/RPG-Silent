@@ -1,47 +1,62 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+
 public class PlayerSkillController : MonoBehaviour
 {
     private SkillData currentSkill;
     private float comboTimer = 0f;
     private bool isWaitingForCombo = false;
     private bool isAttacking = false;
-    private Dictionary<SkillData, float> cooldownTimers = new Dictionary<SkillData, float>();
-    [Header("能量槽系统")]
-    public float maxEnergy = 100f; // 最大能量
-    public float currentEnergy = 0f; // 当前能量
-    public float energyRecoveryRate = 10f; // 每秒回复能量速度
+    private PlayerController playerController;
+    private readonly Dictionary<SkillData, float> cooldownTimers = new();
+
+    [Header("Energy")]
+    public float maxEnergy = 100f;
+    public float currentEnergy = 0f;
+    public float energyRecoveryRate = 10f;
+
+    private void Awake()
+    {
+        playerController = GetComponent<PlayerController>();
+    }
+
     private void Update()
     {
-        if (isWaitingForCombo)
-        {
-            comboTimer -= Time.deltaTime;
-            if (comboTimer <= 0f)
-            {
-                ResetCombo();
-            }
-        }
+        UpdateComboWindow();
 
-        if (Input.GetKeyDown(KeyCode.Mouse0)) // 左键攻击
+        if (Input.GetMouseButtonDown(0))
         {
             TryAttack();
         }
+
         UpdateCooldowns();
         RecoverEnergy();
     }
-    private void RecoverEnergy()
+
+    private void UpdateComboWindow()
     {
-        if (currentEnergy < maxEnergy)
+        if (!isWaitingForCombo) return;
+
+        comboTimer -= Time.deltaTime;
+        if (comboTimer <= 0f)
         {
-            currentEnergy += energyRecoveryRate * Time.deltaTime;
-            currentEnergy = Mathf.Min(currentEnergy, maxEnergy);
+            ResetCombo();
         }
     }
+
+    private void RecoverEnergy()
+    {
+        if (currentEnergy >= maxEnergy) return;
+
+        currentEnergy += energyRecoveryRate * Time.deltaTime;
+        currentEnergy = Mathf.Min(currentEnergy, maxEnergy);
+    }
+
     private void UpdateCooldowns()
     {
-        List<SkillData> keys = new List<SkillData>(cooldownTimers.Keys);
+        List<SkillData> keys = new(cooldownTimers.Keys);
 
-        foreach (var skill in keys)
+        foreach (SkillData skill in keys)
         {
             cooldownTimers[skill] -= Time.deltaTime;
             if (cooldownTimers[skill] <= 0f)
@@ -50,6 +65,7 @@ public class PlayerSkillController : MonoBehaviour
             }
         }
     }
+
     private void TryAttack()
     {
         if (isAttacking)
@@ -58,25 +74,44 @@ public class PlayerSkillController : MonoBehaviour
             {
                 TryPlaySkill(currentSkill.NextComboSkill);
             }
+
+            return;
         }
-        else
+
+        if (SkillDatabase.Instance == null)
         {
-            SkillData normalAttack = SkillDatabase.Instance.GetNormalAttackSkill();
-            TryPlaySkill(normalAttack);
+            Debug.LogWarning("SkillDatabase is not loaded.");
+            TryFallbackAttack();
+            return;
         }
+
+        SkillData normalAttack = SkillDatabase.Instance.GetNormalAttackSkill();
+        if (normalAttack == null)
+        {
+            TryFallbackAttack();
+            return;
+        }
+
+        TryPlaySkill(normalAttack);
     }
 
     private void TryPlaySkill(SkillData skill)
     {
+        if (skill == null)
+        {
+            Debug.LogWarning("Skill is not configured.");
+            return;
+        }
+
         if (IsSkillOnCooldown(skill))
         {
-            Debug.Log("技能冷却中：" + skill.name);
+            Debug.Log("Skill is on cooldown: " + skill.name);
             return;
         }
 
         if (currentEnergy < skill.EnergyCost)
         {
-            Debug.Log("能量不足，无法释放技能：" + skill.name);
+            Debug.Log("Not enough energy to cast skill: " + skill.name);
             return;
         }
 
@@ -95,15 +130,18 @@ public class PlayerSkillController : MonoBehaviour
         currentSkill = skill;
         isWaitingForCombo = false;
 
-        Debug.Log("释放技能：" + skill.name);
+        Debug.Log("Cast skill: " + skill.name);
 
-        // 开始冷却
+        if (SkillDatabase.Instance != null && skill == SkillDatabase.Instance.NormalAttackSkill)
+        {
+            TryFallbackAttack();
+        }
+
         if (skill.CooldownTime > 0f)
         {
             cooldownTimers[skill] = skill.CooldownTime;
         }
 
-        // Combo连招窗口处理
         if (skill.CanCombo && skill.NextComboSkill != null)
         {
             comboTimer = skill.ComboInputWindow;
@@ -115,6 +153,13 @@ public class PlayerSkillController : MonoBehaviour
         }
     }
 
+    private void TryFallbackAttack()
+    {
+        if (playerController == null || playerController.IsRolling || playerController.IsJumping) return;
+
+        playerController.StateMachine.ChangeState(new AttackState(playerController));
+    }
+
     private void ResetCombo()
     {
         isWaitingForCombo = false;
@@ -122,7 +167,6 @@ public class PlayerSkillController : MonoBehaviour
         currentSkill = null;
     }
 
-    // 动画事件调用（打完动作某一帧后）
     public void OnAttackAnimationFinished()
     {
         ResetCombo();

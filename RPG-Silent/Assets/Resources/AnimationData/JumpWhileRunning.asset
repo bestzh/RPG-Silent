@@ -16,6 +16,5 @@ MonoBehaviour:
   AnimatorStateName: JumpWhileRunning
   CanInterrupt: 0
   Duration: 1
-  NextComboName: 
   IsSkill: 0
   SkillCastTime: 0

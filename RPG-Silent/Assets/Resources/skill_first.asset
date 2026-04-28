@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c011a6a7abd0f9d4bb448bb853cd8bb2, type: 3}
+  m_Name: skill_first
+  m_EditorClassIdentifier: 
+  SkillName: 
+  Animation: {fileID: 0}
+  CastTime: 0
+  CooldownTime: 5
+  CanBeInterrupted: 1
+  EffectPrefab: {fileID: 0}
+  EffectOffset: {x: 0, y: 0, z: 0}
+  HitEffectPrefab: {fileID: 0}
+  HitEffectOffset: {x: 0, y: 0, z: 0}
+  HasChainEffect: 0
+  ChainCount: 3
+  ChainRadius: 5
+  ChainEffectPrefab: {fileID: 0}
+  CanCombo: 0
+  NextComboSkill: {fileID: 0}
+  ComboInputWindow: 0.5
+  maxEnergy: 100
+  currentEnergy: 0
+  energyRecoveryRate: 10
+  EnergyCost: 20

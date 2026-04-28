@@ -8,86 +8,84 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    private Dictionary<string, GameObject> activeUIs = new();
-    private Dictionary<string, AsyncOperationHandle<GameObject>> loadedHandles = new();
-    
-    private Dictionary<string, GameObject> cachedUIs = new();
+    private readonly Dictionary<string, GameObject> activeUIs = new();
+    private readonly Dictionary<string, AsyncOperationHandle<GameObject>> loadedHandles = new();
+    private readonly Dictionary<string, GameObject> cachedUIs = new();
+    private readonly HashSet<string> initializedUIs = new();
 
     public Transform UIRoot;
 
     private void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+
+        Destroy(gameObject);
     }
 
     public void OpenUI(string uiKey, params object[] args)
     {
-        // 优先使用缓存的 UI
-        if (cachedUIs.TryGetValue(uiKey, out var cachedObj))
+        if (activeUIs.TryGetValue(uiKey, out GameObject activeObj))
         {
-            cachedObj.SetActive(true);
-            var uiBase = cachedObj.GetComponent<UIBase>();
-            uiBase?.OnOpen(args);
-
-            activeUIs[uiKey] = cachedObj;
+            activeObj.GetComponent<UIBase>()?.OnOpen(args);
             return;
         }
 
-        // 如果当前已打开则直接触发 OnOpen
-        if (activeUIs.ContainsKey(uiKey))
+        if (cachedUIs.TryGetValue(uiKey, out GameObject cachedObj))
         {
-            activeUIs[uiKey].GetComponent<UIBase>().OnOpen(args);
+            OpenLoadedUI(uiKey, cachedObj, args);
             return;
         }
 
-        // 没缓存也没打开，进行加载
-        var handle = Addressables.InstantiateAsync(uiKey, UIRoot);
+        Transform parent = UIRoot != null ? UIRoot : transform;
+        AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(uiKey, parent);
         handle.Completed += op =>
         {
             if (op.Status == AsyncOperationStatus.Succeeded)
             {
-                GameObject uiObj = op.Result;
                 loadedHandles[uiKey] = handle;
-                activeUIs[uiKey] = uiObj;
+                OpenLoadedUI(uiKey, op.Result, args);
+                return;
+            }
 
-                var uiBase = uiObj.GetComponent<UIBase>();
-                uiBase.Init(uiKey);
-                uiBase.OnOpen(args);
-            }
-            else
-            {
-                Debug.LogError($"加载 UI 失败：{uiKey}");
-            }
+            Debug.LogError($"Load UI failed: {uiKey}");
         };
     }
 
     public void CloseUI(string uiKey)
     {
-        if (!activeUIs.ContainsKey(uiKey)) return;
+        if (!activeUIs.TryGetValue(uiKey, out GameObject uiObj)) return;
 
-        GameObject uiObj = activeUIs[uiKey];
-        var uiBase = uiObj.GetComponent<UIBase>();
-        uiBase.OnClose();
+        uiObj.GetComponent<UIBase>()?.OnClose();
+        activeUIs.Remove(uiKey);
 
-        if (loadedHandles.TryGetValue(uiKey, out var handle))
+        if (cachedUIs.ContainsKey(uiKey))
+        {
+            uiObj.SetActive(false);
+            return;
+        }
+
+        if (loadedHandles.TryGetValue(uiKey, out AsyncOperationHandle<GameObject> handle))
         {
             Addressables.ReleaseInstance(handle);
-        }
-        else
-        {
-            GameObject.Destroy(uiObj); // fallback
+            loadedHandles.Remove(uiKey);
+            initializedUIs.Remove(uiKey);
+            return;
         }
 
-        activeUIs.Remove(uiKey);
-        loadedHandles.Remove(uiKey);
+        Destroy(uiObj);
+        initializedUIs.Remove(uiKey);
     }
 
     public void CloseAllUI()
     {
-        foreach (var ui in new List<string>(activeUIs.Keys))
+        foreach (string uiKey in new List<string>(activeUIs.Keys))
         {
-            CloseUI(ui);
+            CloseUI(uiKey);
         }
     }
 
@@ -99,7 +97,8 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        var handle = Addressables.InstantiateAsync(uiKey, UIRoot);
+        Transform parent = UIRoot != null ? UIRoot : transform;
+        AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(uiKey, parent);
         handle.Completed += op =>
         {
             if (op.Status == AsyncOperationStatus.Succeeded)
@@ -107,29 +106,46 @@ public class UIManager : MonoBehaviour
                 GameObject uiObj = op.Result;
                 uiObj.name = uiKey;
                 uiObj.SetActive(false);
+
+                loadedHandles[uiKey] = handle;
                 RegisterUI(uiKey, uiObj);
                 onComplete?.Invoke();
+                return;
             }
-            else
-            {
-                Debug.LogError($"预加载 UI 失败：{uiKey}");
-            }
+
+            Debug.LogError($"Preload UI failed: {uiKey}");
         };
     }
 
-
     public void RegisterUI(string key, GameObject ui)
     {
-        if (!cachedUIs.ContainsKey(key))
-            cachedUIs[key] = ui;
+        if (cachedUIs.ContainsKey(key)) return;
+
+        cachedUIs[key] = ui;
+        InitUI(key, ui);
     }
 
     public void OpenCachedUI(string key, string sceneName)
     {
-        if (cachedUIs.TryGetValue(key, out var ui))
+        if (cachedUIs.TryGetValue(key, out GameObject ui))
         {
-            ui.SetActive(true);
-            ui.GetComponent<UIBase>()?.OnOpen(sceneName);
+            OpenLoadedUI(key, ui, sceneName);
         }
+    }
+
+    private void OpenLoadedUI(string uiKey, GameObject uiObj, params object[] args)
+    {
+        InitUI(uiKey, uiObj);
+        uiObj.SetActive(true);
+        activeUIs[uiKey] = uiObj;
+        uiObj.GetComponent<UIBase>()?.OnOpen(args);
+    }
+
+    private void InitUI(string uiKey, GameObject uiObj)
+    {
+        if (initializedUIs.Contains(uiKey)) return;
+
+        uiObj.GetComponent<UIBase>()?.Init(uiKey);
+        initializedUIs.Add(uiKey);
     }
 }

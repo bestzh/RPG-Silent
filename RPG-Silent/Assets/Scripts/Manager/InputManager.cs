@@ -12,8 +12,9 @@ public class InputManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
