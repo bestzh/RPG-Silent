@@ -44,15 +44,12 @@ public class SkillCastManager : MonoBehaviour
         }
 
         // 示例：按 Q 释放技能1
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            TryCastSkill("Fireball");
-        }
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             TryCastSkill("Fireball");
         }
         // 示例：按 E 释放技能2
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             TryCastSkill("SwordSlash");
         }
