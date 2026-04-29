@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -7,8 +8,16 @@ public class PlayerController : MonoBehaviour
 
     public Animator animator;
     public bool IsRunning => InputDir.magnitude > 0.5f;
+    public bool IsSprinting => sprintInputActive && CanSprint;
+    public bool IsWalking => walkInputActive && CanWalk;
+    public bool CanDiveRoll => IsSprinting;
+    private bool CanSprint => InputDir.magnitude > 0.1f && !IsRolling && !IsJumping;
+    private bool CanWalk => InputDir.magnitude > 0.1f && !IsSprinting && !IsRolling && !IsJumping;
 
+    public float WalkSpeed = 2.5f;
     public float MoveSpeed = 5f;
+    public float SprintSpeed = 8f;
+    public float CurrentMoveSpeed => IsSprinting ? SprintSpeed : IsWalking ? WalkSpeed : MoveSpeed;
     public bool IsGrounded => Physics.Raycast(transform.position, Vector3.down, 1.1f);
 
     public int MaxHealth = 100;
@@ -22,9 +31,16 @@ public class PlayerController : MonoBehaviour
 
     public float mouseSensitivity = 3f;
     public float RollForce = 5f;
+    public float SprintHoldThreshold = 0.5f;
     public bool IsJumping { get; private set; } = false;
     public bool IsRolling { get; private set; } = false;
     public PlayerAnimationController AnimationController { get; private set; }
+    private InputAction sprintAction;
+    private InputAction rollAction;
+    private InputAction jumpAction;
+    private InputAction walkAction;
+    private bool sprintInputActive;
+    private bool walkInputActive;
 
     private void Awake()
     {
@@ -34,6 +50,52 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         CurrentHealth = MaxHealth;
+        SetupInputActions();
+    }
+
+    private void OnEnable()
+    {
+        sprintAction?.Enable();
+        rollAction?.Enable();
+        jumpAction?.Enable();
+        walkAction?.Enable();
+    }
+
+    private void OnDisable()
+    {
+        sprintAction?.Disable();
+        rollAction?.Disable();
+        jumpAction?.Disable();
+        walkAction?.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        if (sprintAction != null)
+        {
+            sprintAction.performed -= OnSprintPerformed;
+            sprintAction.canceled -= OnSprintCanceled;
+            sprintAction.Dispose();
+        }
+
+        if (rollAction != null)
+        {
+            rollAction.performed -= OnRollPerformed;
+            rollAction.Dispose();
+        }
+
+        if (jumpAction != null)
+        {
+            jumpAction.performed -= OnJumpPerformed;
+            jumpAction.Dispose();
+        }
+
+        if (walkAction != null)
+        {
+            walkAction.performed -= OnWalkPerformed;
+            walkAction.canceled -= OnWalkCanceled;
+            walkAction.Dispose();
+        }
     }
 
     private void Start()
@@ -51,16 +113,6 @@ public class PlayerController : MonoBehaviour
             {
                 StateMachine.ChangeState(new AttackState(this));
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !IsJumping)
-        {
-            StateMachine.ChangeState(new RollState(this));
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && !IsRolling)
-        {
-            StateMachine.ChangeState(new JumpState(this));
         }
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
@@ -100,5 +152,62 @@ public class PlayerController : MonoBehaviour
     private void OnGetHit()
     {
         GetComponent<SkillCastManager>()?.InterruptSkill();
+    }
+
+    private void SetupInputActions()
+    {
+        sprintAction = new InputAction("SprintHold", InputActionType.Button);
+        sprintAction.AddBinding("<Keyboard>/leftShift").WithInteraction($"hold(duration={SprintHoldThreshold})");
+        sprintAction.performed += OnSprintPerformed;
+        sprintAction.canceled += OnSprintCanceled;
+
+        rollAction = new InputAction("RollTap", InputActionType.Button);
+        rollAction.AddBinding("<Keyboard>/leftShift").WithInteraction($"tap(duration={SprintHoldThreshold})");
+        rollAction.performed += OnRollPerformed;
+
+        jumpAction = new InputAction("Jump", InputActionType.Button);
+        jumpAction.AddBinding("<Keyboard>/space");
+        jumpAction.performed += OnJumpPerformed;
+
+        walkAction = new InputAction("WalkHold", InputActionType.Button);
+        walkAction.AddBinding("<Keyboard>/leftAlt");
+        walkAction.performed += OnWalkPerformed;
+        walkAction.canceled += OnWalkCanceled;
+    }
+
+    private void OnSprintPerformed(InputAction.CallbackContext context)
+    {
+        sprintInputActive = true;
+    }
+
+    private void OnSprintCanceled(InputAction.CallbackContext context)
+    {
+        sprintInputActive = false;
+    }
+
+    private void OnRollPerformed(InputAction.CallbackContext context)
+    {
+        if (!IsJumping && !IsRolling)
+        {
+            StateMachine.ChangeState(new RollState(this));
+        }
+    }
+
+    private void OnJumpPerformed(InputAction.CallbackContext context)
+    {
+        if (!IsRolling)
+        {
+            StateMachine.ChangeState(new JumpState(this));
+        }
+    }
+
+    private void OnWalkPerformed(InputAction.CallbackContext context)
+    {
+        walkInputActive = true;
+    }
+
+    private void OnWalkCanceled(InputAction.CallbackContext context)
+    {
+        walkInputActive = false;
     }
 }

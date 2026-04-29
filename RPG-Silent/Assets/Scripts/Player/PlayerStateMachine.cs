@@ -1,6 +1,7 @@
 public class PlayerStateMachine
 {
     private PlayerState currentState;
+    public PlayerState CurrentState => currentState;
 
     public void ChangeState(PlayerState newState)
     {

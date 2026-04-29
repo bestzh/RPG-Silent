@@ -10,6 +10,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     private Dictionary<string, AnimationData> animationDict = new Dictionary<string, AnimationData>();
     private AnimationData currentAnimation = null;
+    private float currentDuration = 0f;
     private float currentTimer = 0f;
     private bool isPlaying = false;
 
@@ -29,10 +30,10 @@ public class PlayerAnimationController : MonoBehaviour
 
     private void Update()
     {
-        if (isPlaying && currentAnimation != null)
+        if (isPlaying)
         {
             currentTimer += Time.deltaTime;
-            if (currentTimer >= currentAnimation.Duration)
+            if (currentTimer >= currentDuration)
             {
                 EndCurrentAnimation();
             }
@@ -63,13 +64,19 @@ public class PlayerAnimationController : MonoBehaviour
             return false;
         }
 
-        if (isPlaying && !currentAnimation.CanInterrupt)
+        if (isPlaying && currentAnimation != null && !currentAnimation.CanInterrupt)
+        {
+            return false;
+        }
+
+        if (isPlaying && currentAnimation == null)
         {
             return false;
         }
 
         animator.Play(anim.AnimatorStateName);
         currentAnimation = anim;
+        currentDuration = anim.Duration;
         currentTimer = 0f;
         isPlaying = true;
         return true;
@@ -79,6 +86,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         isPlaying = false;
         currentAnimation = null;
+        currentDuration = 0f;
         currentTimer = 0f;
         ReturnToMoveTree();
     }
