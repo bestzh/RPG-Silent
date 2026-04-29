@@ -8,6 +8,7 @@ public class IdleState : PlayerState
         base.Enter();
         player.animator.SetFloat("Horizontal", 0);
         player.animator.SetFloat("Vertical", 0);
+        player.animator.SetFloat("MoveSpeed", 0);
     }
 
     public override void Update()

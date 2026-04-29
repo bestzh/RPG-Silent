@@ -18,11 +18,18 @@ public class MoveState : PlayerState
 
         Vector2 input = player.InputDir;
         Vector3 moveDir = player.transform.forward * input.y + player.transform.right * input.x;
-        player.rb.linearVelocity = new Vector3(moveDir.x * player.MoveSpeed, player.rb.linearVelocity.y, moveDir.z * player.MoveSpeed);
+        player.rb.linearVelocity = new Vector3(moveDir.x * player.CurrentMoveSpeed, player.rb.linearVelocity.y, moveDir.z * player.CurrentMoveSpeed);
 
         // 设置动画参数（前进值、横向值）
-        player.animator.SetFloat("Horizontal", input.x);
-        player.animator.SetFloat("Vertical", input.y);
+        Vector2 animationInput = player.IsSprinting && input.y > 0.5f
+            ? new Vector2(0f, 2f)
+            : player.IsWalking
+            ? input * 0.5f
+            : input;
+
+        player.animator.SetFloat("Horizontal", animationInput.x);
+        player.animator.SetFloat("Vertical", animationInput.y);
+        player.animator.SetFloat("MoveSpeed", player.IsSprinting ? 1f : player.IsWalking ? 0.5f : 0f);
     }
 
     public override void Exit()
