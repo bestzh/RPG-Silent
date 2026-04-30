@@ -10,8 +10,14 @@ public class PlayerController : MonoBehaviour
     public bool IsRunning => InputDir.magnitude > 0.5f;
     public bool IsSprinting => sprintInputActive && CanSprint;
     public bool IsWalking => walkInputActive && CanWalk;
-    public bool CanDiveRoll => IsSprinting;
-    private bool CanSprint => InputDir.magnitude > 0.1f && !IsRolling && !IsJumping;
+    public bool CanRoll => !IsJumping
+        && !IsRolling
+        && (StanceController == null || StanceController.CanRoll);
+    public bool CanDiveRoll => CanRoll && InputDir.magnitude > 0.1f;
+    private bool CanSprint => InputDir.magnitude > 0.1f
+        && !IsRolling
+        && !IsJumping
+        && (StanceController == null || StanceController.CanSprint);
     private bool CanWalk => InputDir.magnitude > 0.1f && !IsSprinting && !IsRolling && !IsJumping;
 
     public float WalkSpeed = 2.5f;
@@ -35,10 +41,13 @@ public class PlayerController : MonoBehaviour
     public bool IsJumping { get; private set; } = false;
     public bool IsRolling { get; private set; } = false;
     public PlayerAnimationController AnimationController { get; private set; }
+    public PlayerStanceController StanceController { get; private set; }
+    public PlayerStance CurrentStance => StanceController != null ? StanceController.CurrentStance : PlayerStance.Relax;
     private InputAction sprintAction;
     private InputAction rollAction;
     private InputAction jumpAction;
     private InputAction walkAction;
+    private InputAction stanceToggleAction;
     private bool sprintInputActive;
     private bool walkInputActive;
 
@@ -46,6 +55,7 @@ public class PlayerController : MonoBehaviour
     {
         StateMachine = new PlayerStateMachine();
         AnimationController = GetComponent<PlayerAnimationController>();
+        StanceController = GetComponent<PlayerStanceController>();
         skillController = GetComponent<PlayerSkillController>();
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
@@ -59,6 +69,7 @@ public class PlayerController : MonoBehaviour
         rollAction?.Enable();
         jumpAction?.Enable();
         walkAction?.Enable();
+        stanceToggleAction?.Enable();
     }
 
     private void OnDisable()
@@ -67,6 +78,7 @@ public class PlayerController : MonoBehaviour
         rollAction?.Disable();
         jumpAction?.Disable();
         walkAction?.Disable();
+        stanceToggleAction?.Disable();
     }
 
     private void OnDestroy()
@@ -77,24 +89,26 @@ public class PlayerController : MonoBehaviour
             sprintAction.canceled -= OnSprintCanceled;
             sprintAction.Dispose();
         }
-
         if (rollAction != null)
         {
             rollAction.performed -= OnRollPerformed;
             rollAction.Dispose();
         }
-
         if (jumpAction != null)
         {
             jumpAction.performed -= OnJumpPerformed;
             jumpAction.Dispose();
         }
-
         if (walkAction != null)
         {
             walkAction.performed -= OnWalkPerformed;
             walkAction.canceled -= OnWalkCanceled;
             walkAction.Dispose();
+        }
+        if (stanceToggleAction != null)
+        {
+            stanceToggleAction.performed -= OnStanceTogglePerformed;
+            stanceToggleAction.Dispose();
         }
     }
 
@@ -109,7 +123,8 @@ public class PlayerController : MonoBehaviour
 
         if (skillController == null && Input.GetMouseButtonDown(0))
         {
-            if (!IsRolling && !IsJumping)
+            // 只有处于战斗姿态（Armed）下才允许左键攻击
+            if (!IsRolling && !IsJumping && CurrentStance == PlayerStance.Armed)
             {
                 StateMachine.ChangeState(new AttackState(this));
             }
@@ -173,6 +188,20 @@ public class PlayerController : MonoBehaviour
         walkAction.AddBinding("<Keyboard>/leftAlt");
         walkAction.performed += OnWalkPerformed;
         walkAction.canceled += OnWalkCanceled;
+
+        stanceToggleAction = new InputAction("StanceToggle", InputActionType.Button);
+        stanceToggleAction.AddBinding("<Keyboard>/tab");
+        stanceToggleAction.performed += OnStanceTogglePerformed;
+    }
+
+    private void OnStanceTogglePerformed(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+        {
+            return;
+        }
+
+        StanceController?.ToggleStance();
     }
 
     private void OnSprintPerformed(InputAction.CallbackContext context)
@@ -187,7 +216,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnRollPerformed(InputAction.CallbackContext context)
     {
-        if (!IsJumping && !IsRolling)
+        if (CanRoll)
         {
             StateMachine.ChangeState(new RollState(this));
         }
@@ -195,10 +224,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
-        if (!IsRolling)
+        if (IsRolling)
         {
-            StateMachine.ChangeState(new JumpState(this));
+            return;
         }
+
+        // 已经在跳跃中：尝试触发空中跳（二段跳）
+        if (StateMachine.CurrentState is JumpState jumpState)
+        {
+            jumpState.TryAirJump();
+            return;
+        }
+
+        // 当前姿态禁跳直接忽略
+        if (StanceController != null && !StanceController.CanJump)
+        {
+            return;
+        }
+
+        StateMachine.ChangeState(new JumpState(this));
     }
 
     private void OnWalkPerformed(InputAction.CallbackContext context)

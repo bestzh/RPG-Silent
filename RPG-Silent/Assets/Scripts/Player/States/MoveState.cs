@@ -10,6 +10,12 @@ public class MoveState : PlayerState
 
     public override void Update()
     {
+        if (!player.IsGrounded)
+        {
+            player.StateMachine.ChangeState(new JumpState(player, startFalling: true));
+            return;
+        }
+
         if (player.InputDir == Vector2.zero)
         {
             player.StateMachine.ChangeState(new IdleState(player));

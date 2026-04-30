@@ -176796,6 +176796,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 429417873}
+    - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 429417874}
   m_SourcePrefab: {fileID: 100100000, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
 --- !u!1 &429417863 stripped
 GameObject:
@@ -176822,7 +176825,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   mouseSensitivity: 3
   RollForce: 5
-  SprintHoldThreshold: 0.18
+  SprintHoldThreshold: 0.5
 --- !u!114 &429417865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176919,6 +176922,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3dcf879be13e1b4daa1a763fac14b88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &429417874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 429417863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6de534280b5e8841b7bd5b4f630aaa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultStance: 0
+  stanceDatabase: {fileID: 11400000, guid: f5a0119edb03aec4b8cdc517194f500d, type: 2}
+  extraOverrides: []
 --- !u!1001 &429457650
 PrefabInstance:
   m_ObjectHideFlags: 0
