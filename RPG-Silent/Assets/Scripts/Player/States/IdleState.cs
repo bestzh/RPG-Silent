@@ -13,10 +13,15 @@ public class IdleState : PlayerState
 
     public override void Update()
     {
-        // 如果有输入，进入移动状态
+        if (!player.IsGrounded)
+        {
+            player.StateMachine.ChangeState(new JumpState(player, startFalling: true));
+            return;
+        }
+
         if (player.InputDir.magnitude > 0.1f)
         {
-            player.StateMachine.ChangeState(new MoveState(player)); // 切换到移动状态
+            player.StateMachine.ChangeState(new MoveState(player));
         }
     }
 
