@@ -14,6 +14,7 @@ public class AttackState : PlayerState
     private int comboIndex;
     private int maxCombo;
     private float stateTimer;
+    private AttackExecutor attackExecutor;
 
     public AttackState(PlayerController player) : base(player) { }
 
@@ -22,6 +23,7 @@ public class AttackState : PlayerState
         comboIndex = 1;
         maxCombo = player.StanceController != null ? player.StanceController.MaxCombo : 1;
         stateTimer = 0f;
+        attackExecutor = player.GetComponent<AttackExecutor>();
 
         PlayCurrentAttack();
     }
@@ -74,9 +76,9 @@ public class AttackState : PlayerState
     private void PlayCurrentAttack()
     {
         Debug.Log($"攻击 {comboIndex}");
+        attackExecutor?.SetCurrentComboIndex(comboIndex);
         player.animator.SetInteger(ComboIndexParameter, comboIndex);
         player.animator.SetTrigger(AttackTrigger);
-        DetectEnemies();
     }
 
     private void ChangeToLocomotionState()
@@ -90,16 +92,8 @@ public class AttackState : PlayerState
         player.StateMachine.ChangeState(new IdleState(player));
     }
 
-    private void DetectEnemies()
+    public override void Exit()
     {
-        // 检测攻击范围内的敌人（简单的近距离检测）
-        Collider[] hits = Physics.OverlapSphere(player.transform.position + player.transform.forward, 1.5f);
-        foreach (var hit in hits)
-        {
-            if (hit.CompareTag("Enemy"))
-            {
-                hit.GetComponent<EnemyController>()?.TakeDamage(20);  // 伤害值可以调整
-            }
-        }
+        attackExecutor?.AttackEnd();
     }
 }

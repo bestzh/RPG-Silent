@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class PlayerAnimationEventReceiver : MonoBehaviour
 {
+    private AttackExecutor attackExecutor;
+
+    private void Awake()
+    {
+        attackExecutor = GetComponent<AttackExecutor>();
+        if (attackExecutor == null)
+        {
+            attackExecutor = GetComponentInParent<AttackExecutor>();
+        }
+    }
+
     public void FootL()
     {
         // Left footstep animation event.
@@ -17,14 +28,34 @@ public class PlayerAnimationEventReceiver : MonoBehaviour
         // Landing animation event.
     }
 
+    public void AttackStart()
+    {
+        attackExecutor?.AttackStart();
+    }
+
+    public void AttackRelease()
+    {
+        attackExecutor?.AttackRelease();
+    }
+
+    public void AttackEnd()
+    {
+        attackExecutor?.AttackEnd();
+    }
+
     public void Hit()
     {
-        // Attack hit animation event.
+        AttackRelease();
     }
 
     public void Shoot()
     {
-        // Ranged attack animation event.
+        AttackRelease();
+    }
+
+    public void Aoe()
+    {
+        AttackRelease();
     }
 
     public void WeaponSwitch()
