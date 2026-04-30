@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f3f0e7d2c9a4a2a9b7c6d5e4f3a2b1c, type: 3}
+  m_Name: Bow_Attack_1
+  m_EditorClassIdentifier: 
+  DeliveryType: 2
+  Damage: 25
+  TargetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  Range: 1.5
+  Radius: 0.7
+  Angle: 120
+  MaxDistance: 60
+  SpreadAngle: 0
+  ProjectilePrefab: {fileID: 100000, guid: e1f2a3b4c5d640118122334455667788, type: 3}
+  SpawnPointName: 
+  ProjectileSpeed: 24
+  ProjectileLifeTime: 5
+  AoeRadius: 3
+  AoeOffset: {x: 0, y: 0, z: 0}
+  AoeDelay: 0
+  HitEffectPrefab: {fileID: 0}

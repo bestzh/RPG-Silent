@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 3f;
     public float RollForce = 5f;
     public float SprintHoldThreshold = 0.5f;
+
     public bool IsJumping { get; private set; } = false;
     public bool IsRolling { get; private set; } = false;
     public PlayerAnimationController AnimationController { get; private set; }
