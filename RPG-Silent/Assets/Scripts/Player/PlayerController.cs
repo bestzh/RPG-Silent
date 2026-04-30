@@ -43,6 +43,9 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimationController AnimationController { get; private set; }
     public PlayerStanceController StanceController { get; private set; }
     public PlayerStance CurrentStance => StanceController != null ? StanceController.CurrentStance : PlayerStance.Relax;
+    public bool CanAttack => !IsRolling
+        && !IsJumping
+        && (StanceController == null || StanceController.MaxCombo > 0);
     private InputAction sprintAction;
     private InputAction rollAction;
     private InputAction jumpAction;
@@ -123,8 +126,7 @@ public class PlayerController : MonoBehaviour
 
         if (skillController == null && Input.GetMouseButtonDown(0))
         {
-            // 只有处于战斗姿态（Armed）下才允许左键攻击
-            if (!IsRolling && !IsJumping && CurrentStance == PlayerStance.Armed)
+            if (CanAttack)
             {
                 StateMachine.ChangeState(new AttackState(this));
             }
