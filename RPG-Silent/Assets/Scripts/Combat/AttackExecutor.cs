@@ -38,6 +38,11 @@ public class AttackExecutor : MonoBehaviour
         hitEnemies.Clear();
     }
 
+    public AttackProfile GetCurrentAttackProfile()
+    {
+        return GetCurrentProfile();
+    }
+
     public void AttackStart()
     {
         AttackProfile profile = GetCurrentProfile();
@@ -55,6 +60,12 @@ public class AttackExecutor : MonoBehaviour
 
     public void AttackRelease()
     {
+        AttackProfile profile = GetCurrentProfile();
+        if (profile != null && profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
+        {
+            return;
+        }
+
         ExecuteCurrentAttack();
     }
 

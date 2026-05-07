@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f3f0e7d2c9a4a2a9b7c6d5e4f3a2b1c, type: 3}
   m_Name: Unarmed_Attack_1
   m_EditorClassIdentifier: 
-  DeliveryType: 0
+  DeliveryType: 5
   Damage: 20
   TargetLayers:
     serializedVersion: 2
