@@ -15,6 +15,10 @@ public class AttackState : PlayerState
     private int maxCombo;
     private float stateTimer;
     private AttackExecutor attackExecutor;
+    private AttackProfile currentProfile;
+    private bool attackStarted;
+    private bool attackReleased;
+    private bool attackEnded;
 
     public AttackState(PlayerController player) : base(player) { }
 
@@ -40,6 +44,8 @@ public class AttackState : PlayerState
         {
             TryCombo(normalizedTime);
         }
+
+        UpdateAttackTiming(normalizedTime);
 
         if (stateTimer < MinStateTime)
         {
@@ -77,8 +83,38 @@ public class AttackState : PlayerState
     {
         Debug.Log($"攻击 {comboIndex}");
         attackExecutor?.SetCurrentComboIndex(comboIndex);
+        currentProfile = attackExecutor != null ? attackExecutor.GetCurrentAttackProfile() : null;
+        attackStarted = false;
+        attackReleased = false;
+        attackEnded = false;
         player.animator.SetInteger(ComboIndexParameter, comboIndex);
         player.animator.SetTrigger(AttackTrigger);
+    }
+
+    private void UpdateAttackTiming(float normalizedTime)
+    {
+        if (currentProfile == null)
+        {
+            return;
+        }
+
+        if (!attackStarted && normalizedTime >= currentProfile.StartTime)
+        {
+            attackStarted = true;
+            attackExecutor?.AttackStart();
+        }
+
+        if (!attackReleased && normalizedTime >= currentProfile.ReleaseTime)
+        {
+            attackReleased = true;
+            attackExecutor?.AttackRelease();
+        }
+
+        if (!attackEnded && normalizedTime >= currentProfile.EndTime)
+        {
+            attackEnded = true;
+            attackExecutor?.AttackEnd();
+        }
     }
 
     private void ChangeToLocomotionState()

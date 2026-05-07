@@ -20,6 +20,11 @@ public class AttackProfile : ScriptableObject
     public int Damage = 20;
     public LayerMask TargetLayers = ~0;
 
+    [Header("攻击时机")]
+    [Range(0f, 1f)] public float StartTime = 0.25f;
+    [Range(0f, 1f)] public float ReleaseTime = 0.35f;
+    [Range(0f, 1f)] public float EndTime = 0.6f;
+
     [Header("近战扇形")]
     public float Range = 1.5f;
     public float Radius = 0.7f;
