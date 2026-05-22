@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f3f0e7d2c9a4a2a9b7c6d5e4f3a2b1c, type: 3}
   m_Name: Unarmed_Attack_1
   m_EditorClassIdentifier: 
-  DeliveryType: 5
+  DeliveryType: 0
   Damage: 20
   TargetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  StartTime: 0.25
+  ReleaseTime: 0.35
+  EndTime: 0.6
   Range: 1.2
   Radius: 0.65
   Angle: 110

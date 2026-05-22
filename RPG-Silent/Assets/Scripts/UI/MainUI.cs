@@ -11,40 +11,96 @@ public class MainUI : UIBase
     public TextMeshProUGUI moneyText;
     public RawImage miniMap;
 
+    private PlayerController player;
+
     public override void OnOpen(params object[] args)
     {
         base.OnOpen(args);
-        Debug.Log("MainUI 打开");
-
-        // 示例数据填充（后续接入角色系统）
-        UpdateHP(0.8f);
-        UpdateMP(0.6f);
-        UpdateGold(999);
-        UpdateMoney(999);
+        Debug.Log("MainUI opened.");
+        BindPlayer();
     }
 
     public void UpdateHP(float value)
     {
-        hpBar.value = value;
+        if (hpBar != null)
+        {
+            hpBar.value = value;
+        }
     }
 
     public void UpdateMP(float value)
     {
-        mpBar.value = value;
+        if (mpBar != null)
+        {
+            mpBar.value = value;
+        }
     }
 
     public void UpdateGold(int gold)
     {
-        goldText.text = $"{gold}";
+        if (goldText != null)
+        {
+            goldText.text = $"{gold}";
+        }
     }
+
     public void UpdateMoney(int money)
     {
-        moneyText.text = $"{money}";
+        if (moneyText != null)
+        {
+            moneyText.text = $"{money}";
+        }
     }
 
     public override void OnClose()
     {
         base.OnClose();
-        Debug.Log("MainUI 关闭");
+        UnbindPlayer();
+        Debug.Log("MainUI closed.");
+    }
+
+    private void BindPlayer()
+    {
+        UnbindPlayer();
+
+        GameObject playerObject = GameObject.FindWithTag("Player");
+        if (playerObject == null)
+        {
+            Debug.LogWarning("MainUI did not find a Player object.");
+            return;
+        }
+
+        player = playerObject.GetComponent<PlayerController>();
+        if (player == null)
+        {
+            Debug.LogWarning("MainUI found Player object, but it has no PlayerController.");
+            return;
+        }
+
+        player.HealthChanged += OnHealthChanged;
+        player.GoldChanged += UpdateGold;
+        player.ExpChanged += UpdateMoney;
+
+        player.NotifyStatsChanged();
+        UpdateMP(1f);
+    }
+
+    private void UnbindPlayer()
+    {
+        if (player == null)
+        {
+            return;
+        }
+
+        player.HealthChanged -= OnHealthChanged;
+        player.GoldChanged -= UpdateGold;
+        player.ExpChanged -= UpdateMoney;
+        player = null;
+    }
+
+    private void OnHealthChanged(int current, int max)
+    {
+        float value = max > 0 ? (float)current / max : 0f;
+        UpdateHP(value);
     }
 }

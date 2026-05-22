@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,15 +11,18 @@ public class PlayerController : MonoBehaviour
     public bool IsRunning => InputDir.magnitude > 0.5f;
     public bool IsSprinting => sprintInputActive && CanSprint;
     public bool IsWalking => walkInputActive && CanWalk;
-    public bool CanRoll => !IsJumping
+    public bool IsDead => CurrentHealth <= 0;
+    public bool CanRoll => !IsDead
+        && !IsJumping
         && !IsRolling
         && (StanceController == null || StanceController.CanRoll);
     public bool CanDiveRoll => CanRoll && InputDir.magnitude > 0.1f;
-    private bool CanSprint => InputDir.magnitude > 0.1f
+    private bool CanSprint => !IsDead
+        && InputDir.magnitude > 0.1f
         && !IsRolling
         && !IsJumping
         && (StanceController == null || StanceController.CanSprint);
-    private bool CanWalk => InputDir.magnitude > 0.1f && !IsSprinting && !IsRolling && !IsJumping;
+    private bool CanWalk => !IsDead && InputDir.magnitude > 0.1f && !IsSprinting && !IsRolling && !IsJumping;
 
     public float WalkSpeed = 2.5f;
     public float MoveSpeed = 5f;
@@ -28,12 +32,17 @@ public class PlayerController : MonoBehaviour
 
     public int MaxHealth = 100;
     public int CurrentHealth { get; private set; }
+    public int Gold { get; private set; }
+    public int Exp { get; private set; }
+
+    public event Action<int, int> HealthChanged;
+    public event Action<int> GoldChanged;
+    public event Action<int> ExpChanged;
 
     public Rigidbody rb;
 
     private float yaw;
     private float pitch;
-    private PlayerSkillController skillController;
 
     public float mouseSensitivity = 3f;
     public float RollForce = 5f;
@@ -44,7 +53,8 @@ public class PlayerController : MonoBehaviour
     public PlayerAnimationController AnimationController { get; private set; }
     public PlayerStanceController StanceController { get; private set; }
     public PlayerStance CurrentStance => StanceController != null ? StanceController.CurrentStance : PlayerStance.Relax;
-    public bool CanAttack => !IsRolling
+    public bool CanAttack => !IsDead
+        && !IsRolling
         && !IsJumping
         && (StanceController == null || StanceController.MaxCombo > 0);
     private InputAction sprintAction;
@@ -60,7 +70,6 @@ public class PlayerController : MonoBehaviour
         StateMachine = new PlayerStateMachine();
         AnimationController = GetComponent<PlayerAnimationController>();
         StanceController = GetComponent<PlayerStanceController>();
-        skillController = GetComponent<PlayerSkillController>();
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         CurrentHealth = MaxHealth;
@@ -119,13 +128,19 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         StateMachine.ChangeState(new IdleState(this));
+        NotifyStatsChanged();
     }
 
     private void Update()
     {
         StateMachine.Update();
 
-        if (skillController == null && Input.GetMouseButtonDown(0))
+        if (IsDead)
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0))
         {
             if (CanAttack)
             {
@@ -153,11 +168,17 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (CurrentHealth <= 0) return;
+        if (IsDead || damage <= 0)
+        {
+            return;
+        }
 
-        CurrentHealth -= damage;
+        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        OnGetHit();
+        Debug.Log($"Player took {damage} damage. HP: {CurrentHealth}/{MaxHealth}", this);
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
 
-        if (CurrentHealth <= 0)
+        if (IsDead)
         {
             StateMachine.ChangeState(new DeadState(this));
         }
@@ -170,6 +191,30 @@ public class PlayerController : MonoBehaviour
     private void OnGetHit()
     {
         GetComponent<SkillCastManager>()?.InterruptSkill();
+    }
+
+    public void AddReward(int gold, int exp)
+    {
+        if (gold > 0)
+        {
+            Gold += gold;
+            GoldChanged?.Invoke(Gold);
+        }
+
+        if (exp > 0)
+        {
+            Exp += exp;
+            ExpChanged?.Invoke(Exp);
+        }
+
+        Debug.Log($"Player reward: +{gold} gold, +{exp} exp. Total: {Gold} gold, {Exp} exp", this);
+    }
+
+    public void NotifyStatsChanged()
+    {
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        GoldChanged?.Invoke(Gold);
+        ExpChanged?.Invoke(Exp);
     }
 
     private void SetupInputActions()
