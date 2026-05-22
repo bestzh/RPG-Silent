@@ -1,22 +1,22 @@
 using UnityEngine;
+
 public class HurtState : PlayerState
 {
-    private float hurtDuration = 0.3f;
+    private const float HurtDuration = 0.3f;
     private float timer;
 
     public HurtState(PlayerController player) : base(player) { }
 
     public override void Enter()
     {
-        Debug.Log("受击！");
-        timer = hurtDuration;
-        // 播放受击动画/震动等
+        Debug.Log("Player hurt.", player);
+        timer = HurtDuration;
     }
 
     public override void Update()
     {
         timer -= Time.deltaTime;
-        if (timer <= 0)
+        if (timer <= 0f)
         {
             player.StateMachine.ChangeState(new IdleState(player));
         }

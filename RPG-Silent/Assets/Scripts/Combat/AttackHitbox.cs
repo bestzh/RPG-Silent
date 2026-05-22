@@ -18,13 +18,14 @@ public class AttackHitbox : MonoBehaviour
 
     private void Awake()
     {
-        hitboxCollider = GetComponent<Collider>();
-        hitboxCollider.isTrigger = true;
-        hitboxCollider.enabled = false;
+        EnsureCollider();
+        DisableHitbox();
     }
 
     public void EnableHitbox(AttackProfile attackProfile, AttackExecutor attackOwner)
     {
+        EnsureCollider();
+
         profile = attackProfile;
         owner = attackOwner;
         isActive = true;
@@ -34,6 +35,8 @@ public class AttackHitbox : MonoBehaviour
 
     public void DisableHitbox()
     {
+        EnsureCollider();
+
         isActive = false;
         hitboxCollider.enabled = false;
         hitEnemies.Clear();
@@ -61,5 +64,16 @@ public class AttackHitbox : MonoBehaviour
 
         hitEnemies.Add(enemy);
         owner.ApplyDamage(enemy, profile, other.ClosestPoint(transform.position));
+    }
+
+    private void EnsureCollider()
+    {
+        if (hitboxCollider != null)
+        {
+            return;
+        }
+
+        hitboxCollider = GetComponent<Collider>();
+        hitboxCollider.isTrigger = true;
     }
 }

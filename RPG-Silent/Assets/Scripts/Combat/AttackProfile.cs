@@ -15,31 +15,31 @@ public enum AttackDeliveryType
 [CreateAssetMenu(fileName = "AttackProfile", menuName = "Combat/Attack Profile")]
 public class AttackProfile : ScriptableObject
 {
-    [Header("基础")]
+    [Header("Basic")]
     public AttackDeliveryType DeliveryType = AttackDeliveryType.MeleeArc;
     public int Damage = 20;
     public LayerMask TargetLayers = ~0;
 
-    [Header("攻击时机")]
+    [Header("Attack Timing")]
     [Range(0f, 1f)] public float StartTime = 0.25f;
     [Range(0f, 1f)] public float ReleaseTime = 0.35f;
     [Range(0f, 1f)] public float EndTime = 0.6f;
 
-    [Header("近战扇形")]
+    [Header("Melee Arc")]
     public float Range = 1.5f;
     public float Radius = 0.7f;
     [Range(0f, 180f)] public float Angle = 120f;
 
-    [Header("近战 Hitbox")]
+    [Header("Melee Hitbox")]
     public string HitboxName;
     public string HitboxGroup;
 
-    [Header("射线")]
+    [Header("Raycast")]
     public float MaxDistance = 30f;
     [Range(0f, 45f)] public float SpreadAngle = 0f;
     public float CastRadius = 0f;
 
-    [Header("投射物")]
+    [Header("Projectile")]
     public GameObject ProjectilePrefab;
     public string SpawnPointName;
     public float ProjectileSpeed = 20f;
@@ -53,6 +53,6 @@ public class AttackProfile : ScriptableObject
     public float AreaDuration = 5f;
     public float TickInterval = 1f;
 
-    [Header("特效")]
+    [Header("Effects")]
     public GameObject HitEffectPrefab;
 }

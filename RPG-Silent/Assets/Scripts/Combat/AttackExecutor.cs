@@ -132,7 +132,7 @@ public class AttackExecutor : MonoBehaviour
 
     public void ApplyDamage(EnemyController enemy, AttackProfile profile, Vector3 hitPoint, bool allowRepeatedDamage)
     {
-        if (enemy == null || profile == null)
+        if (enemy == null || enemy.IsDead || profile == null)
         {
             return;
         }
