@@ -1,183 +1,110 @@
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingsUI : UIBase
 {
-    private const string MasterVolumeKey = "Settings.MasterVolume";
-    private const string FullscreenKey = "Settings.Fullscreen";
-    private const string QualityLevelKey = "Settings.QualityLevel";
+    public Button Screen;
+    public Button Sound;
+    public Button Controller;
+    public Button Game;
+    public Button Back;
 
-    public Button BackButton;
-    public Button ApplyButton;
-    public Button ResetButton;
+    private SettingsPage[] pages;
 
-    public Slider MasterVolumeSlider;
-    public TextMeshProUGUI MasterVolumeText;
-    public Toggle FullscreenToggle;
-    public TMP_Dropdown QualityDropdown;
-
-    private float masterVolume = 1f;
-    private bool fullscreen = true;
-    private int qualityLevel;
+    private class SettingsPage
+    {
+        public Button Button;
+        public GameObject Select;
+        public GameObject Page;
+    }
 
     private void Awake()
     {
-        BackButton?.onClick.AddListener(OnBackButtonClicked);
-        ApplyButton?.onClick.AddListener(OnApplyButtonClicked);
-        ResetButton?.onClick.AddListener(OnResetButtonClicked);
+        InitPages();
 
-        MasterVolumeSlider?.onValueChanged.AddListener(OnMasterVolumeChanged);
-        FullscreenToggle?.onValueChanged.AddListener(OnFullscreenChanged);
-        QualityDropdown?.onValueChanged.AddListener(OnQualityChanged);
-    }
+        AddPageButtonListener(Screen);
+        AddPageButtonListener(Sound);
+        AddPageButtonListener(Controller);
+        AddPageButtonListener(Game);
 
-    protected override void OnInit()
-    {
-        base.OnInit();
-        InitQualityOptions();
+        Back?.onClick.AddListener(OnBackButtonClicked);
     }
 
     public override void OnOpen(params object[] args)
     {
         base.OnOpen(args);
-        LoadSettings();
-        RefreshControls();
-        ApplySettings();
-        Debug.Log("SettingsUI opened.");
-    }
-
-    public override void OnClose()
-    {
-        base.OnClose();
-        SaveSettings();
-        Debug.Log("SettingsUI closed.");
+        ShowPage(Screen);
     }
 
     private void OnBackButtonClicked()
     {
-        SaveSettings();
         UIManager.Instance.OpenUI("UI/StartUI");
         UIManager.Instance.CloseUI("UI/SettingsUI");
     }
 
-    private void OnApplyButtonClicked()
+    private void InitPages()
     {
-        ApplySettings();
-        SaveSettings();
-    }
+        Transform leftControl = transform.Find("Image/Left/Control");
+        Transform right = transform.Find("Image/Right");
 
-    private void OnResetButtonClicked()
-    {
-        masterVolume = 1f;
-        fullscreen = true;
-        qualityLevel = QualitySettings.names.Length > 0 ? QualitySettings.names.Length - 1 : 0;
+        Screen = ResolveButton(Screen, leftControl, "Screen");
+        Sound = ResolveButton(Sound, leftControl, "Sound");
+        Controller = ResolveButton(Controller, leftControl, "Controller");
+        Game = ResolveButton(Game, leftControl, "Game");
+        Back = ResolveButton(Back, leftControl, "Back");
 
-        RefreshControls();
-        ApplySettings();
-        SaveSettings();
-    }
-
-    private void OnMasterVolumeChanged(float value)
-    {
-        masterVolume = Mathf.Clamp01(value);
-        ApplyMasterVolume();
-        RefreshVolumeText();
-    }
-
-    private void OnFullscreenChanged(bool value)
-    {
-        fullscreen = value;
-        Screen.fullScreen = fullscreen;
-    }
-
-    private void OnQualityChanged(int value)
-    {
-        qualityLevel = ClampQualityLevel(value);
-        QualitySettings.SetQualityLevel(qualityLevel, true);
-    }
-
-    private void LoadSettings()
-    {
-        masterVolume = PlayerPrefs.GetFloat(MasterVolumeKey, 1f);
-        fullscreen = PlayerPrefs.GetInt(FullscreenKey, Screen.fullScreen ? 1 : 0) == 1;
-        qualityLevel = PlayerPrefs.GetInt(QualityLevelKey, QualitySettings.GetQualityLevel());
-
-        masterVolume = Mathf.Clamp01(masterVolume);
-        qualityLevel = ClampQualityLevel(qualityLevel);
-    }
-
-    private void SaveSettings()
-    {
-        PlayerPrefs.SetFloat(MasterVolumeKey, masterVolume);
-        PlayerPrefs.SetInt(FullscreenKey, fullscreen ? 1 : 0);
-        PlayerPrefs.SetInt(QualityLevelKey, qualityLevel);
-        PlayerPrefs.Save();
-    }
-
-    private void ApplySettings()
-    {
-        ApplyMasterVolume();
-        Screen.fullScreen = fullscreen;
-        QualitySettings.SetQualityLevel(qualityLevel, true);
-    }
-
-    private void ApplyMasterVolume()
-    {
-        AudioListener.volume = masterVolume;
-    }
-
-    private void RefreshControls()
-    {
-        if (MasterVolumeSlider != null)
+        pages = new[]
         {
-            MasterVolumeSlider.SetValueWithoutNotify(masterVolume);
+            CreatePage(Screen, right, "Screen"),
+            CreatePage(Sound, right, "Sound"),
+            CreatePage(Controller, right, "Controller"),
+            CreatePage(Game, right, "Game")
+        };
+    }
+
+    private Button ResolveButton(Button button, Transform parent, string buttonName)
+    {
+        if (button != null || parent == null)
+        {
+            return button;
         }
 
-        if (FullscreenToggle != null)
-        {
-            FullscreenToggle.SetIsOnWithoutNotify(fullscreen);
-        }
-
-        if (QualityDropdown != null)
-        {
-            InitQualityOptions();
-            QualityDropdown.SetValueWithoutNotify(qualityLevel);
-            QualityDropdown.RefreshShownValue();
-        }
-
-        RefreshVolumeText();
+        Transform buttonTransform = parent.Find(buttonName);
+        return buttonTransform != null ? buttonTransform.GetComponent<Button>() : null;
     }
 
-    private void RefreshVolumeText()
+    private SettingsPage CreatePage(Button button, Transform right, string pageName)
     {
-        if (MasterVolumeText != null)
+        return new SettingsPage
         {
-            MasterVolumeText.text = $"{Mathf.RoundToInt(masterVolume * 100f)}%";
-        }
+            Button = button,
+            Select = button != null ? button.transform.Find("select")?.gameObject : null,
+            Page = right != null ? right.Find(pageName)?.gameObject : null
+        };
     }
 
-    private void InitQualityOptions()
+    private void AddPageButtonListener(Button button)
     {
-        if (QualityDropdown == null)
+        if (button == null)
         {
             return;
         }
 
-        string[] qualityNames = QualitySettings.names;
-        if (QualityDropdown.options.Count == qualityNames.Length)
-        {
-            return;
-        }
-
-        QualityDropdown.ClearOptions();
-        QualityDropdown.AddOptions(new List<string>(qualityNames));
+        button.onClick.AddListener(() => ShowPage(button));
     }
 
-    private int ClampQualityLevel(int value)
+    private void ShowPage(Button activeButton)
     {
-        int maxQualityLevel = QualitySettings.names.Length - 1;
-        return maxQualityLevel < 0 ? 0 : Mathf.Clamp(value, 0, maxQualityLevel);
+        if (pages == null || pages.Length == 0)
+        {
+            InitPages();
+        }
+
+        foreach (SettingsPage page in pages)
+        {
+            bool isActive = page.Button == activeButton;
+            page.Select?.SetActive(isActive);
+            page.Page?.SetActive(isActive);
+        }
     }
 }
