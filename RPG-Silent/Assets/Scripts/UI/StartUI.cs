@@ -18,7 +18,6 @@ public class StartUI : UIBase
         SettingsButton.onClick.AddListener(() => {
             Debug.Log("点击设置");
             UIManager.Instance.OpenUI("UI/SettingsUI");
-            UIManager.Instance.CloseUI("UI/StartUI");
         });
         QuiteButton.onClick.AddListener(() => {
             Debug.Log("点击关闭游戏");
