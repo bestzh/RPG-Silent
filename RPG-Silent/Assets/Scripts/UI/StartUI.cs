@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class StartUI : UIBase
 {
      public Button StartButton;
+     public Button SettingsButton;
      public Button QuiteButton;
 
     private void Awake()
@@ -12,6 +13,11 @@ public class StartUI : UIBase
         StartButton.onClick.AddListener(() => {
             Debug.Log("点击开始游戏");
             UIManager.Instance.OpenUI("UI/LoadingUI", "Scenes/Main");
+            UIManager.Instance.CloseUI("UI/StartUI");
+        });
+        SettingsButton.onClick.AddListener(() => {
+            Debug.Log("点击设置");
+            UIManager.Instance.OpenUI("UI/SettingsUI");
             UIManager.Instance.CloseUI("UI/StartUI");
         });
         QuiteButton.onClick.AddListener(() => {
