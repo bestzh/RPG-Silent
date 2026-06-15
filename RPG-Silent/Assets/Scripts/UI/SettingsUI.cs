@@ -1,8 +1,12 @@
+using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class SettingsUI : UIBase
 {
+    [Inject] private IUIService _uiService;
+
     public Button Screen;
     public Button Sound;
     public Button Controller;
@@ -13,7 +17,7 @@ public class SettingsUI : UIBase
 
     private class SettingsPage
     {
-        public Button Button;
+        public Button     Button;
         public GameObject Select;
         public GameObject Page;
     }
@@ -38,39 +42,35 @@ public class SettingsUI : UIBase
 
     private void OnBackButtonClicked()
     {
-        UIManager.Instance.OpenUI("UI/StartUI");
-        UIManager.Instance.CloseUI("UI/SettingsUI");
+        _uiService.OpenUI("UI/StartUI");
+        _uiService.CloseUI("UI/SettingsUI");
     }
 
     private void InitPages()
     {
         Transform leftControl = transform.Find("Image/Left/Control");
-        Transform right = transform.Find("Image/Right");
+        Transform right       = transform.Find("Image/Right");
 
-        Screen = ResolveButton(Screen, leftControl, "Screen");
-        Sound = ResolveButton(Sound, leftControl, "Sound");
+        Screen     = ResolveButton(Screen,     leftControl, "Screen");
+        Sound      = ResolveButton(Sound,      leftControl, "Sound");
         Controller = ResolveButton(Controller, leftControl, "Controller");
-        Game = ResolveButton(Game, leftControl, "Game");
-        Back = ResolveButton(Back, leftControl, "Back");
+        Game       = ResolveButton(Game,       leftControl, "Game");
+        Back       = ResolveButton(Back,       leftControl, "Back");
 
         pages = new[]
         {
-            CreatePage(Screen, right, "Screen"),
-            CreatePage(Sound, right, "Sound"),
+            CreatePage(Screen,     right, "Screen"),
+            CreatePage(Sound,      right, "Sound"),
             CreatePage(Controller, right, "Controller"),
-            CreatePage(Game, right, "Game")
+            CreatePage(Game,       right, "Game")
         };
     }
 
     private Button ResolveButton(Button button, Transform parent, string buttonName)
     {
-        if (button != null || parent == null)
-        {
-            return button;
-        }
-
-        Transform buttonTransform = parent.Find(buttonName);
-        return buttonTransform != null ? buttonTransform.GetComponent<Button>() : null;
+        if (button != null || parent == null) return button;
+        Transform t = parent.Find(buttonName);
+        return t != null ? t.GetComponent<Button>() : null;
     }
 
     private SettingsPage CreatePage(Button button, Transform right, string pageName)
@@ -79,26 +79,19 @@ public class SettingsUI : UIBase
         {
             Button = button,
             Select = button != null ? button.transform.Find("select")?.gameObject : null,
-            Page = right != null ? right.Find(pageName)?.gameObject : null
+            Page   = right  != null ? right.Find(pageName)?.gameObject            : null
         };
     }
 
     private void AddPageButtonListener(Button button)
     {
-        if (button == null)
-        {
-            return;
-        }
-
+        if (button == null) return;
         button.onClick.AddListener(() => ShowPage(button));
     }
 
     private void ShowPage(Button activeButton)
     {
-        if (pages == null || pages.Length == 0)
-        {
-            InitPages();
-        }
+        if (pages == null || pages.Length == 0) InitPages();
 
         foreach (SettingsPage page in pages)
         {

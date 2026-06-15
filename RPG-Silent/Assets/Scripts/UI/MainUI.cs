@@ -1,106 +1,73 @@
+using RPGSilent.Domain;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class MainUI : UIBase
 {
-    public Image avatarImage;
-    public Slider hpBar;
-    public Slider mpBar;
+    // 通过 VContainer 注入，不再 FindWithTag
+    [Inject] private IPlayerStatsReader _stats;
+
+    public Image          avatarImage;
+    public Slider         hpBar;
+    public Slider         mpBar;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI moneyText;
-    public RawImage miniMap;
-
-    private PlayerController player;
+    public RawImage        miniMap;
 
     public override void OnOpen(params object[] args)
     {
         base.OnOpen(args);
-        Debug.Log("MainUI opened.");
-        BindPlayer();
-    }
 
-    public void UpdateHP(float value)
-    {
-        if (hpBar != null)
+        if (_stats == null)
         {
-            hpBar.value = value;
+            Debug.LogWarning("[MainUI] IPlayerStatsReader 未注入，无法绑定数据。");
+            return;
         }
-    }
 
-    public void UpdateMP(float value)
-    {
-        if (mpBar != null)
-        {
-            mpBar.value = value;
-        }
-    }
+        _stats.OnHealthChanged += OnHealthChanged;
+        _stats.OnGoldChanged   += OnGoldChanged;
+        _stats.OnExpChanged    += OnExpChanged;
 
-    public void UpdateGold(int gold)
-    {
-        if (goldText != null)
-        {
-            goldText.text = $"{gold}";
-        }
-    }
+        _stats.Refresh();
+        UpdateMP(1f);
 
-    public void UpdateMoney(int money)
-    {
-        if (moneyText != null)
-        {
-            moneyText.text = $"{money}";
-        }
+        Debug.Log("[MainUI] 已打开并绑定玩家数据。");
     }
 
     public override void OnClose()
     {
         base.OnClose();
-        UnbindPlayer();
-        Debug.Log("MainUI closed.");
-    }
 
-    private void BindPlayer()
-    {
-        UnbindPlayer();
-
-        GameObject playerObject = GameObject.FindWithTag("Player");
-        if (playerObject == null)
+        if (_stats != null)
         {
-            Debug.LogWarning("MainUI did not find a Player object.");
-            return;
+            _stats.OnHealthChanged -= OnHealthChanged;
+            _stats.OnGoldChanged   -= OnGoldChanged;
+            _stats.OnExpChanged    -= OnExpChanged;
         }
 
-        player = playerObject.GetComponent<PlayerController>();
-        if (player == null)
-        {
-            Debug.LogWarning("MainUI found Player object, but it has no PlayerController.");
-            return;
-        }
-
-        player.HealthChanged += OnHealthChanged;
-        player.GoldChanged += UpdateGold;
-        player.ExpChanged += UpdateMoney;
-
-        player.NotifyStatsChanged();
-        UpdateMP(1f);
-    }
-
-    private void UnbindPlayer()
-    {
-        if (player == null)
-        {
-            return;
-        }
-
-        player.HealthChanged -= OnHealthChanged;
-        player.GoldChanged -= UpdateGold;
-        player.ExpChanged -= UpdateMoney;
-        player = null;
+        Debug.Log("[MainUI] 已关闭。");
     }
 
     private void OnHealthChanged(int current, int max)
     {
-        float value = max > 0 ? (float)current / max : 0f;
-        UpdateHP(value);
+        if (hpBar != null)
+            hpBar.value = max > 0 ? (float)current / max : 0f;
+    }
+
+    private void OnGoldChanged(int gold)
+    {
+        if (goldText != null) goldText.text = $"{gold}";
+    }
+
+    private void OnExpChanged(int exp)
+    {
+        if (moneyText != null) moneyText.text = $"{exp}";
+    }
+
+    private void UpdateMP(float value)
+    {
+        if (mpBar != null) mpBar.value = value;
     }
 }
