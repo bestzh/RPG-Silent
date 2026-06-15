@@ -1,62 +1,81 @@
-using System;
+using RPGSilent.Application;
+using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 {
-    public PlayerStateMachine StateMachine { get; private set; }
-    public Vector2 InputDir => InputManager.Instance != null ? InputManager.Instance.MoveInput : Vector2.zero;
+    // ── VContainer 注入 ────────────────────────────────────────────────────────
+    [Inject] private IInputService              _inputService;
+    [Inject] private IPlayerStatsReader         _statsReader;
+    [Inject] private PlayerTakeDamageUseCase    _takeDamageUseCase;
+    [Inject] private PlayerAddRewardUseCase     _addRewardUseCase;
+    [Inject] private IControllerSettingsService _controllerSettings;
 
+    // ── FSM ────────────────────────────────────────────────────────────────────
+    public PlayerStateMachine StateMachine { get; private set; }
+
+    // ── Unity 组件引用（Inspector 或 GetComponent 获取）────────────────────────
     public Animator animator;
-    public bool IsRunning => InputDir.magnitude > 0.5f;
+    public Rigidbody rb;
+
+    // ── IDamageable 实现 ───────────────────────────────────────────────────────
+    public bool IsDead => _statsReader?.IsDead ?? false;
+
+    // ── 移动状态（本地，无需持久化）────────────────────────────────────────────
+    public bool IsJumping  { get; private set; }
+    public bool IsRolling  { get; private set; }
+
+    public Vector2 InputDir => _inputService?.MoveInput ?? Vector2.zero;
+
+    public bool IsRunning  => InputDir.magnitude > 0.5f;
     public bool IsSprinting => sprintInputActive && CanSprint;
-    public bool IsWalking => walkInputActive && CanWalk;
-    public bool IsDead => CurrentHealth <= 0;
+    public bool IsWalking  => walkInputActive && CanWalk;
+
     public bool CanRoll => !IsDead
         && !IsJumping
         && !IsRolling
         && (StanceController == null || StanceController.CanRoll);
+
     public bool CanDiveRoll => CanRoll && InputDir.magnitude > 0.1f;
+
     private bool CanSprint => !IsDead
         && InputDir.magnitude > 0.1f
         && !IsRolling
         && !IsJumping
         && (StanceController == null || StanceController.CanSprint);
-    private bool CanWalk => !IsDead && InputDir.magnitude > 0.1f && !IsSprinting && !IsRolling && !IsJumping;
 
-    public float WalkSpeed = 2.5f;
-    public float MoveSpeed = 5f;
+    private bool CanWalk => !IsDead && InputDir.magnitude > 0.1f
+        && !IsSprinting && !IsRolling && !IsJumping;
+
+    public float WalkSpeed   = 2.5f;
+    public float MoveSpeed   = 5f;
     public float SprintSpeed = 8f;
     public float CurrentMoveSpeed => IsSprinting ? SprintSpeed : IsWalking ? WalkSpeed : MoveSpeed;
+
     public bool IsGrounded => Physics.Raycast(transform.position, Vector3.down, 1.1f);
 
-    public int MaxHealth = 100;
-    public int CurrentHealth { get; private set; }
-    public int Gold { get; private set; }
-    public int Exp { get; private set; }
-
-    public event Action<int, int> HealthChanged;
-    public event Action<int> GoldChanged;
-    public event Action<int> ExpChanged;
-
-    public Rigidbody rb;
-
-    private float yaw;
-    private float pitch;
-
-    public float mouseSensitivity = 3f;
-    public float RollForce = 5f;
-    public float SprintHoldThreshold = 0.5f;
-
-    public bool IsJumping { get; private set; } = false;
-    public bool IsRolling { get; private set; } = false;
-    public PlayerAnimationController AnimationController { get; private set; }
-    public PlayerStanceController StanceController { get; private set; }
-    public PlayerStance CurrentStance => StanceController != null ? StanceController.CurrentStance : PlayerStance.Relax;
     public bool CanAttack => !IsDead
         && !IsRolling
         && !IsJumping
         && (StanceController == null || StanceController.MaxCombo > 0);
+
+    // ── 子系统组件引用 ─────────────────────────────────────────────────────────
+    public PlayerAnimationController AnimationController { get; private set; }
+    public PlayerStanceController    StanceController    { get; private set; }
+
+    public PlayerStance CurrentStance =>
+        StanceController != null ? StanceController.CurrentStance : PlayerStance.Relax;
+
+    // ── 输入参数 ───────────────────────────────────────────────────────────────
+    public float mouseSensitivity    = 3f;
+    public float RollForce           = 5f;
+    public float SprintHoldThreshold = 0.5f;
+
+    private float yaw;
+    private float pitch;
+
     private InputAction sprintAction;
     private InputAction rollAction;
     private InputAction jumpAction;
@@ -65,14 +84,15 @@ public class PlayerController : MonoBehaviour
     private bool sprintInputActive;
     private bool walkInputActive;
 
+    // ──────────────────────────────────────────────────────────────────────────
+
     private void Awake()
     {
-        StateMachine = new PlayerStateMachine();
+        StateMachine        = new PlayerStateMachine();
         AnimationController = GetComponent<PlayerAnimationController>();
-        StanceController = GetComponent<PlayerStanceController>();
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-        CurrentHealth = MaxHealth;
+        StanceController    = GetComponent<PlayerStanceController>();
+        rb                  = GetComponent<Rigidbody>();
+        animator            = GetComponent<Animator>();
         SetupInputActions();
     }
 
@@ -96,136 +116,84 @@ public class PlayerController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (sprintAction != null)
-        {
-            sprintAction.performed -= OnSprintPerformed;
-            sprintAction.canceled -= OnSprintCanceled;
-            sprintAction.Dispose();
-        }
-        if (rollAction != null)
-        {
-            rollAction.performed -= OnRollPerformed;
-            rollAction.Dispose();
-        }
-        if (jumpAction != null)
-        {
-            jumpAction.performed -= OnJumpPerformed;
-            jumpAction.Dispose();
-        }
-        if (walkAction != null)
-        {
-            walkAction.performed -= OnWalkPerformed;
-            walkAction.canceled -= OnWalkCanceled;
-            walkAction.Dispose();
-        }
-        if (stanceToggleAction != null)
-        {
-            stanceToggleAction.performed -= OnStanceTogglePerformed;
-            stanceToggleAction.Dispose();
-        }
+        DisposeAction(ref sprintAction,      OnSprintPerformed,      OnSprintCanceled);
+        DisposeAction(ref rollAction,        OnRollPerformed);
+        DisposeAction(ref jumpAction,        OnJumpPerformed);
+        DisposeAction(ref walkAction,        OnWalkPerformed,        OnWalkCanceled);
+        DisposeAction(ref stanceToggleAction, OnStanceTogglePerformed);
     }
 
     private void Start()
     {
         StateMachine.ChangeState(new IdleState(this));
-        NotifyStatsChanged();
     }
 
     private void Update()
     {
         StateMachine.Update();
 
-        if (IsDead)
+        if (IsDead) return;
+
+        if (Input.GetMouseButtonDown(0) && CanAttack)
         {
-            return;
+            StateMachine.ChangeState(new AttackState(this));
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (CanAttack)
-            {
-                StateMachine.ChangeState(new AttackState(this));
-            }
-        }
+        float sensitivity = _controllerSettings?.CurrentSettings.MouseSensitivity ?? mouseSensitivity;
+        bool  invertY     = _controllerSettings?.CurrentSettings.InvertY ?? false;
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
-        yaw += mouseX;
-        pitch -= mouseY;
-        pitch = Mathf.Clamp(pitch, -35f, 60f);
+        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+        yaw   += mouseX;
+        pitch += invertY ? mouseY : -mouseY;
+        pitch  = Mathf.Clamp(pitch, -35f, 60f);
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
-    public void SetIsJumping(bool jumping)
-    {
-        IsJumping = jumping;
-    }
-
-    public void SetIsRolling(bool rolling)
-    {
-        IsRolling = rolling;
-    }
+    // ── IDamageable ────────────────────────────────────────────────────────────
 
     public void TakeDamage(int damage)
     {
-        if (IsDead || damage <= 0)
-        {
-            return;
-        }
+        if (IsDead || damage <= 0) return;
 
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-        OnGetHit();
-        Debug.Log($"Player took {damage} damage. HP: {CurrentHealth}/{MaxHealth}", this);
-        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+        _takeDamageUseCase.Execute(damage);
+        GetComponent<SkillCastManager>()?.InterruptSkill();
 
         if (IsDead)
-        {
             StateMachine.ChangeState(new DeadState(this));
-        }
         else
-        {
             StateMachine.ChangeState(new HurtState(this));
-        }
     }
 
-    private void OnGetHit()
-    {
-        GetComponent<SkillCastManager>()?.InterruptSkill();
-    }
+    // ── IRewardable ────────────────────────────────────────────────────────────
 
     public void AddReward(int gold, int exp)
     {
-        if (gold > 0)
-        {
-            Gold += gold;
-            GoldChanged?.Invoke(Gold);
-        }
-
-        if (exp > 0)
-        {
-            Exp += exp;
-            ExpChanged?.Invoke(Exp);
-        }
-
-        Debug.Log($"Player reward: +{gold} gold, +{exp} exp. Total: {Gold} gold, {Exp} exp", this);
+        _addRewardUseCase.Execute(gold, exp);
     }
 
-    public void NotifyStatsChanged()
-    {
-        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
-        GoldChanged?.Invoke(Gold);
-        ExpChanged?.Invoke(Exp);
-    }
+    // ── 状态辅助方法 ───────────────────────────────────────────────────────────
+
+    public void SetIsJumping(bool jumping) => IsJumping = jumping;
+    public void SetIsRolling(bool rolling) => IsRolling = rolling;
+
+    // ── 输入配置 ───────────────────────────────────────────────────────────────
 
     private void SetupInputActions()
     {
+        // 优先使用持久化的冲刺持定时间，未注入时回退到本地字段
+        float holdDuration = _controllerSettings?.CurrentSettings.SprintHoldTime
+                             ?? SprintHoldThreshold;
+
         sprintAction = new InputAction("SprintHold", InputActionType.Button);
-        sprintAction.AddBinding("<Keyboard>/leftShift").WithInteraction($"hold(duration={SprintHoldThreshold})");
+        sprintAction.AddBinding("<Keyboard>/leftShift")
+                    .WithInteraction($"hold(duration={holdDuration})");
         sprintAction.performed += OnSprintPerformed;
-        sprintAction.canceled += OnSprintCanceled;
+        sprintAction.canceled  += OnSprintCanceled;
 
         rollAction = new InputAction("RollTap", InputActionType.Button);
-        rollAction.AddBinding("<Keyboard>/leftShift").WithInteraction($"tap(duration={SprintHoldThreshold})");
+        rollAction.AddBinding("<Keyboard>/leftShift")
+                  .WithInteraction($"tap(duration={holdDuration})");
         rollAction.performed += OnRollPerformed;
 
         jumpAction = new InputAction("Jump", InputActionType.Button);
@@ -235,71 +203,54 @@ public class PlayerController : MonoBehaviour
         walkAction = new InputAction("WalkHold", InputActionType.Button);
         walkAction.AddBinding("<Keyboard>/leftAlt");
         walkAction.performed += OnWalkPerformed;
-        walkAction.canceled += OnWalkCanceled;
+        walkAction.canceled  += OnWalkCanceled;
 
         stanceToggleAction = new InputAction("StanceToggle", InputActionType.Button);
         stanceToggleAction.AddBinding("<Keyboard>/tab");
         stanceToggleAction.performed += OnStanceTogglePerformed;
     }
 
-    private void OnStanceTogglePerformed(InputAction.CallbackContext context)
+    private void OnStanceTogglePerformed(InputAction.CallbackContext ctx)
     {
-        if (!context.performed)
-        {
-            return;
-        }
-
-        StanceController?.ToggleStance();
+        if (ctx.performed) StanceController?.ToggleStance();
     }
 
-    private void OnSprintPerformed(InputAction.CallbackContext context)
+    private void OnSprintPerformed(InputAction.CallbackContext ctx) => sprintInputActive = true;
+    private void OnSprintCanceled(InputAction.CallbackContext ctx)  => sprintInputActive = false;
+
+    private void OnRollPerformed(InputAction.CallbackContext ctx)
     {
-        sprintInputActive = true;
+        if (CanRoll) StateMachine.ChangeState(new RollState(this));
     }
 
-    private void OnSprintCanceled(InputAction.CallbackContext context)
+    private void OnJumpPerformed(InputAction.CallbackContext ctx)
     {
-        sprintInputActive = false;
-    }
+        if (IsRolling) return;
 
-    private void OnRollPerformed(InputAction.CallbackContext context)
-    {
-        if (CanRoll)
-        {
-            StateMachine.ChangeState(new RollState(this));
-        }
-    }
-
-    private void OnJumpPerformed(InputAction.CallbackContext context)
-    {
-        if (IsRolling)
-        {
-            return;
-        }
-
-        // 已经在跳跃中：尝试触发空中跳（二段跳）
         if (StateMachine.CurrentState is JumpState jumpState)
         {
             jumpState.TryAirJump();
             return;
         }
 
-        // 当前姿态禁跳直接忽略
-        if (StanceController != null && !StanceController.CanJump)
-        {
-            return;
-        }
+        if (StanceController != null && !StanceController.CanJump) return;
 
         StateMachine.ChangeState(new JumpState(this));
     }
 
-    private void OnWalkPerformed(InputAction.CallbackContext context)
-    {
-        walkInputActive = true;
-    }
+    private void OnWalkPerformed(InputAction.CallbackContext ctx) => walkInputActive = true;
+    private void OnWalkCanceled(InputAction.CallbackContext ctx)  => walkInputActive = false;
 
-    private void OnWalkCanceled(InputAction.CallbackContext context)
+    // ── 辅助工具 ───────────────────────────────────────────────────────────────
+
+    private static void DisposeAction(ref InputAction action,
+        System.Action<InputAction.CallbackContext> performed,
+        System.Action<InputAction.CallbackContext> canceled = null)
     {
-        walkInputActive = false;
+        if (action == null) return;
+        action.performed -= performed;
+        if (canceled != null) action.canceled -= canceled;
+        action.Dispose();
+        action = null;
     }
 }

@@ -1,19 +1,16 @@
+using RPGSilent.Domain;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+/// <summary>
+/// 输入服务，实现 IInputService 接口。
+/// 由 VContainer 的 GameLifetimeScope 注册并管理，不再使用静态单例。
+/// </summary>
+public class InputManager : MonoBehaviour, IInputService
 {
-    public static InputManager Instance { get; private set; }
     public Vector2 MoveInput { get; private set; }
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

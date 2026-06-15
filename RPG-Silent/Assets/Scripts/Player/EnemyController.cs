@@ -1,43 +1,51 @@
 using System.Collections;
+using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyController : MonoBehaviour
+/// <summary>
+/// 敌人控制器，实现 IDamageable 接口，通过 IDamageable / IRewardable 与玩家交互，不再直接依赖 PlayerController。
+/// </summary>
+public class EnemyController : MonoBehaviour, IDamageable
 {
-    [Header("Health")]
+    [Header("生命值")]
     public int MaxHealth = 60;
-    public int CurrentHealth { get; private set; }
-    public bool IsDead { get; private set; }
+    public int  CurrentHealth { get; private set; }
+    public bool IsDead        { get; private set; }
 
-    [Header("Combat")]
-    public float moveSpeed = 3f;
-    public float turnSpeed = 8f;
+    [Header("战斗")]
+    public float moveSpeed     = 3f;
+    public float turnSpeed     = 8f;
     public float attackDistance = 2f;
     public float attackCooldown = 2f;
-    public int damage = 10;
+    public int   damage         = 10;
 
-    [Header("Reward")]
+    [Header("奖励")]
     [SerializeField] private int rewardGold = 10;
-    [SerializeField] private int rewardExp = 25;
+    [SerializeField] private int rewardExp  = 25;
 
-    [Header("Navigation")]
+    [Header("导航")]
     [SerializeField] private bool useNavMeshAgent = true;
 
-    [Header("Feedback")]
-    [SerializeField] private float destroyDelay = 2f;
-    [SerializeField] private float hitStopDuration = 0.15f;
-    [SerializeField] private float knockbackDistance = 0.25f;
-    [SerializeField] private GameObject hitEffectPrefab;
-    [SerializeField] private GameObject deathEffectPrefab;
+    [Header("反馈")]
+    [SerializeField] private float       destroyDelay      = 2f;
+    [SerializeField] private float       hitStopDuration   = 0.15f;
+    [SerializeField] private float       knockbackDistance = 0.25f;
+    [SerializeField] private GameObject  hitEffectPrefab;
+    [SerializeField] private GameObject  deathEffectPrefab;
 
-    private Transform target;
-    private float attackTimer;
-    private Animator animator;
-    private Rigidbody rb;
+    // 通过接口与玩家交互，不依赖 PlayerController 具体类
+    private IDamageable  _targetDamageable;
+    private IRewardable  _targetRewardable;
+    private Transform    _targetTransform;
+
+    private float        attackTimer;
+    private Animator     animator;
+    private Rigidbody    rb;
     private NavMeshAgent agent;
-    private Coroutine hurtRoutine;
-    private Vector3 desiredMoveDirection;
-    private bool warnedMissingNavMesh;
+    private Coroutine    hurtRoutine;
+    private Vector3      desiredMoveDirection;
+    private bool         warnedMissingNavMesh;
 
     private bool CanUseAgent => useNavMeshAgent
         && agent != null
@@ -47,28 +55,35 @@ public class EnemyController : MonoBehaviour
     private void Start()
     {
         CurrentHealth = MaxHealth;
-        target = GameObject.FindWithTag("Player")?.transform;
-        attackTimer = attackCooldown;
-        animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
-        agent = GetComponent<NavMeshAgent>();
+        attackTimer   = attackCooldown;
+        animator      = GetComponent<Animator>();
+        rb            = GetComponent<Rigidbody>();
+        agent         = GetComponent<NavMeshAgent>();
+
         ConfigureAgent();
         ConfigureRigidbody();
+        FindPlayer();
+    }
 
-        if (target == null)
+    private void FindPlayer()
+    {
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj == null)
         {
-            Debug.LogWarning("EnemyController did not find a Player target.", this);
+            Debug.LogWarning("[EnemyController] 未找到 Player 对象。", this);
+            return;
         }
+
+        _targetTransform  = playerObj.transform;
+        _targetDamageable = playerObj.GetComponent<IDamageable>();
+        _targetRewardable = playerObj.GetComponent<IRewardable>();
     }
 
     private void Update()
     {
-        if (IsDead || target == null)
-        {
-            return;
-        }
+        if (IsDead || _targetTransform == null) return;
 
-        Vector3 direction = target.position - transform.position;
+        Vector3 direction = _targetTransform.position - transform.position;
         direction.y = 0f;
 
         if (direction.magnitude > attackDistance)
@@ -78,7 +93,7 @@ public class EnemyController : MonoBehaviour
             if (CanUseAgent)
             {
                 agent.isStopped = false;
-                agent.SetDestination(target.position);
+                agent.SetDestination(_targetTransform.position);
             }
             else
             {
@@ -103,248 +118,178 @@ public class EnemyController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (CanUseAgent)
-        {
-            return;
-        }
+        if (CanUseAgent) return;
 
         if (rb != null && !rb.isKinematic)
         {
-            Vector3 velocity = rb.linearVelocity;
-            Vector3 horizontalVelocity = IsDead
-                ? Vector3.zero
-                : desiredMoveDirection * moveSpeed;
-
-            rb.linearVelocity = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
+            Vector3 velocity           = rb.linearVelocity;
+            Vector3 horizontalVelocity = IsDead ? Vector3.zero : desiredMoveDirection * moveSpeed;
+            rb.linearVelocity  = new Vector3(horizontalVelocity.x, velocity.y, horizontalVelocity.z);
             rb.angularVelocity = Vector3.zero;
             return;
         }
 
-        if (IsDead || desiredMoveDirection.sqrMagnitude <= 0.001f)
-        {
-            return;
-        }
-
-        Vector3 movement = desiredMoveDirection * moveSpeed * Time.fixedDeltaTime;
-        transform.position += movement;
+        if (IsDead || desiredMoveDirection.sqrMagnitude <= 0.001f) return;
+        transform.position += desiredMoveDirection * moveSpeed * Time.fixedDeltaTime;
     }
 
-    private void Attack()
+    // ── IDamageable 实现 ───────────────────────────────────────────────────────
+
+    public void TakeDamage(int dmg)
     {
-        if (IsDead)
-        {
-            return;
-        }
+        if (IsDead || dmg <= 0) return;
 
-        Debug.Log($"Enemy attacked player for {damage} damage.", this);
-        target.GetComponent<PlayerController>()?.TakeDamage(damage);
-    }
-
-    public void TakeDamage(int damage)
-    {
-        if (IsDead || damage <= 0)
-        {
-            return;
-        }
-
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-        Debug.Log($"Enemy took {damage} damage. HP: {CurrentHealth}/{MaxHealth}", this);
+        CurrentHealth = Mathf.Max(0, CurrentHealth - dmg);
+        Debug.Log($"[Enemy] 受伤 -{dmg} HP。当前: {CurrentHealth}/{MaxHealth}", this);
 
         if (hitEffectPrefab != null)
-        {
             Instantiate(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity);
-        }
 
-        if (CurrentHealth <= 0)
-        {
-            Die();
-            return;
-        }
+        if (CurrentHealth <= 0) { Die(); return; }
 
-        if (hurtRoutine != null)
-        {
-            StopCoroutine(hurtRoutine);
-        }
-
+        if (hurtRoutine != null) StopCoroutine(hurtRoutine);
         hurtRoutine = StartCoroutine(HurtFeedback());
     }
 
     public void Die()
     {
-        if (IsDead)
-        {
-            return;
-        }
+        if (IsDead) return;
 
-        IsDead = true;
+        IsDead      = true;
         attackTimer = attackCooldown;
         StopAgent();
         GrantReward();
 
-        if (hurtRoutine != null)
-        {
-            StopCoroutine(hurtRoutine);
-            hurtRoutine = null;
-        }
+        if (hurtRoutine != null) { StopCoroutine(hurtRoutine); hurtRoutine = null; }
 
         animator?.SetTrigger("Die");
 
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
+            rb.linearVelocity  = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
+            rb.isKinematic     = true;
         }
 
-        foreach (Collider enemyCollider in GetComponentsInChildren<Collider>())
-        {
-            enemyCollider.enabled = false;
-        }
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+            col.enabled = false;
 
         if (deathEffectPrefab != null)
-        {
             Instantiate(deathEffectPrefab, transform.position + Vector3.up, Quaternion.identity);
-        }
 
-        Debug.Log("Enemy died.", this);
+        Debug.Log("[Enemy] 死亡。", this);
 
-        if (destroyDelay >= 0f)
-        {
-            Destroy(gameObject, destroyDelay);
-        }
+        if (destroyDelay >= 0f) Destroy(gameObject, destroyDelay);
+    }
+
+    // ── 内部逻辑 ───────────────────────────────────────────────────────────────
+
+    private void Attack()
+    {
+        if (IsDead) return;
+        Debug.Log($"[Enemy] 攻击玩家，伤害 {damage}。", this);
+        _targetDamageable?.TakeDamage(damage);
     }
 
     private void GrantReward()
     {
-        PlayerController player = target != null ? target.GetComponent<PlayerController>() : null;
-        player?.AddReward(rewardGold, rewardExp);
+        _targetRewardable?.AddReward(rewardGold, rewardExp);
     }
 
     private IEnumerator HurtFeedback()
     {
         animator?.SetTrigger("Hit");
 
-        if (target != null && knockbackDistance > 0f)
+        if (_targetTransform != null && knockbackDistance > 0f)
         {
-            Vector3 knockbackDirection = transform.position - target.position;
-            knockbackDirection.y = 0f;
+            Vector3 dir = transform.position - _targetTransform.position;
+            dir.y = 0f;
 
-            if (knockbackDirection.sqrMagnitude > 0.001f)
+            if (dir.sqrMagnitude > 0.001f)
             {
-                Vector3 knockback = knockbackDirection.normalized * knockbackDistance;
+                Vector3 knockback = dir.normalized * knockbackDistance;
                 if (CanUseAgent)
-                {
                     agent.Warp(transform.position + knockback);
-                }
                 else if (rb != null && !rb.isKinematic)
-                {
-                    rb.linearVelocity = new Vector3(knockback.x / Time.fixedDeltaTime, rb.linearVelocity.y, knockback.z / Time.fixedDeltaTime);
-                }
+                    rb.linearVelocity = new Vector3(
+                        knockback.x / Time.fixedDeltaTime,
+                        rb.linearVelocity.y,
+                        knockback.z / Time.fixedDeltaTime);
                 else
-                {
                     transform.position += knockback;
-                }
             }
         }
 
         float originalSpeed = moveSpeed;
         moveSpeed = 0f;
-        if (CanUseAgent)
-        {
-            agent.speed = 0f;
-        }
+        if (CanUseAgent) agent.speed = 0f;
 
         yield return new WaitForSeconds(hitStopDuration);
 
         moveSpeed = originalSpeed;
-        if (CanUseAgent)
-        {
-            agent.speed = moveSpeed;
-        }
-
+        if (CanUseAgent) agent.speed = moveSpeed;
         hurtRoutine = null;
     }
 
     private void RotateTowards(Vector3 direction, float deltaTime)
     {
-        if (direction.sqrMagnitude <= 0.001f)
-        {
-            return;
-        }
-
-        Quaternion toRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, deltaTime * turnSpeed);
+        if (direction.sqrMagnitude <= 0.001f) return;
+        Quaternion to = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, to, deltaTime * turnSpeed);
     }
 
     private void ConfigureRigidbody()
     {
-        if (rb == null)
-        {
-            return;
-        }
+        if (rb == null) return;
 
         if (useNavMeshAgent && agent != null)
         {
             rb.isKinematic = true;
-            rb.useGravity = false;
+            rb.useGravity  = false;
             rb.angularVelocity = Vector3.zero;
             return;
         }
 
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.isKinematic         = false;
+        rb.useGravity          = true;
+        rb.interpolation       = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-        rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
-        rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        rb.angularVelocity = Vector3.zero;
+        rb.constraints         &= ~RigidbodyConstraints.FreezePositionY;
+        rb.constraints         |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.angularVelocity     = Vector3.zero;
 
-        foreach (Collider enemyCollider in GetComponentsInChildren<Collider>())
+        foreach (Collider col in GetComponentsInChildren<Collider>())
         {
-            if (enemyCollider.isTrigger)
-            {
-                Debug.LogWarning($"{enemyCollider.name} is a Trigger collider. Enemy needs at least one non-trigger collider to stand on the ground.", enemyCollider);
-            }
+            if (col.isTrigger)
+                Debug.LogWarning($"[Enemy] {col.name} 是 Trigger Collider，敌人至少需要一个非 Trigger Collider。", col);
         }
     }
 
     private void ConfigureAgent()
     {
-        if (agent == null)
-        {
-            return;
-        }
-
-        agent.speed = moveSpeed;
-        agent.angularSpeed = turnSpeed * 60f;
+        if (agent == null) return;
+        agent.speed           = moveSpeed;
+        agent.angularSpeed    = turnSpeed * 60f;
         agent.stoppingDistance = attackDistance;
-        agent.updateRotation = true;
-        agent.updatePosition = true;
-        agent.autoBraking = true;
+        agent.updateRotation  = true;
+        agent.updatePosition  = true;
+        agent.autoBraking     = true;
     }
 
     private void StopAgent()
     {
-        if (!CanUseAgent)
-        {
-            return;
-        }
-
+        if (!CanUseAgent) return;
         agent.isStopped = true;
         agent.ResetPath();
     }
 
     private void WarnIfAgentIsMissingNavMesh()
     {
-        if (!useNavMeshAgent || agent == null || warnedMissingNavMesh)
-        {
-            return;
-        }
-
+        if (!useNavMeshAgent || agent == null || warnedMissingNavMesh) return;
         if (!agent.isOnNavMesh)
         {
             warnedMissingNavMesh = true;
-            Debug.LogWarning("Enemy has a NavMeshAgent, but it is not on a baked NavMesh.", this);
+            Debug.LogWarning("[Enemy] NavMeshAgent 不在 NavMesh 上。", this);
         }
     }
 }

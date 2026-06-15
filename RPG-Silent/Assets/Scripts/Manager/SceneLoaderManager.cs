@@ -1,34 +1,31 @@
 using System;
 using System.Collections;
+using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
-public class SceneLoaderManager : MonoBehaviour
+/// <summary>
+/// 场景加载服务，实现 ISceneLoader 接口。
+/// 由 VContainer 的 GameLifetimeScope 注册并管理，不再使用静态单例。
+/// </summary>
+public class SceneLoaderManager : MonoBehaviour, ISceneLoader
 {
-    public static SceneLoaderManager Instance;
-
     private bool isSceneLoading;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            return;
-        }
-
-        Destroy(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
-    public void LoadScene(string sceneKey, bool additive = false, Action<float> onProgress = null, Action onComplete = null)
+    public void LoadScene(string sceneKey, bool additive = false,
+                          Action<float> onProgress = null, Action onComplete = null)
     {
         if (isSceneLoading)
         {
-            Debug.LogWarning($"Scene is already loading: {sceneKey}");
+            Debug.LogWarning($"[SceneLoader] 场景正在加载中，忽略重复请求: {sceneKey}");
             return;
         }
 
@@ -47,13 +44,14 @@ public class SceneLoaderManager : MonoBehaviour
                 return;
             }
 
-            Debug.LogError($"Scene load failed: {sceneKey}");
+            Debug.LogError($"[SceneLoader] 场景加载失败: {sceneKey}");
         };
 
         StartCoroutine(TrackProgressCoroutine(handle, onProgress));
     }
 
-    private IEnumerator TrackProgressCoroutine(AsyncOperationHandle<SceneInstance> handle, Action<float> onProgress)
+    private IEnumerator TrackProgressCoroutine(AsyncOperationHandle<SceneInstance> handle,
+                                               Action<float> onProgress)
     {
         while (!handle.IsDone)
         {

@@ -1,28 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using RPGSilent.Domain;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class AttackArea : MonoBehaviour
 {
-    private readonly HashSet<EnemyController> targets = new HashSet<EnemyController>();
-    private AttackProfile profile;
-    private AttackExecutor owner;
-    private float duration;
-    private float tickInterval;
+    private readonly HashSet<IDamageable> targets = new HashSet<IDamageable>();
+    private AttackProfile   profile;
+    private AttackExecutor  owner;
+    private float           tickInterval;
 
     private void Awake()
     {
-        Collider areaCollider = GetComponent<Collider>();
-        areaCollider.isTrigger = true;
+        GetComponent<Collider>().isTrigger = true;
     }
 
     public void Initialize(AttackProfile attackProfile, AttackExecutor attackOwner)
     {
-        profile = attackProfile;
-        owner = attackOwner;
-        duration = profile != null ? Mathf.Max(0f, profile.AreaDuration) : 0f;
-        tickInterval = profile != null ? Mathf.Max(0.05f, profile.TickInterval) : 1f;
+        profile      = attackProfile;
+        owner        = attackOwner;
+        float duration = profile != null ? Mathf.Max(0f,    profile.AreaDuration) : 0f;
+        tickInterval   = profile != null ? Mathf.Max(0.05f, profile.TickInterval)  : 1f;
 
         StartCoroutine(TickDamage());
         Destroy(gameObject, duration);
@@ -30,45 +29,34 @@ public class AttackArea : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        EnemyController enemy = ResolveEnemy(other);
-        if (enemy != null)
-        {
-            targets.Add(enemy);
-        }
+        IDamageable target = ResolveTarget(other);
+        if (target != null) targets.Add(target);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        EnemyController enemy = ResolveEnemy(other);
-        if (enemy != null)
-        {
-            targets.Remove(enemy);
-        }
+        IDamageable target = ResolveTarget(other);
+        if (target != null) targets.Remove(target);
     }
 
     private IEnumerator TickDamage()
     {
         while (profile != null && owner != null)
         {
-            foreach (EnemyController enemy in targets)
+            foreach (IDamageable target in targets)
             {
-                if (enemy != null)
-                {
-                    owner.ApplyDamage(enemy, profile, enemy.transform.position, allowRepeatedDamage: true);
-                }
+                if (target is Component targetComp)
+                    owner.ApplyDamage(target, profile,
+                        targetComp.transform.position, allowRepeatedDamage: true);
             }
-
             yield return new WaitForSeconds(tickInterval);
         }
     }
 
-    private EnemyController ResolveEnemy(Collider other)
+    private IDamageable ResolveTarget(Collider other)
     {
         if (profile == null || (profile.TargetLayers.value & (1 << other.gameObject.layer)) == 0)
-        {
             return null;
-        }
-
-        return other.GetComponentInParent<EnemyController>();
+        return other.GetComponentInParent<IDamageable>();
     }
 }

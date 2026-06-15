@@ -1,30 +1,48 @@
 using System;
 using System.Collections.Generic;
+using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using VContainer;
+using VContainer.Unity;
 
-public class UIManager : MonoBehaviour
+/// <summary>
+/// UI 生命周期管理器，实现 IUIService 接口。
+/// 由 VContainer 的 GameLifetimeScope 注册并管理，不再使用静态单例。
+/// 加载 UI Prefab 后自动调用 VContainer 注入，使 UIBase 子类可使用 [Inject]。
+/// </summary>
+public class UIManager : MonoBehaviour, IUIService
 {
-    public static UIManager Instance;
+    // 全局容器（GameLifetimeScope），由 GameLifetimeScope.RegisterBuildCallback 显式传入
+    private IObjectResolver _container;
 
-    private readonly Dictionary<string, GameObject> activeUIs = new();
-    private readonly Dictionary<string, AsyncOperationHandle<GameObject>> loadedHandles = new();
-    private readonly Dictionary<string, GameObject> cachedUIs = new();
-    private readonly HashSet<string> initializedUIs = new();
+    // 场景级容器（SceneLifetimeScope），游戏场景加载后由 SceneLifetimeScope 传入
+    // 注入 MainUI 等场景级 UI 时优先使用，因为它拥有 IPlayerStatsReader 等场景注册
+    private IObjectResolver _sceneResolver;
+
+    private readonly Dictionary<string, GameObject>                        activeUIs      = new();
+    private readonly Dictionary<string, AsyncOperationHandle<GameObject>>  loadedHandles  = new();
+    private readonly Dictionary<string, GameObject>                        cachedUIs      = new();
+    private readonly HashSet<string>                                       initializedUIs = new();
+
+    /// <summary>GameLifetimeScope 构建完成后调用，传入全局容器。</summary>
+    public void SetGlobalResolver(IObjectResolver resolver)
+    {
+        _container = resolver;
+    }
+
+    /// <summary>游戏场景加载后由 SceneLifetimeScope 调用，切换到场景级容器。</summary>
+    public void SetSceneResolver(IObjectResolver resolver)
+    {
+        _sceneResolver = resolver;
+    }
 
     public Transform UIRoot;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            return;
-        }
-
-        Destroy(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     public void OpenUI(string uiKey, params object[] args)
@@ -47,12 +65,15 @@ public class UIManager : MonoBehaviour
         {
             if (op.Status == AsyncOperationStatus.Succeeded)
             {
+                // 先关闭，确保 InjectGameObject 在 OnEnable 之前完成
+                // 避免子组件（如 ScreenPage）在注入前就触发 OnEnable
+                op.Result.SetActive(false);
                 loadedHandles[uiKey] = handle;
                 OpenLoadedUI(uiKey, op.Result, args);
                 return;
             }
 
-            Debug.LogError($"Load UI failed: {uiKey}");
+            Debug.LogError($"[UIManager] 加载 UI 失败: {uiKey}");
         };
     }
 
@@ -113,7 +134,7 @@ public class UIManager : MonoBehaviour
                 return;
             }
 
-            Debug.LogError($"Preload UI failed: {uiKey}");
+            Debug.LogError($"[UIManager] 预加载 UI 失败: {uiKey}");
         };
     }
 
@@ -135,6 +156,14 @@ public class UIManager : MonoBehaviour
 
     private void OpenLoadedUI(string uiKey, GameObject uiObj, params object[] args)
     {
+        // 优先使用场景级容器（含 IPlayerStatsReader 等），没有时退回全局容器
+        IObjectResolver resolver = _sceneResolver ?? _container;
+        if (resolver == null)
+            Debug.LogError($"[UIManager] 容器为 null，{uiKey} 的依赖注入将跳过。" +
+                           "请确认 GameLifetimeScope 已正确初始化。");
+        else
+            resolver.InjectGameObject(uiObj);
+
         InitUI(uiKey, uiObj);
         uiObj.SetActive(true);
         activeUIs[uiKey] = uiObj;
