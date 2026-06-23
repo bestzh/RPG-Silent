@@ -16,6 +16,8 @@ using VContainer.Unity;
 /// </summary>
 public class SceneLifetimeScope : LifetimeScope
 {
+    private const string PauseUiKey = "UI/PauseUI";
+
     [SerializeField] private int playerMaxHealth = 100;
 
     protected override void Configure(IContainerBuilder builder)
@@ -31,8 +33,12 @@ public class SceneLifetimeScope : LifetimeScope
         builder.Register<PlayerAddRewardUseCase>(Lifetime.Scoped);
         builder.Register<PlayerHealUseCase>(Lifetime.Scoped);
 
-        // 从场景层级中找到 PlayerController 并注入依赖
+        // 暂停菜单服务（ESC 唤出 PauseUI，不冻结游戏，仅游戏场景有效）
+        builder.Register<GamePauseService>(Lifetime.Scoped).As<IGamePauseService>();
+
+        // 从场景层级中找到 PlayerController / CameraControl 并注入依赖
         builder.RegisterComponentInHierarchy<PlayerController>();
+        builder.RegisterComponentInHierarchy<CameraControl>();
 
         // 场景容器构建完毕后，把场景级容器传给 UIManager
         // 这样 UIManager 加载 MainUI 时能解析 IPlayerStatsReader 等场景级类型
@@ -40,6 +46,10 @@ public class SceneLifetimeScope : LifetimeScope
         {
             var uiService = container.Resolve<IUIService>() as UIManager;
             uiService?.SetSceneResolver(container);
+
+            // 解析后订阅 ESC，并预加载 PauseUI，避免首次按键异步加载导致状态错乱
+            container.Resolve<IGamePauseService>();
+            container.Resolve<IUIService>().PreloadUI(PauseUiKey);
         });
     }
 
@@ -48,8 +58,10 @@ public class SceneLifetimeScope : LifetimeScope
         // 场景卸载时，清除 UIManager 中的场景级容器引用，恢复使用全局容器
         if (Container != null)
         {
-            var uiService = Container.Resolve<IUIService>() as UIManager;
-            uiService?.SetSceneResolver(null);
+            var uiService = Container.Resolve<IUIService>();
+            uiService?.CloseUI(PauseUiKey);
+            uiService?.SetRaycastEnabled("UI/MainUI", true);
+            (uiService as UIManager)?.SetSceneResolver(null);
         }
 
         base.OnDestroy();

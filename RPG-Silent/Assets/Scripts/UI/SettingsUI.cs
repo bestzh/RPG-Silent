@@ -14,6 +14,7 @@ public class SettingsUI : UIBase
     public Button Back;
 
     private SettingsPage[] pages;
+    private string _returnUiKey;
 
     private class SettingsPage
     {
@@ -37,13 +38,16 @@ public class SettingsUI : UIBase
     public override void OnOpen(params object[] args)
     {
         base.OnOpen(args);
+        _returnUiKey = args.Length > 0 ? args[0] as string : null;
         ShowPage(Screen);
     }
 
     private void OnBackButtonClicked()
     {
-        _uiService.OpenUI("UI/StartUI");
         _uiService.CloseUI("UI/SettingsUI");
+
+        if (!string.IsNullOrEmpty(_returnUiKey))
+            _uiService.OpenUI(_returnUiKey);
     }
 
     private void InitPages()

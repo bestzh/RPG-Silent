@@ -7,7 +7,8 @@ using VContainer;
 public class MainUI : UIBase
 {
     // 通过 VContainer 注入，不再 FindWithTag
-    [Inject] private IPlayerStatsReader _stats;
+    [Inject] private IPlayerStatsReader   _stats;
+    [Inject] private IGameSettingsService _gameSettings;
 
     public Image          avatarImage;
     public Slider         hpBar;
@@ -30,8 +31,12 @@ public class MainUI : UIBase
         _stats.OnGoldChanged   += OnGoldChanged;
         _stats.OnExpChanged    += OnExpChanged;
 
+        if (_gameSettings != null)
+            _gameSettings.OnSettingsApplied += OnGameSettingsApplied;
+
         _stats.Refresh();
         UpdateMP(1f);
+        ApplyGameSettings(_gameSettings?.CurrentSettings);
 
         Debug.Log("[MainUI] 已打开并绑定玩家数据。");
     }
@@ -46,6 +51,9 @@ public class MainUI : UIBase
             _stats.OnGoldChanged   -= OnGoldChanged;
             _stats.OnExpChanged    -= OnExpChanged;
         }
+
+        if (_gameSettings != null)
+            _gameSettings.OnSettingsApplied -= OnGameSettingsApplied;
 
         Debug.Log("[MainUI] 已关闭。");
     }
@@ -69,5 +77,25 @@ public class MainUI : UIBase
     private void UpdateMP(float value)
     {
         if (mpBar != null) mpBar.value = value;
+    }
+
+    private void OnGameSettingsApplied(GameSettings settings) => ApplyGameSettings(settings);
+
+    private void ApplyGameSettings(GameSettings settings)
+    {
+        if (settings == null) return;
+
+        bool showHud = settings.ShowHud;
+        SetActiveIfNotNull(avatarImage?.gameObject, showHud);
+        SetActiveIfNotNull(hpBar?.gameObject,       showHud);
+        SetActiveIfNotNull(mpBar?.gameObject,       showHud);
+        SetActiveIfNotNull(goldText?.gameObject,    showHud);
+        SetActiveIfNotNull(moneyText?.gameObject,   showHud);
+        SetActiveIfNotNull(miniMap?.gameObject,     showHud && settings.ShowMiniMap);
+    }
+
+    private static void SetActiveIfNotNull(GameObject target, bool active)
+    {
+        if (target != null) target.SetActive(active);
     }
 }

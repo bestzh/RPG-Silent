@@ -17,7 +17,8 @@ public class LoadingUI : UIBase
         base.OnOpen(args);
         Debug.Log("[LoadingUI] 已打开，开始加载场景。");
 
-        string nextScene = args.Length > 0 ? args[0] as string : "Scenes/Main";
+        string nextScene   = args.Length > 0 ? args[0] as string : "Scenes/Main";
+        string openUiAfter = args.Length > 1 ? args[1] as string : "UI/MainUI";
 
         _sceneLoader.LoadScene(
             nextScene,
@@ -31,7 +32,8 @@ public class LoadingUI : UIBase
             {
                 Debug.Log("[LoadingUI] 场景加载完成。");
                 _uiService.CloseUI("UI/LoadingUI");
-                _uiService.OpenUI("UI/MainUI");
+                if (!string.IsNullOrEmpty(openUiAfter))
+                    _uiService.OpenUI(openUiAfter);
             });
     }
 

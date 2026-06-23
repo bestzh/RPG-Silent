@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour, IUIService
     {
         if (activeUIs.TryGetValue(uiKey, out GameObject activeObj))
         {
+            BringToFront(activeObj);
             activeObj.GetComponent<UIBase>()?.OnOpen(args);
             return;
         }
@@ -110,6 +111,28 @@ public class UIManager : MonoBehaviour, IUIService
         }
     }
 
+    public bool IsUIOpen(string uiKey) => activeUIs.ContainsKey(uiKey);
+
+    public void SetRaycastEnabled(string uiKey, bool enabled)
+    {
+        if (!TryGetUIGameObject(uiKey, out GameObject uiObj)) return;
+
+        var group = uiObj.GetComponent<CanvasGroup>();
+        if (group == null) group = uiObj.AddComponent<CanvasGroup>();
+
+        group.blocksRaycasts = enabled;
+        group.interactable   = enabled;
+    }
+
+    private bool TryGetUIGameObject(string uiKey, out GameObject uiObj)
+    {
+        if (activeUIs.TryGetValue(uiKey, out uiObj)) return true;
+        if (cachedUIs.TryGetValue(uiKey, out uiObj)) return true;
+
+        uiObj = null;
+        return false;
+    }
+
     public void PreloadUI(string uiKey, Action onComplete = null)
     {
         if (cachedUIs.ContainsKey(uiKey))
@@ -165,9 +188,16 @@ public class UIManager : MonoBehaviour, IUIService
             resolver.InjectGameObject(uiObj);
 
         InitUI(uiKey, uiObj);
+        BringToFront(uiObj);
         uiObj.SetActive(true);
         activeUIs[uiKey] = uiObj;
         uiObj.GetComponent<UIBase>()?.OnOpen(args);
+    }
+
+    private static void BringToFront(GameObject uiObj)
+    {
+        if (uiObj != null)
+            uiObj.transform.SetAsLastSibling();
     }
 
     private void InitUI(string uiKey, GameObject uiObj)

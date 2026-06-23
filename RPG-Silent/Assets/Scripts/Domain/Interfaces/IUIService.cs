@@ -8,5 +8,7 @@ namespace RPGSilent.Domain
         void CloseUI(string uiKey);
         void CloseAllUI();
         void PreloadUI(string uiKey, Action onComplete = null);
+        bool IsUIOpen(string uiKey);
+        void SetRaycastEnabled(string uiKey, bool enabled);
     }
 }

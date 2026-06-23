@@ -3,11 +3,17 @@ using UnityEngine;
 public class ScreenShakeManager : MonoBehaviour
 {
     public static ScreenShakeManager Instance;
+
+    private static float _intensityScale = 1f;
+
     private Transform cameraTransform;
     private Vector3 originalPos;
     private float shakeDuration = 0f;
     private float shakeAmount = 0.2f;
     private float decreaseFactor = 1.5f;
+
+    public static void SetIntensityScale(float scale) =>
+        _intensityScale = Mathf.Clamp01(scale);
 
     private void Awake()
     {
@@ -33,7 +39,9 @@ public class ScreenShakeManager : MonoBehaviour
 
     public void Shake(float amount, float duration)
     {
-        shakeAmount = amount;
+        if (_intensityScale <= 0f) return;
+
+        shakeAmount = amount * _intensityScale;
         shakeDuration = duration;
     }
 }
