@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Scene
   m_GUID: 1e47e785c1bcf694e92a0611910161da
   m_SerializeEntries:
+  - m_GUID: 121ef50d0993f3d41a5663b03a24a33a
+    m_Address: Scenes/Dungeon01.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c0d88f7a4a8e18b40ae584043bc602fc
     m_Address: Scenes/Main
     m_ReadOnly: 0
