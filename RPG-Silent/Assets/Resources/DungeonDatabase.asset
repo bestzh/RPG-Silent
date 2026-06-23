@@ -12,4 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3a50eb6d6837fc41a8527940122b807, type: 3}
   m_Name: DungeonDatabase
   m_EditorClassIdentifier: 
-  entries: []
+  entries:
+  - Id: 1001
+    DisplayName: "\u8FF7\u5F71\u68EE\u6797"
+    Description: 
+    Icon: {fileID: 0}
+    BackgroundImage: {fileID: 21300000, guid: b534effd95649274795afe9f76b4dbce, type: 3}
+    SceneKey: Dungeon01
+    DifficultyTiers:
+    - Difficulty: 1
+      RecommendedLevel: 0
+      MinLevel: 0
+      IsEnabled: 0
+    - Difficulty: 2
+      RecommendedLevel: 10
+      MinLevel: 0
+      IsEnabled: 1
+    - Difficulty: 3
+      RecommendedLevel: 20
+      MinLevel: 0
+      IsEnabled: 1
+    IsEnabled: 1
+  - Id: 1002
+    DisplayName: "\u6C34\u6676\u6D1E\u7A9F"
+    Description: 
+    Icon: {fileID: 0}
+    BackgroundImage: {fileID: 21300000, guid: 62c2148be0b1afb4f9db8dd2bf68b031, type: 3}
+    SceneKey: Dungeon01
+    DifficultyTiers:
+    - Difficulty: 2
+      RecommendedLevel: 10
+      MinLevel: 0
+      IsEnabled: 0
+    - Difficulty: 3
+      RecommendedLevel: 20
+      MinLevel: 0
+      IsEnabled: 1
+    - Difficulty: 4
+      RecommendedLevel: 30
+      MinLevel: 0
+      IsEnabled: 1
+    IsEnabled: 0
