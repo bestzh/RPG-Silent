@@ -36,6 +36,9 @@ public class SceneLifetimeScope : LifetimeScope
         // 暂停菜单服务（ESC 唤出 PauseUI，不冻结游戏，仅游戏场景有效）
         builder.Register<GamePauseService>(Lifetime.Scoped).As<IGamePauseService>();
 
+        // 传送门服务（玩家进入传送门触发器时唤出 PortalUI）
+        builder.Register<PortalService>(Lifetime.Scoped).As<IPortalService>();
+
         // 从场景层级中找到 PlayerController / CameraControl 并注入依赖
         builder.RegisterComponentInHierarchy<PlayerController>();
         builder.RegisterComponentInHierarchy<CameraControl>();
@@ -50,6 +53,13 @@ public class SceneLifetimeScope : LifetimeScope
             // 解析后订阅 ESC，并预加载 PauseUI，避免首次按键异步加载导致状态错乱
             container.Resolve<IGamePauseService>();
             container.Resolve<IUIService>().PreloadUI(PauseUiKey);
+
+            // 实例化传送门服务，并给场景中所有传送门触发器注入依赖
+            container.Resolve<IPortalService>();
+            PortalTrigger[] triggers = FindObjectsByType<PortalTrigger>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (PortalTrigger trigger in triggers)
+                container.InjectGameObject(trigger.gameObject);
         });
     }
 
