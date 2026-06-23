@@ -1,3 +1,4 @@
+using System;
 using RPGSilent.Domain;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ public class ControllerSettingsService : MonoBehaviour, IControllerSettingsServi
 
     public ControllerSettings CurrentSettings { get; private set; } = new ControllerSettings();
 
+    public event Action<ControllerSettings> OnSettingsApplied;
+
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -31,6 +34,8 @@ public class ControllerSettingsService : MonoBehaviour, IControllerSettingsServi
             SprintHoldTime   = Mathf.Clamp(settings.SprintHoldTime,   0.05f, 2f),
             InvertY          = settings.InvertY
         };
+
+        OnSettingsApplied?.Invoke(CurrentSettings);
     }
 
     public void Save()

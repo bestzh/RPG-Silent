@@ -1,3 +1,5 @@
+using System;
+
 namespace RPGSilent.Domain
 {
     /// <summary>
@@ -7,6 +9,9 @@ namespace RPGSilent.Domain
     {
         /// <summary>当前正在生效的设置。</summary>
         ControllerSettings CurrentSettings { get; }
+
+        /// <summary>每次 Apply 后触发，参数为最新设置。</summary>
+        event Action<ControllerSettings> OnSettingsApplied;
 
         /// <summary>立即应用指定设置。</summary>
         void Apply(ControllerSettings settings);
