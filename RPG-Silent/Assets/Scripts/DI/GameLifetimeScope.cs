@@ -1,3 +1,4 @@
+using RPGSilent.Application;
 using RPGSilent.Domain;
 using UnityEngine;
 using VContainer;
@@ -24,8 +25,21 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private GameSettingsService         gameSettingsService;
     [SerializeField] private PlayerInputActionsService   playerInputActionsService;
 
+    [Header("玩家（跨场景保留，全局单例）")]
+    [SerializeField] private int playerMaxHealth = 100;
+
     protected override void Configure(IContainerBuilder builder)
     {
+        // 玩家数据与用例：注册为全局单例，使玩家可跨场景持久保留（HP 等状态延续）
+        builder.Register<PlayerStats>(
+            _ => new PlayerStats(playerMaxHealth),
+            Lifetime.Singleton
+        ).AsSelf().As<IPlayerStatsReader>();
+
+        builder.Register<PlayerTakeDamageUseCase>(Lifetime.Singleton);
+        builder.Register<PlayerAddRewardUseCase>(Lifetime.Singleton);
+        builder.Register<PlayerHealUseCase>(Lifetime.Singleton);
+
         // 基础服务
         builder.RegisterComponent(uiManager).As<IUIService>();
         builder.RegisterComponent(inputManager).As<IInputService>();

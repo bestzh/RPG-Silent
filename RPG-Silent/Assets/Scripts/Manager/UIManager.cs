@@ -126,8 +126,10 @@ public class UIManager : MonoBehaviour, IUIService
 
     private bool TryGetUIGameObject(string uiKey, out GameObject uiObj)
     {
-        if (activeUIs.TryGetValue(uiKey, out uiObj)) return true;
-        if (cachedUIs.TryGetValue(uiKey, out uiObj)) return true;
+        // 注意：用 Unity 的 != null 判断，已销毁的 GameObject 会被视为 null，
+        // 避免场景切换时字典里残留的悬空引用导致 MissingReferenceException。
+        if (activeUIs.TryGetValue(uiKey, out uiObj) && uiObj != null) return true;
+        if (cachedUIs.TryGetValue(uiKey, out uiObj) && uiObj != null) return true;
 
         uiObj = null;
         return false;

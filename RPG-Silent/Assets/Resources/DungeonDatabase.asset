@@ -19,6 +19,8 @@ MonoBehaviour:
     Icon: {fileID: 0}
     BackgroundImage: {fileID: 21300000, guid: b534effd95649274795afe9f76b4dbce, type: 3}
     SceneKey: Scenes/Dungeon01
+    SpawnPosition: {x: -12.881, y: 8.177, z: 52.135}
+    SpawnEulerAngles: {x: -0, y: 0, z: 0}
     DifficultyTiers:
     - Difficulty: 1
       RecommendedLevel: 0
@@ -39,6 +41,8 @@ MonoBehaviour:
     Icon: {fileID: 0}
     BackgroundImage: {fileID: 21300000, guid: 62c2148be0b1afb4f9db8dd2bf68b031, type: 3}
     SceneKey: Scenes/Dungeon01
+    SpawnPosition: {x: 236, y: 144, z: -15}
+    SpawnEulerAngles: {x: 0, y: 0, z: 0}
     DifficultyTiers:
     - Difficulty: 2
       RecommendedLevel: 10
