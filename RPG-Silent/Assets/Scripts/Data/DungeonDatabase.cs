@@ -73,6 +73,14 @@ public class DungeonDatabase : ScriptableObject
         [Tooltip("五档难度共用同一场景，难度差异由副本内逻辑处理")]
         public string SceneKey;
 
+        [Tooltip("进入该副本后玩家的初始位置（世界坐标）")]
+        public Vector3 SpawnPosition;
+
+        [Tooltip("进入该副本后玩家的初始朝向（欧拉角）")]
+        public Vector3 SpawnEulerAngles;
+
+        public Quaternion SpawnRotation => Quaternion.Euler(SpawnEulerAngles);
+
         [Header("难度档位")]
         [Tooltip("按需添加难度档位，不必凑齐五档。未添加的档位对该副本不可用。")]
         public List<DifficultyTier> DifficultyTiers = new List<DifficultyTier>();
