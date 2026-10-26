@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d1670afed44cb45a957f6978721b73, type: 3}
+  m_Name: RangedBolt
+  m_EditorClassIdentifier: 
+  DisplayName: "\u6697\u7130\u5F39"
+  Attack: {fileID: 11400000, guid: 66cc1d2466167cd439b275a3f9a74e12, type: 2}
+  AnimationState: Attack
+  Duration: 1.7
+  ReleaseTime: 0.55
+  Cooldown: 2.4
+  MinRange: 0
+  MaxRange: 14
+  RequiredPhase: 1
+  Weight: 1
+  SuperArmor: 0
+  AimAtTargetGround: 0
+  WindupEffect: {fileID: 0}
+  ReleaseEffect: {fileID: 0}
+  TelegraphMaterial: {fileID: 0}
+  TelegraphColor: {r: 1, g: 0.25, b: 0.08, a: 0.9}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd2226f033f2e64d97f81e51a69fc64, type: 3}
+  m_Name: Melee
+  m_EditorClassIdentifier: 
+  DisplayName: "\u66AE\u5F71\u5251\u536B"
+  Behavior: 0
+  Health: 65
+  MoveSpeed: 3.4
+  DetectionDistance: 18
+  LeashDistance: 60
+  PreferredDistance: 2.1
+  RetreatDistance: 0
+  RewardGold: 10
+  RewardExp: 25
+  StaggerThreshold: 0
+  Skills:
+  - {fileID: 11400000, guid: 23aac46718e46e149ab5c3a9f983853b, type: 2}
+  HitEffect: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
+  DeathEffect: {fileID: 5610560069491694539, guid: 0def5d88622eaa74681191f2c29a1126, type: 3}

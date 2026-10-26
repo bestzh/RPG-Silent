@@ -45,6 +45,10 @@ public class DungeonDatabase : ScriptableObject
         [Tooltip("关闭后该难度档位不可选")]
         public bool IsEnabled = true;
 
+        [Min(0.1f)] public float EnemyHealthMultiplier = 1f;
+        [Min(0.1f)] public float EnemyDamageMultiplier = 1f;
+        [Min(0f)] public float RewardMultiplier = 1f;
+
         public string DifficultyLabel => GetDifficultyLabel(Difficulty);
     }
 
@@ -80,6 +84,9 @@ public class DungeonDatabase : ScriptableObject
         public Vector3 SpawnEulerAngles;
 
         public Quaternion SpawnRotation => Quaternion.Euler(SpawnEulerAngles);
+
+        public bool MatchesScene(string sceneName) => !string.IsNullOrEmpty(SceneKey) &&
+            (SceneKey == sceneName || SceneKey.EndsWith("/" + sceneName, StringComparison.Ordinal));
 
         [Header("难度档位")]
         [Tooltip("按需添加难度档位，不必凑齐五档。未添加的档位对该副本不可用。")]
