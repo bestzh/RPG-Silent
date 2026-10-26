@@ -112,6 +112,26 @@ class RepositoryChecks(unittest.TestCase):
         self.assertEqual([], issues)
         self.assertTrue((self.root / path).is_file())
 
+    def test_addressables_outputs_in_nested_project_are_ignored_and_rejected(self):
+        ignore = Path(__file__).resolve().parents[3] / ".gitignore"
+        self.write(".gitignore", ignore.read_text(encoding="utf-8"))
+        generated = [
+            "RPG-Silent/Assets/AddressableAssetsData/Windows/addressables_content_state.bin",
+            "RPG-Silent/Assets/AddressableAssetsData/Windows/addressables_content_state.bin.meta",
+            "RPG-Silent/Assets/AddressableAssetsData/link.xml",
+            "RPG-Silent/Assets/AddressableAssetsData/link.xml.meta",
+            "RPG-Silent/Assets/StreamingAssets/aa/settings.json",
+        ]
+        for path in generated:
+            self.write(path, "generated")
+            self.assertTrue(check.generated(path), path)
+            self.assertEqual(path, check.git(self.root, "check-ignore", "--", path).decode().strip())
+        settings = "RPG-Silent/Assets/AddressableAssetsData/AddressableAssetSettings.asset"
+        self.asset(settings)
+        self.stage()
+        self.assertIn(settings, check.snapshot(self.root, None))
+        self.assertFalse(check.generated(settings))
+
     def test_large_file_exception_is_path_specific_and_bounded(self):
         self.policy.exceptions["legacy.bin"] = 8192
         self.write("legacy.bin", b"\0" * 8192)
