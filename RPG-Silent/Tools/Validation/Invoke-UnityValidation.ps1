@@ -1,9 +1,11 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)][string]$UnityEditorPath,
-    [switch]$BuildWindows
+    [switch]$BuildWindows,
+    [switch]$SmokeStartup
 )
 $ErrorActionPreference = 'Stop'
+if ($SmokeStartup -and !$BuildWindows) { throw '-SmokeStartup requires -BuildWindows.' }
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $unityExe = (Resolve-Path -LiteralPath $UnityEditorPath).Path
 $runId = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
@@ -86,6 +88,21 @@ try {
             Where-Object Name -ne 'sha256.json' | ForEach-Object {
                 @{ path = $_.FullName.Substring($buildOutput.Length + 1).Replace('\', '/'); sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
             } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $buildOutput 'sha256.json') -Encoding UTF8
+        if ($SmokeStartup) {
+            $playerLog = Join-Path $logs 'player-startup.log'
+            $player = Start-Process -FilePath $build.output -ArgumentList @('-batchmode', '-logFile', ('"' + $playerLog + '"')) -PassThru -WindowStyle Hidden
+            try {
+                $earlyExit = $player.WaitForExit(30000)
+                $playerText = Get-Content -LiteralPath $playerLog -Raw
+                $startup = [ordered]@{
+                    seconds = 30; earlyExit = $earlyExit
+                    startMenuLoaded = $playerText.Contains('[StartUI] 已打开')
+                    errorPatternFound = [bool]($playerText -match 'Exception:|Crash!!!|Failed to load|Error:')
+                }
+                $startup | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $logs 'player-startup.json') -Encoding UTF8
+                if ($earlyExit -or !$startup.startMenuLoaded -or $startup.errorPatternFound) { throw 'Independent Player startup check failed.' }
+            } finally { if (!$player.HasExited) { Stop-Process -InputObject $player } }
+        }
     }
     $record.status = 'Passed'
 }
