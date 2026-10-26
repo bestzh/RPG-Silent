@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+repository=$(git rev-parse --show-toplevel)
+python_path=$(git config --local --get rpg-silent.hooksPython || :)
+if [ -z "$python_path" ] || [ ! -x "$python_path" ]; then
+    printf '%s\n' '提交检查未找到 Python，请重新运行 python RPG-Silent/Tools/Git/install_hooks.py。' >&2
+    exit 1
+fi
+
+export PYTHONDONTWRITEBYTECODE=1
+exec "$python_path" "$repository/RPG-Silent/Tools/Git/check_repository.py" --staged
