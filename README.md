@@ -7,4 +7,4 @@ Unity 工程位于 `RPG-Silent/`，请使用 `RPG-Silent/ProjectSettings/Project
 - [Git 管理、提交检查与 CI](RPG-Silent/Docs/GitWorkflow.md)
 - [敌人及副本配置](RPG-Silent/Docs/EnemyEncounter.md)
 
-提交前运行 `python RPG-Silent/Tools/Git/check_repository.py --staged`。
+首次克隆后运行 `python RPG-Silent/Tools/Git/install_hooks.py`，此后提交时自动检查暂存区。`main` 通过 PR 合并，必须通过 `Git hygiene` 检查。
