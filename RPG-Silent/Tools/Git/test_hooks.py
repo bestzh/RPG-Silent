@@ -33,7 +33,7 @@ class CommitHookTests(unittest.TestCase):
         for name in ("check_repository.py", "policy.json", "install_hooks.py"):
             shutil.copyfile(source / name, self.tool_dir / name)
         (self.tool_dir / "hooks").mkdir()
-        for name in ("pre-commit", "pre-push"):
+        for name in ("pre-commit", "pre-push", "post-checkout", "post-commit", "post-merge"):
             shutil.copyfile(source / "hooks" / name, self.tool_dir / "hooks" / name)
         self.write(".gitignore", "__pycache__/\n*.pyc\n")
         check.git(self.root, "add", "-A")
@@ -119,6 +119,8 @@ class CommitHookTests(unittest.TestCase):
         (self.root / "fixture.dat").write_bytes(payload)
         check.git(self.root, "add", "-A")
         self.assertEqual(0, self.commit().returncode)
+        self.assertEqual(b"", check.git(self.root, "status", "--porcelain"),
+                         "LFS must not generate untracked hook files")
         pointer = check.git(self.root, "show", "HEAD:fixture.dat")
         self.assertTrue(pointer.startswith(b"version https://git-lfs.github.com/spec/v1\n"))
         with tempfile.TemporaryDirectory(prefix="lfs remote ") as directory:
