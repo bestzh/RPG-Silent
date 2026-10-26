@@ -18,8 +18,14 @@ public class AddressableManager : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            // 全局根的唯一性由 GameLifetimeScope 决定，不销毁共享根上的其他服务。
+            Destroy(this);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     public void LoadAndInstantiate(string address, Transform parent = null, Action<GameObject> onLoaded = null)
