@@ -11,13 +11,14 @@
 ```powershell
 ./Tools/Validation/Invoke-UnityValidation.ps1 -UnityEditorPath 'E:/unityEditor/unity6000.0.66/Editor/Unity.exe'
 ./Tools/Validation/Invoke-UnityValidation.ps1 -UnityEditorPath 'E:/unityEditor/unity6000.0.66/Editor/Unity.exe' -BuildWindows
+./Tools/Validation/Invoke-UnityValidation.ps1 -UnityEditorPath 'E:/unityEditor/unity6000.0.66/Editor/Unity.exe' -BuildWindows -SmokeStartup
 ```
 
 脚本拒绝使用被编辑器占用的工程。测试必须全部通过且非空，才会进入构建；构建状态必须为 Succeeded 且错误数为 0，失败返回非零状态。批处理在 Addressables 构建后明确加载已保存的启动场景，满足 Opsive 预制体验证器恢复场景的要求。日志与 NUnit XML 位于 `Logs/Validation/<UTC时间>/`，独立构建产物位于 `Builds/Validation/<UTC时间>/`，包括每个产物的 SHA-256。`validation.json` 记录提交和未提交文件，避免把工作区验证误认为某个提交的验证。
 
 TMP 会在构建和编辑器退出时清理动态字体缓存。批处理先备份 TMP 字体资产、PlayerSettings、SBP 设置及已有 Addressables state，在 Unity 进程退出后按文件哈希恢复变动；备份保存在本次日志的 `source-backup/`，不使用会被 Unity 删除的 `Temp/`。本次构建的 Addressables state 另存到产物中的 `AddressablesState/<平台>/`，供该版本后续内容更新使用。编辑器菜单构建不包含这个外部恢复步骤，可能产生字体缓存改动；日常交付优先使用批处理。
 
-脚本不会自动发布、打标签或覆盖玩家存档。Player 启动和玩法回归需额外验证，不能由构建成功推定。
+`-SmokeStartup` 会启动本次独立 Player 30 秒，确认 StartUI 日志、未提前退出和无异常模式，再停止本次进程并保存 `player-startup.json`。该选项必须与 `-BuildWindows` 同用。脚本不会自动发布、打标签或覆盖玩家存档；实际操作、玩法和画面仍需单独验收。
 
 ## 验证记录
 
