@@ -1,0 +1,27 @@
+COMPLETE 26 checks
+PASS actual portal selected Hard
+PASS hard initial health and per-instance damage multiplier
+PASS hard spawn leaves shared health definitions unchanged
+PASS player entry lies on dungeon navigation
+PASS complete route to Spawn_1
+PASS complete route to Spawn_2
+PASS complete route to Spawn_3
+PASS complete route to Spawn_4
+PASS all spawned enemies execute assigned Pro assets
+PASS shared melee asset has independent runtime task instances
+PASS real Pro wait task is scheduled between decisions
+PASS disabling EnemyController stops Pro execution
+PASS disabled enemy has no decisions or active attack
+PASS component re-enable restarts actual Pro tasks
+PASS decision gate bounds evaluation frequency
+PASS stopping plugin alone stops decisions: no old AI loop remains
+PASS tree can restart after explicit stop
+PASS GameObject disable stops tree and decision gate
+PASS GameObject re-enable starts a fresh tree run
+PASS death stops every enemy tree
+PASS hard boss health and rewards
+PASS saved boss bar stays below objective without overlap
+PASS phase threshold scales with hard maximum health
+PASS boss death stops tree after phase transition
+PASS hard victory rewards include rounded per-enemy multipliers
+PASS hard run returns cleanly to Main

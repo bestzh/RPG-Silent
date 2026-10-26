@@ -1,0 +1,6 @@
+PASS Assets/Resources/Enemy.prefab graph=Melee missingScripts=0
+PASS Assets/Combat/Enemies/Prefabs/MeleeGuard.prefab graph=Melee missingScripts=0
+PASS Assets/Combat/Enemies/Prefabs/RangedCaster.prefab graph=Ranged missingScripts=0
+PASS Assets/Combat/Enemies/Prefabs/ShadowLord.prefab graph=Boss missingScripts=0
+Scene=Assets/Scenes/StartScene.unity dirty=False playing=False
+Validation save directory restored= background=False

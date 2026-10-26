@@ -1,0 +1,82 @@
+// Run from Main after an isolated-save game. Reproduces cancellation during an attack,
+// leash return while attacking, and lethal-hit -> dungeon settlement reentrancy.
+if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Play Mode required");
+var c=GameLifetimeScope.Instance.Container;
+var save=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if(!save.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp")+System.IO.Path.DirectorySeparatorChar))throw new System.Exception("Isolated save required");
+var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var session=(PlayerSessionService)c.Resolve(typeof(PlayerSessionService));
+var input=(RPGSilent.Domain.IPlayerInputActions)c.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+System.Func<PlayerController> player=()=>session.PlayerRig.GetComponentInChildren<PlayerController>(true);
+System.Func<SceneLifetimeScope> scope=()=>UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>();
+System.Func<DungeonRunService> run=()=> (DungeonRunService)scope().Container.Resolve(typeof(DungeonRunService));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Action<EnemyController,float> near=(e,d)=>{
+    var filter=new UnityEngine.AI.NavMeshQueryFilter{agentTypeID=1479372276,areaMask=UnityEngine.AI.NavMesh.AllAreas};
+    for(int i=0;i<24;i++){
+        Vector3 offset=Quaternion.Euler(0f,i*15f,0f)*Vector3.right*d;
+        UnityEngine.AI.NavMeshHit navHit;
+        if(!UnityEngine.AI.NavMesh.SamplePosition(e.transform.position+offset,out navHit,1.5f,filter))continue;
+        Vector3 delta=navHit.position+Vector3.up-e.transform.position-Vector3.up;
+        var obstructions=Physics.RaycastAll(e.transform.position+Vector3.up,delta.normalized,delta.magnitude,~0,QueryTriggerInteraction.Ignore);
+        if(System.Linq.Enumerable.Any(obstructions,h=>h.collider.GetComponentInParent<RPGSilent.Domain.IDamageable>()==null))continue;
+        player().Teleport(navHit.position+Vector3.up*.15f,Quaternion.LookRotation(e.transform.position-navHit.position));return;
+    }
+    throw new System.Exception("No unobstructed test position around "+e.name);
+};
+
+var token=new object();input.SetGameplayInputBlocked(token,true);
+var log=new System.Text.StringBuilder();int checks=0;
+System.Action<bool,string> check=(ok,s)=>{log.AppendLine((ok?"PASS ":"FAIL ")+s);if(!ok)throw new System.Exception(s);checks++;};
+EnemyController probe=null;Opsive.BehaviorDesigner.Runtime.BehaviorTree tree=null;
+float oldLeash=0,observedAt=0;bool heal=true;int decisions=0;
+var stages=new System.Collections.Generic.List<System.Func<bool>>();
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading)return false;((RPGSilent.Domain.IPortalService)scope().Container.Resolve(typeof(RPGSilent.Domain.IPortalService))).OpenPortal(101);return true;});
+stages.Add(()=>{var v=UnityEngine.Object.FindFirstObjectByType<PortalUI>();if(v==null)return false;((TMPro.TMP_Dropdown)typeof(PortalUI).GetField("difficultyDropdown",flags).GetValue(v)).value=1;((UnityEngine.UI.Button)typeof(PortalUI).GetField("okButton",flags).GetValue(v)).onClick.Invoke();return true;});
+stages.Add(()=>{
+ if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Dungeon01"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI")||run().State!=DungeonRunState.Running)return false;
+ var enemies=UnityEngine.Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
+ probe=System.Linq.Enumerable.First(enemies,e=>e.Definition.Behavior==EnemyBehaviorStyle.Melee);
+ foreach(var e in enemies)if(e!=probe)e.enabled=false;
+ tree=probe.GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>();oldLeash=probe.leashDistance;
+ near(probe,7);return true;
+});
+stages.Add(()=>{
+ if(probe.State!=EnemyState.Attack)return false;
+ check(tree.IsActive()&&probe.CurrentSkill!=null,"actual Pro decision starts attack before leash test");
+ decisions=probe.DecisionCount;probe.leashDistance=.1f;return true;
+});
+stages.Add(()=>{
+ if(probe.State!=EnemyState.Return)return false;
+ check(probe.ReturningHome&&!probe.HasAggro&&probe.CurrentSkill==null,"leash interrupts attack and Pro selects return-home branch");
+ check(probe.DecisionCount>decisions,"attack cancellation releases decision gate");
+ probe.leashDistance=oldLeash;return true;
+});
+stages.Add(()=>{
+ if(probe.ReturningHome)return false;
+ check(probe.State!=EnemyState.Return,"return-home command completes without stuck attack state");
+ heal=false;stats.TakeDamage(stats.CurrentHealth-1);near(probe,1.8f);return true;
+});
+stages.Add(()=>{
+ if(!stats.IsDead)return false;
+ check(run().State==DungeonRunState.Failed,"real enemy hit kills player and settles failure");
+ check(!tree.IsActive()&&!probe.enabled&&probe.CurrentSkill==null,"lethal-hit callback stops tree and cancels releasing skill");
+ check(run().AwardedGold==0&&run().AwardedExp==0,"lethal failure grants no rewards");
+ observedAt=Time.time;return true;
+});
+stages.Add(()=>{if(Time.time-observedAt<1f)return false;run().ReturnToMain();return true;});
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI"))return false;check(!stats.IsDead&&!DungeonLaunchContext.HasValue,"lethal failure returns to Main and revives player");return true;});
+int stage=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+40;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+System.Action cleanup=()=>{UnityEditor.EditorApplication.update-=update;input.SetGameplayInputBlocked(token,false);if(probe!=null)probe.leashDistance=oldLeash;};
+update=()=>{try{
+ if(!UnityEditor.EditorApplication.isPlaying||UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.Exception("Timeout or Play stopped at stage "+stage);
+ if(heal&&!stats.IsDead)stats.Heal(stats.MaxHealth);
+ if(!stages[stage]())return;++stage;deadline=UnityEditor.EditorApplication.timeSinceStartup+40;
+ System.AppDomain.CurrentDomain.SetData("EBDE.result","Running "+stage+"/"+stages.Count);
+ if(stage==stages.Count){cleanup();System.AppDomain.CurrentDomain.SetData("EBDE.result","COMPLETE "+checks+" checks\n"+log);}
+}catch(System.Exception e){cleanup();System.AppDomain.CurrentDomain.SetData("EBDE.result","FAILED "+e+"\n"+log);}};
+UnityEditor.EditorApplication.update+=update;return "Started Pro attack/lifecycle edge validation";
+

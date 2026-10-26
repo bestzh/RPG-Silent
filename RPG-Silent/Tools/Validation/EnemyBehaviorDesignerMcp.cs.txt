@@ -1,0 +1,98 @@
+// Run in Main in an isolated-save Play Mode session. Hard flow plus Pro ownership/lifecycle checks.
+// Uses portal/result buttons and validates difficulty scaling plus saved HUD layout.
+var c=GameLifetimeScope.Instance.Container;
+var save=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if(!save.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp")+System.IO.Path.DirectorySeparatorChar))throw new System.Exception("Isolated save required");
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Func<SceneLifetimeScope> scope=()=>UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>();
+System.Func<DungeonRunService> run=()=> (DungeonRunService)scope().Container.Resolve(typeof(DungeonRunService));
+EnemyController[] wave=null;EnemyController probe=null;Opsive.BehaviorDesigner.Runtime.BehaviorTree tree=null;
+int decisionBefore=0;float observedAt=0;
+var log=new System.Text.StringBuilder();int checks=0;
+System.Action<bool,string> check=(ok,s)=>{log.AppendLine((ok?"PASS ":"FAIL ")+s);if(!ok)throw new System.Exception(s);++checks;};
+var stages=new System.Collections.Generic.List<System.Func<bool>>();
+int gold=stats.Gold,exp=stats.Exp;EnemyController boss=null;
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading)return false;((RPGSilent.Domain.IPortalService)scope().Container.Resolve(typeof(RPGSilent.Domain.IPortalService))).OpenPortal(101);return true;});
+stages.Add(()=>{var v=UnityEngine.Object.FindFirstObjectByType<PortalUI>();if(v==null)return false;((TMPro.TMP_Dropdown)typeof(PortalUI).GetField("difficultyDropdown",flags).GetValue(v)).value=2;((UnityEngine.UI.Button)typeof(PortalUI).GetField("okButton",flags).GetValue(v)).onClick.Invoke();return true;});
+stages.Add(()=>{
+ if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Dungeon01"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI")||run().State!=DungeonRunState.Running)return false;
+ check(run().Difficulty==DungeonDifficulty.Hard,"actual portal selected Hard");
+ var enemies=UnityEngine.Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
+ check(enemies.Length==3 && System.Linq.Enumerable.All(enemies,e=>e.MaxHealth==(e.Definition.Behavior==EnemyBehaviorStyle.Melee?98:75) && Mathf.Approximately(e.DamageMultiplier,1.5f)),"hard initial health and per-instance damage multiplier");
+ check(System.Linq.Enumerable.All(enemies,e=>e.Definition.Health==(e.Definition.Behavior==EnemyBehaviorStyle.Melee?65:50)),"hard spawn leaves shared health definitions unchanged");
+ var encounter=UnityEngine.Object.FindFirstObjectByType<DungeonEncounter>();
+ var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+ var filter=new UnityEngine.AI.NavMeshQueryFilter{agentTypeID=1479372276,areaMask=UnityEngine.AI.NavMesh.AllAreas};UnityEngine.AI.NavMeshHit start;
+ check(UnityEngine.AI.NavMesh.SamplePosition(p.transform.position,out start,2f,filter),"player entry lies on dungeon navigation");
+ foreach(var encounterWave in encounter.Waves)foreach(var spawn in encounterWave.Enemies){var path=new UnityEngine.AI.NavMeshPath();check(UnityEngine.AI.NavMesh.CalculatePath(start.position,spawn.Point.position,filter,path)&&path.status==UnityEngine.AI.NavMeshPathStatus.PathComplete,"complete route to "+spawn.Point.name);}
+ wave=enemies;return true;
+});
+stages.Add(()=>{
+ if(System.Linq.Enumerable.Any(wave,e=>!e.GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>().IsActive()||e.DecisionCount==0))return false;
+ check(System.Linq.Enumerable.All(wave,e=>e.GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>().Subgraph!=null),"all spawned enemies execute assigned Pro assets");
+ var melees=System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(wave,e=>e.Definition.Behavior==EnemyBehaviorStyle.Melee));
+ var a=melees[0].GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>();var b=melees[1].GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>();
+ check(System.Object.ReferenceEquals(a.Subgraph,b.Subgraph)&&!System.Object.ReferenceEquals(a.TreeLogicNodes[2],b.TreeLogicNodes[2]),"shared melee asset has independent runtime task instances");
+ probe=melees[0];tree=a;
+ var gate=(Opsive.BehaviorDesigner.Runtime.Tasks.StackedTask)tree.TreeLogicNodes[2];
+ check(gate.Tasks[0] is RPGSilent.Enemies.BehaviorDesigner.WaitForEnemyDecision && (tree.GetRuntimeNodeStatus(2)==Opsive.BehaviorDesigner.Runtime.Tasks.TaskStatus.Running||tree.GetRuntimeNodeStatus(2)==Opsive.BehaviorDesigner.Runtime.Tasks.TaskStatus.Queued),"real Pro wait task is scheduled between decisions");
+ probe.enabled=false;decisionBefore=probe.DecisionCount;observedAt=Time.time;
+ check(!tree.IsActive(),"disabling EnemyController stops Pro execution");return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.4f)return false;
+ check(probe.DecisionCount==decisionBefore && probe.CurrentSkill==null,"disabled enemy has no decisions or active attack");
+ probe.enabled=true;observedAt=Time.time;return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.6f)return false;
+ check(tree.IsActive()&&probe.DecisionCount>decisionBefore,"component re-enable restarts actual Pro tasks");
+ check(probe.DecisionCount-decisionBefore<=5,"decision gate bounds evaluation frequency");
+ tree.StopBehavior();decisionBefore=probe.DecisionCount;observedAt=Time.time;return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.4f)return false;
+ check(probe.enabled&&probe.DecisionCount==decisionBefore,"stopping plugin alone stops decisions: no old AI loop remains");
+ probe.enabled=false;probe.enabled=true;observedAt=Time.time;return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.4f)return false;
+ check(tree.IsActive()&&probe.DecisionCount>decisionBefore,"tree can restart after explicit stop");
+ probe.gameObject.SetActive(false);decisionBefore=probe.DecisionCount;observedAt=Time.time;return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.4f)return false;
+ check(!tree.IsActive()&&probe.DecisionCount==decisionBefore,"GameObject disable stops tree and decision gate");
+ probe.gameObject.SetActive(true);observedAt=Time.time;return true;
+});
+stages.Add(()=>{
+ if(Time.time-observedAt<.6f)return false;
+ check(tree.IsActive()&&probe.DecisionCount>decisionBefore,"GameObject re-enable starts a fresh tree run");
+ foreach(var e in wave)e.TakeDamage(99999);
+ check(System.Linq.Enumerable.All(wave,e=>!e.GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>().IsActive()),"death stops every enemy tree");
+ return true;
+});
+stages.Add(()=>{
+ boss=run().Boss;if(boss==null)return false;
+ check(boss.MaxHealth==900 && boss.RewardGold==150 && boss.RewardExp==300,"hard boss health and rewards");
+ var v=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();var b=(RectTransform)v.transform.Find("Boss Health");var o=(RectTransform)v.transform.Find("Objective");
+ var bc=new Vector3[4];var oc=new Vector3[4];b.GetWorldCorners(bc);o.GetWorldCorners(oc);
+ check(bc[1].y<oc[0].y && Mathf.Approximately(b.anchoredPosition.y,-174f),"saved boss bar stays below objective without overlap");
+ boss.TakeDamage(460);return true;
+});
+stages.Add(()=>{if(boss.Phase!=2||boss.State==EnemyState.PhaseTransition)return false;check(boss.CurrentHealth==440,"phase threshold scales with hard maximum health");boss.TakeDamage(99999);check(!boss.GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>().IsActive(),"boss death stops tree after phase transition");return true;});
+stages.Add(()=>{
+ if(!run().HasResult)return false;
+ check(run().Succeeded&&run().AwardedGold==195&&run().AwardedExp==414&&stats.Gold==gold+195&&stats.Exp==exp+414,"hard victory rewards include rounded per-enemy multipliers");
+ var v=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();((UnityEngine.UI.Button)typeof(DungeonUI).GetField("returnButton",flags).GetValue(v)).onClick.Invoke();return true;
+});
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI"))return false;check(!DungeonLaunchContext.HasValue&&!ui.IsUIOpen(DungeonRunService.UiKey),"hard run returns cleanly to Main");return true;});
+int stage=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+30;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+update=()=>{try{if(!UnityEditor.EditorApplication.isPlaying||UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.Exception("Timeout or Play stopped at stage "+stage);if(!stages[stage]())return;++stage;deadline=UnityEditor.EditorApplication.timeSinceStartup+30;System.AppDomain.CurrentDomain.SetData("EBDH.result","Running "+stage+"/"+stages.Count);if(stage==stages.Count){UnityEditor.EditorApplication.update-=update;System.AppDomain.CurrentDomain.SetData("EBDH.result","COMPLETE "+checks+" checks\n"+log);}}catch(System.Exception e){UnityEditor.EditorApplication.update-=update;System.AppDomain.CurrentDomain.SetData("EBDH.result","FAILED "+e+"\n"+log);}};
+UnityEditor.EditorApplication.update+=update;return "Started Hard validation";
+
+

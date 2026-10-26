@@ -1,0 +1,83 @@
+// MCP execute_code method body (CodeDom/C# 6). Not a Unity asset or player script.
+// Usage: enter Play Mode from StartScene, click Start and wait for Main/HUD,
+// then pass this entire file as execute_code(action="execute", code=...).
+// Run in a disposable Play Mode session with the player idle and no menu open.
+// Uses real InputSystem events and actual Animator transitions. Boundary tests
+// seek only the starting pose; rate tests advance complete clips at fixed dt.
+// This is deterministic Animator stepping, not a rendered frame-rate benchmark.
+// Does not save settings/assets. Resets the player to idle after testing.
+var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+var input=UnityEngine.Object.FindFirstObjectByType<PlayerInputActionsService>();
+if(!UnityEditor.EditorApplication.isPlaying || p==null || input==null || !input.GameplayInputEnabled)
+    throw new System.InvalidOperationException("Requires an active player in Main with menus closed.");
+var a=p.animator;
+// The project's Editor input mode routes keyboard events only to the focused Game View.
+UnityEditor.EditorWindow.GetWindow(typeof(UnityEditor.EditorWindow).Assembly.GetType("UnityEditor.GameView")).Focus();
+float previousTimeScale=UnityEngine.Time.timeScale;
+var previousStance=p.CurrentStance;
+string previousOverride=input.Attack.bindings[0].overridePath;
+var k=UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+System.Action press=()=>{
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(k,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.K));
+    UnityEngine.InputSystem.InputSystem.Update();
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(k,new UnityEngine.InputSystem.LowLevel.KeyboardState());
+    UnityEngine.InputSystem.InputSystem.Update();
+};
+try {
+    UnityEngine.Time.timeScale=0;
+    UnityEngine.InputSystem.InputActionRebindingExtensions.ApplyBindingOverride(input.Attack,0,new UnityEngine.InputSystem.InputBinding{overridePath="<Keyboard>/k"});
+    System.Func<string> boundaries=()=>{
+        var sb=new System.Text.StringBuilder();int passed=0,failed=0;
+        foreach(var stance in new[]{PlayerStance.Unarmed,PlayerStance.Armed})foreach(float target in new[]{0.3499f,0.35f,0.3501f,0.4499f,0.4501f,0.6876f,0.75f,0.7999f,0.8f,0.8001f,0.94f})for(int segment=1;segment<=(stance==PlayerStance.Unarmed?4:2);segment++){
+         p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(stance);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);press();
+         for(int j=1;j<segment;j++){a.Play("Base Layer.Attack_"+j,0,0.5f);a.Update(0);press();p.StateMachine.Update();a.Update(0.001f);a.Update(0.2f);}
+         a.Play("Base Layer.Attack_"+segment,0,target);a.Update(0);
+         float observed=a.GetCurrentAnimatorStateInfo(0).normalizedTime;
+         press();p.StateMachine.Update();int index=a.GetInteger("ComboIndex");
+         bool expected=target>=0.35f&&target<=0.8f&&segment<p.StanceController.MaxCombo;
+         bool reached=false,returned=false;
+         for(int frame=0;frame<180;frame++){a.Update(1f/120f);if(p.StateMachine.CurrentState is AttackState)p.StateMachine.Update();var s=a.GetCurrentAnimatorStateInfo(0);if(s.shortNameHash==UnityEngine.Animator.StringToHash("Attack_"+(segment+1)))reached=true;if(s.IsName("Base Layer.MoveTree")&&!(p.StateMachine.CurrentState is AttackState))returned=true;}
+         bool ok=index==(expected?segment+1:segment)&&reached==expected&&returned;
+         if(ok)passed++;else failed++;
+         sb.AppendLine((ok?"PASS ":"FAIL ")+stance+" seg="+segment+" target="+target.ToString("R")+" observed="+observed.ToString("R")+" index="+index+" nextSeen="+reached+" returned="+returned);
+        }
+        sb.AppendLine("TOTAL passed="+passed+" failed="+failed);return sb.ToString();
+    };
+    System.Func<string> rates=()=>{
+        var sb=new System.Text.StringBuilder();int passed=0,failed=0;
+        foreach(var stance in new[]{PlayerStance.Unarmed,PlayerStance.Armed})foreach(int fps in new[]{15,30,60,120})foreach(float target in new[]{0.36f,0.5f,0.7f}) {
+        p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(stance);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);press();
+        int max=p.StanceController.MaxCombo,pressed=0,seen=0;string requests="";
+        for(int frame=0;frame<fps*10;frame++){
+        var s=a.GetCurrentAnimatorStateInfo(0);int index=a.GetInteger("ComboIndex");
+        for(int j=1;j<=max;j++)if(s.shortNameHash==UnityEngine.Animator.StringToHash("Attack_"+j))seen|=1<<j;
+        if(!a.IsInTransition(0)&&s.shortNameHash==UnityEngine.Animator.StringToHash("Attack_"+index)&&index<max&&s.normalizedTime>=target&&pressed<index){pressed=index;press();requests+=" "+index+"@"+s.normalizedTime.ToString("F4");}
+        if(p.StateMachine.CurrentState is AttackState)p.StateMachine.Update();a.Update(1f/fps);
+        }
+        bool ok=seen==((1<<(max+1))-2)&&a.GetInteger("ComboIndex")==max&&a.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.MoveTree")&&!(p.StateMachine.CurrentState is AttackState);
+        if(ok)passed++;else failed++;
+        sb.AppendLine((ok?"PASS ":"FAIL ")+stance+" fps="+fps+" target="+target+" seen="+seen+" requests="+requests);
+        }
+        p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(PlayerStance.Relax);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);
+        for(int j=0;j<10;j++)press();
+        sb.AppendLine("Relax blocked="+(!(p.StateMachine.CurrentState is AttackState)&&a.GetInteger("ComboIndex")==0));
+        sb.AppendLine("TOTAL passed="+passed+" failed="+failed);
+        return sb.ToString();
+    };
+    string result=boundaries()+"\n"+rates();
+    if(result.Contains("FAIL") || result.Contains("Relax blocked=False"))
+        throw new System.InvalidOperationException(result);
+    return result;
+} finally {
+    if(previousOverride==null)
+        UnityEngine.InputSystem.InputActionRebindingExtensions.RemoveBindingOverride(input.Attack,0);
+    else
+        UnityEngine.InputSystem.InputActionRebindingExtensions.ApplyBindingOverride(input.Attack,0,new UnityEngine.InputSystem.InputBinding{overridePath=previousOverride});
+    UnityEngine.InputSystem.InputSystem.RemoveDevice(k);
+    p.StateMachine.ChangeState(new IdleState(p));
+    p.StanceController.SetStance(previousStance);
+    a.Rebind();
+    a.Play("Base Layer.MoveTree",0,0);
+    a.Update(0);
+    UnityEngine.Time.timeScale=previousTimeScale;
+}

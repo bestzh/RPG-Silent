@@ -1,0 +1,9 @@
+COMPLETE 8 checks
+PASS actual Pro decision starts attack before leash test
+PASS leash interrupts attack and Pro selects return-home branch
+PASS attack cancellation releases decision gate
+PASS return-home command completes without stuck attack state
+PASS real enemy hit kills player and settles failure
+PASS lethal-hit callback stops tree and cancels releasing skill
+PASS lethal failure grants no rewards
+PASS lethal failure returns to Main and revives player

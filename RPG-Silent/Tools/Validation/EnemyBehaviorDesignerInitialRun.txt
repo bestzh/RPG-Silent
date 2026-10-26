@@ -1,0 +1,32 @@
+FAILED at 11: System.Exception: locked meteor area can be dodged after telegraph
+  at MCPDynamicCode+<Execute>c__AnonStorey0.<>m__1 (System.Boolean ok, System.String s) [0x0002c] in <a0e2d21006af410ab55f5c2f0be60e9e>:0 
+  at MCPDynamicCode+<Execute>c__AnonStorey0.<>m__11 () [0x0004f] in <a0e2d21006af410ab55f5c2f0be60e9e>:0 
+  at MCPDynamicCode+<Execute>c__AnonStorey0.<>m__18 () [0x00082] in <a0e2d21006af410ab55f5c2f0be60e9e>:0 
+PASS three initial enemies, four total targets
+PASS melee detects and chases before attacking
+PASS melee natural attack deals one scaled hit
+PASS melee recovery does not hit repeatedly
+PASS player attack pipeline accepted 1 damage
+PASS ordinary hit interrupts unreleased attack
+PASS interrupted attack has no delayed hit
+PASS caster fires a traveling projectile that hits player
+PASS caster retreats when player closes distance
+PASS enemy projectile context cannot damage allies
+PASS per-instance damage snapshot leaves shared skill unchanged
+PASS reset invalidates released attack contexts
+PASS player attack pipeline accepted 9999 damage
+PASS player attack pipeline accepted 9999 damage
+PASS player attack pipeline accepted 9999 damage
+PASS wave one counts once and does not settle rewards
+PASS delayed wave spawns phase-one boss with 600 HP
+PASS boss wave preserves total progress
+PASS boss health UI appears
+PASS phase one excludes meteor
+PASS boss phase-one attack lands
+PASS player attack pipeline accepted 310 damage
+PASS half-health threshold triggers phase transition exactly once
+PASS player attack pipeline accepted 1 damage
+PASS armored meteor resists ordinary stagger
+FAIL locked meteor area can be dodged after telegraph
+
+Console after test cleanup/player death: EnemySkillRunner.Tick line 74 NullReferenceException

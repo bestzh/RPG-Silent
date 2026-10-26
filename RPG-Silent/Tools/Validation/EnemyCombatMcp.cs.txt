@@ -1,0 +1,89 @@
+// MCP execute_code method body (C# 6). Requires Play Mode in Main, player alive.
+// Uses a temporary copy of the real Enemy prefab and controlled Animator stepping.
+// Calls the real enemy update and damage methods; tests do not save assets/settings.
+var player=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+if(!UnityEditor.EditorApplication.isPlaying || player==null || player.IsDead)throw new System.Exception("Requires a living player in Main.");
+var stats=(RPGSilent.Domain.PlayerStats)GameLifetimeScope.Instance.Container.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var enemyType=typeof(EnemyController);
+var hp=enemyType.GetField("<CurrentHealth>k__BackingField",flags);
+var dead=enemyType.GetField("<IsDead>k__BackingField",flags);
+var aggro=enemyType.GetField("<HasAggro>k__BackingField",flags);
+var update=enemyType.GetMethod("Update",flags);
+var enter=enemyType.GetMethod("EnterState",flags);
+var holder=new UnityEngine.GameObject("__H07Validation");holder.SetActive(false);
+var root=UnityEngine.Object.Instantiate(UnityEngine.Resources.Load<UnityEngine.GameObject>("Enemy"),holder.transform);
+root.name="EnemyUnderTest";
+var e=root.GetComponent<EnemyController>();e.enabled=false;
+root.GetComponent<UnityEngine.AI.NavMeshAgent>().enabled=false;
+enemyType.GetField("useNavMeshAgent",flags).SetValue(e,false);
+enemyType.GetField("destroyDelay",flags).SetValue(e,-1f);
+enemyType.GetField("knockbackDistance",flags).SetValue(e,0f);
+holder.SetActive(true);
+var targetRoot=new UnityEngine.GameObject("__H07Target");targetRoot.transform.SetParent(holder.transform);
+var target=targetRoot.AddComponent<EnemyController>();target.enabled=false;
+var a=root.GetComponent<Animator>();
+float oldTimeScale=UnityEngine.Time.timeScale;
+int oldGold=stats.Gold,oldExp=stats.Exp;
+var origin=new UnityEngine.Vector3(1000,1000,1000);
+int passed=0;
+var result=new System.Text.StringBuilder();
+System.Action<bool,string> check=(ok,name)=>{result.AppendLine((ok?"PASS ":"FAIL ")+name);if(!ok)throw new System.Exception(name);++passed;};
+System.Action reset=()=>{
+ root.transform.position=origin;root.transform.rotation=UnityEngine.Quaternion.identity;
+ targetRoot.transform.position=origin+UnityEngine.Vector3.forward*1.5f;
+ hp.SetValue(target,10000);dead.SetValue(target,false);hp.SetValue(e,e.MaxHealth);dead.SetValue(e,false);aggro.SetValue(e,false);
+ enemyType.GetField("_targetTransform",flags).SetValue(e,targetRoot.transform);
+ enemyType.GetField("_targetDamageable",flags).SetValue(e,target);
+ enemyType.GetField("_targetRewardable",flags).SetValue(e,null);
+ enemyType.GetField("homePosition",flags).SetValue(e,origin);
+ enemyType.GetField("returningHome",flags).SetValue(e,false);
+ enemyType.GetField("attackTimer",flags).SetValue(e,0f);
+ a.Rebind();a.Play("Base Layer.Idle",0,0);a.Update(0);
+ enter.Invoke(e,new object[]{EnemyState.Idle,true});
+};
+System.Action begin=()=>{update.Invoke(e,null);if(e.State!=EnemyState.Attack)throw new System.Exception("Attack did not begin");};
+System.Action<float> seek=phase=>{a.Play("Base Layer.Attack",0,phase);a.Update(0);update.Invoke(e,null);};
+System.Func<int> damage=()=>10000-target.CurrentHealth;
+try {
+ UnityEngine.Time.timeScale=0;
+ enemyType.GetMethod("Start",flags).Invoke(e,null);root.GetComponent<UnityEngine.Rigidbody>().isKinematic=true;
+ reset();check(a.avatar!=null && a.isHuman && a.GetBoneTransform(UnityEngine.HumanBodyBones.RightHand)!=null,"real enemy has valid humanoid avatar and bone binding");
+ foreach(var name in new[]{"Idle","Chase","Attack","Hurt","Dead"})check(a.HasState(0,UnityEngine.Animator.StringToHash("Base Layer."+name)),"animator state "+name);
+ reset();begin();check(damage()==0,"starting attack does not deal instant damage");
+ seek(e.attackHitNormalizedTime-.0001f);check(damage()==0,"before hit boundary does not damage");
+ seek(e.attackHitNormalizedTime);check(damage()==e.damage,"inclusive hit boundary damages once");
+ seek(.8f);seek(.95f);check(damage()==e.damage,"recovery does not repeat damage");
+ reset();begin();targetRoot.transform.position=origin+UnityEngine.Vector3.forward*(e.attackDistance+.05f);seek(e.attackHitNormalizedTime+.001f);check(damage()==0,"leaving range during windup dodges hit");
+ targetRoot.transform.position=origin+UnityEngine.Vector3.forward;seek(.8f);check(damage()==0,"returning after a missed hit does not apply delayed damage");
+ reset();begin();targetRoot.transform.position=origin-UnityEngine.Vector3.forward;seek(.4f);check(damage()==0 && root.transform.forward.z>.99f,"moving behind enemy dodges; windup does not track target");
+ reset();begin();dead.SetValue(target,true);seek(.4f);check(damage()==0 && e.State!=EnemyState.Attack,"dead target cancels pending attack");
+ reset();begin();targetRoot.SetActive(false);seek(.4f);check(damage()==0 && e.State!=EnemyState.Attack,"inactive target cancels pending attack");targetRoot.SetActive(true);
+ reset();begin();e.TakeDamage(1);a.Update(.1f);check(e.State==EnemyState.Hurt && damage()==0 && a.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Hurt"),"taking damage interrupts windup and plays hurt");
+ float speed=e.moveSpeed;e.TakeDamage(1);e.TakeDamage(1);
+ a.Play("Base Layer.Hurt",0,1.01f);a.Update(0);enemyType.GetField("stateElapsed",flags).SetValue(e,1f);update.Invoke(e,null);
+ check(e.State==EnemyState.Idle && e.moveSpeed==speed,"repeated hurt recovers without overwriting base movement speed");
+ reset();targetRoot.transform.position=origin+UnityEngine.Vector3.forward*(e.detectionDistance+1f);update.Invoke(e,null);check(e.State==EnemyState.Idle&&!e.HasAggro,"outside detection range remains idle");
+ targetRoot.transform.position=origin+UnityEngine.Vector3.forward*5;update.Invoke(e,null);check(e.State==EnemyState.Chase&&e.HasAggro,"entering detection range starts chase");
+ root.transform.position=origin+UnityEngine.Vector3.forward*4;targetRoot.transform.position=origin+UnityEngine.Vector3.forward*(e.leashDistance+2);update.Invoke(e,null);check(e.State==EnemyState.Return&&!e.HasAggro,"exceeding leash cancels chase and starts return");
+ root.transform.position=origin;update.Invoke(e,null);check(e.State==EnemyState.Idle&&!e.HasAggro,"arriving home returns to idle");
+ foreach(int fps in new[]{15,30,60,120}){
+  reset();begin();a.Update(0);
+  for(int frame=0;frame<fps*4 && e.State==EnemyState.Attack;frame++){a.Update(1f/fps);update.Invoke(e,null);}
+  check(damage()==e.damage&&e.State==EnemyState.Idle,"complete attack at "+fps+" animator steps/second hits once and recovers");
+ }
+ reset();begin();enemyType.GetField("_targetRewardable",flags).SetValue(e,player);
+ int gold=stats.Gold,exp=stats.Exp;
+ e.TakeDamage(100000);e.Die();e.TakeDamage(100000);a.Update(.1f);update.Invoke(e,null);
+ check(e.IsDead&&e.State==EnemyState.Dead&&damage()==0,"death during windup prevents pending damage");
+ check(stats.Gold-gold==10&&stats.Exp-exp==25,"death grants gold and experience exactly once");
+ check(a.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Dead")&&root.GetComponent<UnityEngine.Rigidbody>().isKinematic,"death animation plays with stopped physics");
+ bool disabled=true;foreach(var col in root.GetComponentsInChildren<UnityEngine.Collider>())if(col.enabled)disabled=false;
+ check(disabled,"death disables all combat colliders");
+ return "COMPLETE "+passed+" checks\n"+result;
+} finally {
+ UnityEngine.Time.timeScale=oldTimeScale;
+ typeof(RPGSilent.Domain.PlayerStats).GetField("<Gold>k__BackingField",flags).SetValue(stats,oldGold);
+ typeof(RPGSilent.Domain.PlayerStats).GetField("<Exp>k__BackingField",flags).SetValue(stats,oldExp);stats.Refresh();
+ UnityEngine.Object.Destroy(holder);
+}

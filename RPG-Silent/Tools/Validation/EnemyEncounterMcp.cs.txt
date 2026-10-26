@@ -1,0 +1,171 @@
+// Execute with Unity MCP execute_code (C# 6), in Dungeon01 Play Mode.
+// Requires isolated save path set before Play Mode. Tests real AI and scene/result services.
+// Poll AppDomain EC.result. At phase-two checkpoint set EC.continue=true after visual capture.
+if (!UnityEditor.EditorApplication.isPlaying) throw new System.Exception("Play Mode required");
+if (System.AppDomain.CurrentDomain.GetData("EC.update") != null) throw new System.Exception("Already running");
+var c=GameLifetimeScope.Instance.Container;
+var store=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if (!store.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp")+System.IO.Path.DirectorySeparatorChar)) throw new System.Exception("Isolated save required");
+var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var session=(PlayerSessionService)c.Resolve(typeof(PlayerSessionService));
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var input=(RPGSilent.Domain.IPlayerInputActions)c.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var settings=(RPGSilent.Domain.IGameSettingsService)c.Resolve(typeof(RPGSilent.Domain.IGameSettingsService));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Func<PlayerController> player=()=>session.PlayerRig.GetComponentInChildren<PlayerController>(true);
+System.Func<DungeonRunService> run=()=> (DungeonRunService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(DungeonRunService));
+System.Func<EnemyController[]> enemies=()=>UnityEngine.Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
+System.Action<string> log=s=>System.AppDomain.CurrentDomain.SetData("EC.log",(string)System.AppDomain.CurrentDomain.GetData("EC.log")+s+"\n");
+int passed=0;
+System.Action<bool,string> check=(ok,s)=>{log((ok?"PASS ":"FAIL ")+s);if(!ok)throw new System.Exception(s);++passed;};
+System.Action<EnemyController,float> near=(e,d)=>{
+    var filter=new UnityEngine.AI.NavMeshQueryFilter{agentTypeID=1479372276,areaMask=UnityEngine.AI.NavMesh.AllAreas};
+    for(int i=0;i<24;i++){
+        Vector3 offset=Quaternion.Euler(0f,i*15f,0f)*Vector3.right*d;
+        UnityEngine.AI.NavMeshHit navHit;
+        if(!UnityEngine.AI.NavMesh.SamplePosition(e.transform.position+offset,out navHit,1.5f,filter))continue;
+        Vector3 delta=navHit.position+Vector3.up-e.transform.position-Vector3.up;
+        var obstructions=Physics.RaycastAll(e.transform.position+Vector3.up,delta.normalized,delta.magnitude,~0,QueryTriggerInteraction.Ignore);
+        if(System.Linq.Enumerable.Any(obstructions,h=>h.collider.GetComponentInParent<RPGSilent.Domain.IDamageable>()==null))continue;
+        player().Teleport(navHit.position+Vector3.up*.15f,Quaternion.LookRotation(e.transform.position-navHit.position));return;
+    }
+    throw new System.Exception("No unobstructed test position around "+e.name);
+};
+System.Action<object,string> click=(o,f)=>((UnityEngine.UI.Button)o.GetType().GetField(f,flags).GetValue(o)).onClick.Invoke();
+var token=new object();input.SetGameplayInputBlocked(token,true);
+ui.CloseUI("UI/StartUI");
+bool heal=true;int damageTaken=0,lastHealth=stats.CurrentHealth;
+System.Action<int,int> health=(hp,max)=>{if(hp<lastHealth)damageTaken+=lastHealth-hp;lastHealth=hp;};
+stats.OnHealthChanged+=health;
+var hit=ScriptableObject.CreateInstance<AttackProfile>();hit.Damage=1;
+System.Action<EnemyController,int> damage=(e,n)=>{hit.Damage=n;var ex=player().GetComponent<AttackExecutor>();var ctx=ex.CreateAttack(hit);check(ex.ApplyDamage(e,ctx,e.transform.position),"player attack pipeline accepted "+n+" damage");ex.EndAttack(ctx);};
+var steps=new System.Collections.Generic.List<System.Func<bool>>();
+EnemyController melee=null,caster=null,boss=null;EnemyController[] wave=null;
+float started=0f;int before=0,baselineGold=stats.Gold;Vector3 origin=Vector3.zero;DungeonRunService oldRun=null;bool sawChase=false,sawRetreat=false,sawBolt=false,sawPhase=false,sawMeteor=false;
+steps.Add(()=>{
+    if(run().State!=DungeonRunState.Running)return false;
+    wave=enemies();check(wave.Length==3 && run().TotalEnemies==4,"three initial enemies, four total targets");
+    melee=System.Linq.Enumerable.First(wave,e=>e.Definition.Behavior==EnemyBehaviorStyle.Melee);
+    caster=System.Linq.Enumerable.First(wave,e=>e.Definition.Behavior==EnemyBehaviorStyle.Ranged);
+    foreach(var e in wave)if(e!=melee)e.enabled=false;
+    near(melee,7f);started=Time.time;before=damageTaken;return true;
+});
+steps.Add(()=>{
+    sawChase|=melee.State==EnemyState.Chase;
+    if(damageTaken==before)return false;
+    check(sawChase && melee.HasAggro,"melee detects and chases before attacking");
+    check(damageTaken-before==settings.ScaleIncomingDamage(10),"melee natural attack deals one scaled hit");
+    started=Time.time;before=damageTaken;return true;
+});
+steps.Add(()=>{if(Time.time-started<.85f)return false;check(damageTaken==before,"melee recovery does not hit repeatedly");return true;});
+steps.Add(()=>{
+    if(melee.State!=EnemyState.Attack)return false;
+    damage(melee,1);check(melee.State==EnemyState.Hurt && melee.CurrentSkill==null,"ordinary hit interrupts unreleased attack");
+    before=damageTaken;started=Time.time;return true;
+});
+steps.Add(()=>{
+    if(Time.time-started<.55f)return false;
+    check(damageTaken==before,"interrupted attack has no delayed hit");
+    foreach(var e in wave)e.enabled=false;
+    caster.enabled=true;near(caster,8f);started=Time.time;before=damageTaken;return true;
+});
+steps.Add(()=>{
+    sawBolt|=UnityEngine.Object.FindObjectsByType<AttackProjectile>(FindObjectsSortMode.None).Length>0;
+    if(damageTaken==before)return false;
+    check(sawBolt && damageTaken-before==settings.ScaleIncomingDamage(12),"caster fires a traveling projectile that hits player");
+    near(caster,1.6f);origin=caster.transform.position;started=Time.time;return true;
+});
+steps.Add(()=>{
+    sawRetreat|=caster.State==EnemyState.Retreat;
+    if(!sawRetreat || Vector3.Distance(origin,caster.transform.position)<1f)return false;
+    check(sawRetreat,"caster retreats when player closes distance");
+    var ex=caster.GetComponent<AttackExecutor>();var ctx=ex.CreateAttack(caster.Definition.Skills[0].Attack,2f,player().transform.position);
+    check(!ex.ApplyDamage(melee,ctx,melee.transform.position),"enemy projectile context cannot damage allies");
+    check(ctx.Damage==24 && caster.Definition.Skills[0].Attack.Damage==12,"per-instance damage snapshot leaves shared skill unchanged");
+    ex.ResetCombat();check(!ex.IsContextValid(ctx),"reset invalidates released attack contexts");
+    foreach(var e in wave){e.enabled=true;damage(e,9999);e.Die();}
+    check(run().DefeatedEnemies==3 && !run().HasResult && stats.Gold==baselineGold,"wave one counts once and does not settle rewards");
+    started=Time.time;return true;
+});
+steps.Add(()=>{
+    boss=run().Boss;if(boss==null)return false;
+    check(Time.time-started>=2.3f && boss.MaxHealth==600 && boss.Phase==1,"delayed wave spawns phase-one boss with 600 HP");
+    check(run().TotalEnemies==4 && run().DefeatedEnemies==3,"boss wave preserves total progress");
+    var view=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();
+    check(((GameObject)typeof(DungeonUI).GetField("bossPanel",flags).GetValue(view)).activeInHierarchy,"boss health UI appears");
+    near(boss,3f);started=Time.time;before=damageTaken;return true;
+});
+steps.Add(()=>{
+    if(damageTaken==before)return false;
+    check(boss.CurrentSkill!=null && boss.CurrentSkill.RequiredPhase==1,"phase one excludes meteor");
+    check(damageTaken-before==settings.ScaleIncomingDamage(18) || damageTaken-before==settings.ScaleIncomingDamage(22),"boss phase-one attack lands");
+    damage(boss,310);started=Time.time;return true;
+});
+steps.Add(()=>{
+    sawPhase|=boss.State==EnemyState.PhaseTransition;
+    if(boss.Phase!=2 || boss.State==EnemyState.PhaseTransition)return false;
+    check(sawPhase && boss.CurrentHealth==290,"half-health threshold triggers phase transition exactly once");
+    near(boss,9f);started=Time.time;return true;
+});
+steps.Add(()=>{
+    if(boss.CurrentSkill==null || boss.CurrentSkill.RequiredPhase!=2)return false;
+    var warning=System.Linq.Enumerable.FirstOrDefault(UnityEngine.Object.FindObjectsByType<LineRenderer>(FindObjectsSortMode.None),l=>l.name=="Attack warning: "+boss.CurrentSkill.DisplayName);
+    if(warning==null)return false;
+    sawMeteor=true;before=damageTaken;origin=warning.transform.position;
+    log("Meteor telegraph="+origin+" observed player="+player().transform.position);
+    damage(boss,1);check(boss.State==EnemyState.Attack,"armored meteor resists ordinary stagger");
+    near(boss,Vector3.Distance(origin,boss.transform.position)>6f?3f:9f);started=Time.time;return true;
+});
+steps.Add(()=>{
+    if(Time.time-started<1.8f)return false;
+    check(damageTaken==before && Vector3.Distance(origin,player().transform.position)>3f,"locked meteor area can be dodged after telegraph");
+    check(boss.Phase==2,"boss remains in phase two");
+    log("VISUAL CHECKPOINT: phase-two boss alive; set EC.continue=true to finish");return true;
+});
+steps.Add(()=>{
+    if(!(System.AppDomain.CurrentDomain.GetData("EC.continue") is bool) || !(bool)System.AppDomain.CurrentDomain.GetData("EC.continue"))return false;
+    damage(boss,9999);boss.Die();started=Time.time;return true;
+});
+steps.Add(()=>{
+    if(!run().HasResult)return false;
+    check(run().Succeeded && run().DefeatedEnemies==4 && run().AwardedGold==130 && run().AwardedExp==275 && stats.Gold==baselineGold+130,"all four targets settle 130 gold / 275 XP exactly once");
+    check(UnityEngine.Object.FindFirstObjectByType<DungeonUI>().transform.Find("ResultPanel").gameObject.activeInHierarchy,"victory panel visible");
+    boss.Die();check(stats.Gold==baselineGold+130,"duplicate death cannot duplicate reward");
+    oldRun=run();click(UnityEngine.Object.FindFirstObjectByType<DungeonUI>(),"retryButton");return true;
+});
+steps.Add(()=>{
+    if(loader.IsLoading || ui.IsUIOpen("UI/LoadingUI") || run()==oldRun || run().State!=DungeonRunState.Running)return false;
+    check(run().DefeatedEnemies==0 && run().TotalEnemies==4 && run().Boss==null && enemies().Length==3,"retry resets waves, phase and enemy count");
+    check(stats.CurrentHealth==stats.MaxHealth && player().enabled,"retry revives player");
+    foreach(var e in enemies())e.enabled=false;
+    damage(enemies()[0],9999);heal=false;player().TakeDamage(99999);started=Time.time;return true;
+});
+steps.Add(()=>{
+    if(Time.time-started<3f)return false;
+    check(run().State==DungeonRunState.Failed && run().AwardedGold==0 && run().AwardedExp==0 && stats.Gold==baselineGold+130,"player death forfeits partial-run rewards");
+    check(run().Boss==null && run().DefeatedEnemies==1,"failure cancels remaining wave flow");
+    click(UnityEngine.Object.FindFirstObjectByType<DungeonUI>(),"returnButton");return true;
+});
+steps.Add(()=>{
+    if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main" || loader.IsLoading || ui.IsUIOpen("UI/LoadingUI"))return false;
+    check(!DungeonLaunchContext.HasValue && !ui.IsUIOpen(DungeonRunService.UiKey) && !stats.IsDead,"return to town clears encounter UI/context and restores player");
+    check(UnityEngine.Object.FindObjectsByType<AttackProjectile>(FindObjectsSortMode.None).Length==0,"scene unload removes enemy projectiles");return true;
+});
+int step=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+40;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+System.Action cleanup=()=>{UnityEditor.EditorApplication.update-=update;stats.OnHealthChanged-=health;input.SetGameplayInputBlocked(token,false);UnityEngine.Object.Destroy(hit);System.AppDomain.CurrentDomain.SetData("EC.update",null);};
+update=()=>{
+ try{
+    if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Play stopped");
+    if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("stage "+step);
+    if(heal && !stats.IsDead)stats.Heal(stats.MaxHealth);
+    if(!steps[step]())return;
+    ++step;deadline=UnityEditor.EditorApplication.timeSinceStartup+(step==12?180:40);
+    System.AppDomain.CurrentDomain.SetData("EC.result","Running "+step+"/"+steps.Count+" checks="+passed);
+    if(step==steps.Count){cleanup();System.AppDomain.CurrentDomain.SetData("EC.result","COMPLETE "+passed+" checks\n"+(string)System.AppDomain.CurrentDomain.GetData("EC.log"));}
+ }catch(System.Exception e){cleanup();System.AppDomain.CurrentDomain.SetData("EC.result","FAILED at "+step+": "+e+"\n"+(string)System.AppDomain.CurrentDomain.GetData("EC.log"));}
+};
+System.AppDomain.CurrentDomain.SetData("EC.log","");System.AppDomain.CurrentDomain.SetData("EC.continue",false);
+System.AppDomain.CurrentDomain.SetData("EC.update",update);System.AppDomain.CurrentDomain.SetData("EC.result","Started");UnityEditor.EditorApplication.update+=update;
+return "Started "+steps.Count+" stages";
