@@ -99,6 +99,13 @@ def generated(path: str) -> bool:
     relative = path[len(PROJECT):]
     if relative in GENERATED_SCRIPTS:
         return True
+    asset_path = relative.lower()
+    if asset_path.startswith("assets/addressableassetsdata/"):
+        return asset_path.endswith(("/addressables_content_state.bin", "/addressables_content_state.bin.meta")) or asset_path in {
+            "assets/addressableassetsdata/link.xml", "assets/addressableassetsdata/link.xml.meta",
+        }
+    if asset_path == "assets/streamingassets/aa.meta" or asset_path.startswith("assets/streamingassets/aa/"):
+        return True
     return relative.split("/", 1)[0].lower() in {
         "library", "temp", "obj", "logs", "usersettings", "build", "builds",
         "memorycaptures", "recordings",
