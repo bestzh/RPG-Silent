@@ -2,6 +2,15 @@ name: Unity validation
 
 on:
   workflow_dispatch:
+    inputs:
+      licensing_method:
+        description: Unity activation method
+        type: choice
+        default: personal
+        options:
+          - personal
+          - serial
+          - file
 
 permissions:
   contents: read
@@ -19,15 +28,18 @@ jobs:
       - name: Check license configuration
         shell: bash
         env:
+          LICENSING_METHOD: ${{ inputs.licensing_method }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         run: |
-          if [[ -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" || ( -z "$UNITY_LICENSE" && -z "$UNITY_SERIAL" ) ]]; then
-            echo '::error::Configure UNITY_EMAIL, UNITY_PASSWORD and UNITY_LICENSE (Personal) or UNITY_SERIAL (Pro) in Actions secrets. See RPG-Silent/Docs/UnityValidation.md.'
-            exit 1
-          fi
+          case "$LICENSING_METHOD" in
+            personal) [[ -n "$UNITY_EMAIL" && -n "$UNITY_PASSWORD" ]] ;;
+            serial) [[ -n "$UNITY_EMAIL" && -n "$UNITY_PASSWORD" && -n "$UNITY_SERIAL" ]] ;;
+            file) [[ -n "$UNITY_LICENSE" ]] ;;
+            *) false ;;
+          esac || { echo '::error::Missing credentials for the selected licensing method. See RPG-Silent/Docs/UnityValidation.md.'; exit 1; }
       - name: Checkout project and LFS content
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -44,13 +56,14 @@ jobs:
       - name: Run first-party EditMode tests
         shell: bash
         env:
+          LICENSING_METHOD: ${{ inputs.licensing_method }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         run: |
           "$RUNNER_TEMP/game-ci/game-ci" test --docker --engine=unity RPG-Silent \
-            --testPlatforms=editmode --coverageEnabled=false \
+            --unityLicensingMethod="$LICENSING_METHOD" --testPlatforms=editmode --coverageEnabled=false \
             --customParameters="-assemblyNames RPGSilent.Tests.Editor" \
             --artifactsPath=Logs/CI --dockerShmSize=1025m
       - name: Require non-empty passing results
