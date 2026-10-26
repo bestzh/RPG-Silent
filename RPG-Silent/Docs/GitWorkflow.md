@@ -61,7 +61,7 @@ python -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
 - 禁止提交 `output/`、工程缓存、生成的解决方案、七个根目录生成脚本，以及 Addressables 的 content state、自动 link.xml 和 StreamingAssets/aa 产物。
 - 检查新增或修改文件中的合并冲突标记；跳过二进制文件和 Markdown 的普通分隔线。
 - 检查本次改动涉及的 `Assets/` 资源、目录及 `.meta` 是否配对；资源删除时也需删除对应 `.meta`。允许 Unity 的空目录元数据，校验 `.meta` 的 GUID 格式，不对全仓库 GUID 唯一性作保证。
-- 普通文件上限为 50 MiB。`policy.json` 对已有六个大文件逐路径记录原因，暂允至 75 MiB；达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
+- 普通文件上限为 50 MiB。`policy.json` 对三个尚未拆分/裁剪的场景逐路径记录原因，暂允至 75 MiB；三个大型二进制文件改为 LFS 后已移除例外。达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
 
 这是增量仓库卫生检查，不替代 Unity 编译、运行测试、构建或完整历史审计。修改检查策略前须运行检查器测试。
 
@@ -93,6 +93,10 @@ git mergetool
 升级 Git 包应使用独立提交，同步 manifest 和锁文件，并在 Unity 解析完成后检查包哈希和 Console。不要只删除锁文件来尝试修复包问题。完整 SHA 的语法见 [Unity Git 依赖说明](https://docs.unity3d.com/6000.0/Documentation/Manual/upm-git.html#revision)。
 
 ## 大文件与资源裁剪评估
+
+当前 LFS 范围仅为下表中的 `VampArmsLegs_S.tga`、`VampTorso_S.tga` 和 `Suntail - Mild Flight.wav`，合计 188,553,860 字节；精确路径规则位于根 `.gitattributes`。暂存指针的 SHA-256 和大小均与转换前工作区字节一致，资源及 `.meta` 内容不变。钩子负责先上传对象，Unity 验证工作流使用 `lfs: true` 检出。现有历史瘦身是独立后续步骤，新增指针提交不会删除旧历史中的完整二进制。
+
+首次克隆后安装 Git LFS 和本仓库钩子，运行 `git lfs pull`，再打开 Unity。遇到缺失资源时先检查 `git lfs ls-files`、`git lfs status` 和 `git lfs fsck`，不要让 Unity 导入指针文本。暂不按扩展名把所有贴图、音频或场景整体转入 LFS。
 
 2026-10-26，以第一阶段合并提交 `fde403e06be0525e56c61b9cdfbe58a59a692f04` 为基线：当前树共 34,782 个文件，未压缩内容约 4,138.10 MiB；这不是克隆下载量。`git lfs ls-files` 为空。六个超过 50 MiB 的文件如下，路径相对于 `RPG-Silent/`：
 
