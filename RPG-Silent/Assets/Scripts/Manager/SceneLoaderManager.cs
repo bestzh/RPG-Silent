@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 public class SceneLoaderManager : MonoBehaviour, ISceneLoader
 {
     private bool isSceneLoading;
+    public bool IsLoading => isSceneLoading;
 
     private void Awake()
     {
@@ -21,17 +22,35 @@ public class SceneLoaderManager : MonoBehaviour, ISceneLoader
     }
 
     public void LoadScene(string sceneKey, bool additive = false,
-                          Action<float> onProgress = null, Action onComplete = null)
+                          Action<float> onProgress = null, Action onComplete = null,
+                          Action<Exception> onFailed = null)
     {
         if (isSceneLoading)
         {
-            Debug.LogWarning($"[SceneLoader] 场景正在加载中，忽略重复请求: {sceneKey}");
+            onFailed?.Invoke(new InvalidOperationException("另一个场景正在加载，请稍后重试。"));
             return;
         }
 
-        LoadSceneMode mode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-        AsyncOperationHandle<SceneInstance> handle = Addressables.LoadSceneAsync(sceneKey, mode);
+        if (string.IsNullOrWhiteSpace(sceneKey))
+        {
+            ReportFailure(sceneKey, new ArgumentException("场景地址不能为空。"), onFailed);
+            return;
+        }
+
+        // 先占用请求，连同步异常和已完成的失败句柄也必须走同一恢复路径。
         isSceneLoading = true;
+        AsyncOperationHandle<SceneInstance> handle;
+        try
+        {
+            LoadSceneMode mode = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
+            handle = Addressables.LoadSceneAsync(sceneKey, mode);
+        }
+        catch (Exception exception)
+        {
+            isSceneLoading = false;
+            ReportFailure(sceneKey, exception, onFailed);
+            return;
+        }
 
         handle.Completed += completedHandle =>
         {
@@ -44,7 +63,11 @@ public class SceneLoaderManager : MonoBehaviour, ISceneLoader
                 return;
             }
 
-            Debug.LogError($"[SceneLoader] 场景加载失败: {sceneKey}");
+            Exception failure = completedHandle.OperationException ??
+                                new InvalidOperationException("场景加载未成功完成。");
+            // 成功场景由 Addressables 在卸载时释放；失败句柄由本服务释放。
+            Addressables.Release(completedHandle);
+            ReportFailure(sceneKey, failure, onFailed);
         };
 
         StartCoroutine(TrackProgressCoroutine(handle, onProgress));
@@ -53,10 +76,16 @@ public class SceneLoaderManager : MonoBehaviour, ISceneLoader
     private IEnumerator TrackProgressCoroutine(AsyncOperationHandle<SceneInstance> handle,
                                                Action<float> onProgress)
     {
-        while (!handle.IsDone)
+        while (handle.IsValid() && !handle.IsDone)
         {
             onProgress?.Invoke(handle.PercentComplete);
             yield return null;
         }
+    }
+
+    private static void ReportFailure(string sceneKey, Exception failure, Action<Exception> onFailed)
+    {
+        Debug.LogError($"[SceneLoader] 场景加载失败: {sceneKey}\n{failure.Message}");
+        onFailed?.Invoke(failure);
     }
 }
