@@ -3,15 +3,18 @@ using UnityEngine;
 using VContainer;
 
 /// <summary>
-/// 游戏入口，由 VContainer 注入 IUIService，不再使用单例访问。
+/// 菜单入口：使用唯一的全局容器注入本场景入口，再结束玩家会话并打开菜单。
 /// </summary>
 public class GameStart : MonoBehaviour
 {
     [Inject] private IUIService _uiService;
+    [Inject] private PlayerSessionService _playerSession;
 
     private void Start()
     {
-        if (_uiService == null)
+        // 菜单每次重新加载都会创建本组件；依赖始终来自存活的全局根。
+        var scope = GameLifetimeScope.Instance;
+        if (scope == null || scope.Container == null)
         {
             Debug.LogError("[GameStart] IUIService 未注入！\n" +
                            "请检查：场景中是否已添加 GameLifetimeScope 组件，并将 UIManager 拖入其字段。\n" +
@@ -19,6 +22,8 @@ public class GameStart : MonoBehaviour
             return;
         }
 
+        scope.Container.Inject(this);
+        _playerSession.EndSession();
         _uiService.OpenUI("UI/StartUI");
         _uiService.PreloadUI("UI/LoadingUI");
     }

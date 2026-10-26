@@ -14,8 +14,39 @@ using VContainer.Unity;
 ///    以及 ScreenSettingsService / SoundSettingsService / GameSettingsService 拖入对应字段
 /// ================================
 /// </summary>
+[DefaultExecutionOrder(-6000)]
 public class GameLifetimeScope : LifetimeScope
 {
+    public static GameLifetimeScope Instance { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetInstance() => Instance = null;
+    private PlayerProgressService progress;
+
+    private void OnApplicationPause(bool paused) { if (paused) progress?.Save(); }
+    private void OnApplicationQuit() => progress?.Save();
+
+    protected override void Awake()
+    {
+        // 必须早于容器构建和其他全局组件的 Awake，避免重复根先启动再被销毁。
+        if (Instance != null && Instance != this)
+        {
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        base.Awake();
+    }
+
+    protected override void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        base.OnDestroy();
+    }
+
     [SerializeField] private UIManager                   uiManager;
     [SerializeField] private InputManager                inputManager;
     [SerializeField] private SceneLoaderManager          sceneLoaderManager;
@@ -25,16 +56,29 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private GameSettingsService         gameSettingsService;
     [SerializeField] private PlayerInputActionsService   playerInputActionsService;
 
-    [Header("玩家（跨场景保留，全局单例）")]
-    [SerializeField] private int playerMaxHealth = 100;
+    [Header("玩家（同一局跨场景保留，新游戏重置）")]
+    [SerializeField] private int   playerMaxHealth = 100;
+    [SerializeField] private float playerMaxEnergy = 100f;
 
     protected override void Configure(IContainerBuilder builder)
     {
         // 玩家数据与用例：注册为全局单例，使玩家可跨场景持久保留（HP 等状态延续）
         builder.Register<PlayerStats>(
-            _ => new PlayerStats(playerMaxHealth),
+            _ => new PlayerStats(playerMaxHealth, playerMaxEnergy),
             Lifetime.Singleton
         ).AsSelf().As<IPlayerStatsReader>();
+
+        // 技能槽 UI 桥接：玩家生成后由 PlayerSkillController 绑定
+        builder.Register<PlayerSkillAccess>(Lifetime.Singleton);
+        string saveDirectory = System.IO.Path.Combine(Application.persistentDataPath, "Saves");
+#if UNITY_EDITOR
+        // Isolated MCP test storage survives Play Mode restarts, never player builds.
+        string validationDirectory = UnityEditor.SessionState.GetString("RPGSilent.Validation.SaveDirectory", string.Empty);
+        if (!string.IsNullOrEmpty(validationDirectory)) saveDirectory = validationDirectory;
+#endif
+        builder.RegisterInstance(new ProgressSaveStore(saveDirectory));
+        builder.Register<PlayerProgressService>(Lifetime.Singleton);
+        builder.Register<PlayerSessionService>(Lifetime.Singleton);
 
         builder.Register<PlayerTakeDamageUseCase>(Lifetime.Singleton);
         builder.Register<PlayerAddRewardUseCase>(Lifetime.Singleton);
@@ -63,13 +107,11 @@ public class GameLifetimeScope : LifetimeScope
         // 光标状态（游戏中隐藏，Ctrl 切换，UI 模式强制显示）
         builder.Register<CursorService>(Lifetime.Singleton).As<ICursorService>();
 
-        // 让 GameStart 也能被注入
-        builder.RegisterComponentInHierarchy<GameStart>();
-
         // 容器构建完成后，直接把容器实例传给 UIManager
         // 比依赖 [Inject] 字段注入更可靠，避免 DontDestroyOnLoad 的时序问题
         builder.RegisterBuildCallback(container =>
         {
+            progress = container.Resolve<PlayerProgressService>();
             uiManager.SetGlobalResolver(container);
         });
     }
