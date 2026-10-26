@@ -1,5 +1,5 @@
 # Unity — 模板来源: https://github.com/github/gitignore/blob/main/Unity.gitignore
-# 路径未使用前导 "/"，以便 Unity 工程在仓库子目录（如 RPG-Silent/）时也能匹配。
+# 不含斜杠的目录规则匹配任意层级；包含目录层级的 Unity 规则使用 **/ 支持仓库子目录。
 
 .utmp/
 [Ll]ibrary/
@@ -20,7 +20,7 @@
 # [Aa]ssets/AssetStoreTools*
 
 # Rider 插件（自动生成）
-[Aa]ssets/Plugins/Editor/JetBrains*
+**/[Aa]ssets/Plugins/Editor/JetBrains*
 
 # Visual Studio
 .vs/
@@ -65,11 +65,14 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Addressables 打包数据
-[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/addressables_content_state.bin
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/addressables_content_state.bin.meta
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml.meta
 
 # Android StreamingAssets 临时文件
-[Aa]ssets/[Ss]treamingAssets/aa.meta
-[Aa]ssets/[Ss]treamingAssets/aa/*
+**/[Aa]ssets/[Ss]treamingAssets/aa.meta
+**/[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # 系统杂项
 .DS_Store
