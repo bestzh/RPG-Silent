@@ -6,6 +6,7 @@
 *.py text eol=lf
 *.ps1 text eol=lf
 *.sh text eol=lf
+RPG-Silent/Tools/Git/hooks/* text eol=lf
 *.json text eol=lf
 *.asmdef text eol=lf
 *.asmref text eol=lf
