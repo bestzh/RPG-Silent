@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+if ! git lfs version >/dev/null 2>&1; then
+    printf '%s\n' '推送需要 Git LFS，请安装后运行 python RPG-Silent/Tools/Git/install_hooks.py。' >&2
+    exit 1
+fi
+
+exec git lfs pre-push "$@"

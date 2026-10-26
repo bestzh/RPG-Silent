@@ -28,7 +28,7 @@ chore(仓库): 完善资源忽略规则
 
 ## 本地检查
 
-需要 Git 和 Python 3.10 或更新版本，不需要额外 Python 包或 Unity 许可证。
+需要 Git、Git LFS 和 Python 3.10 或更新版本，不需要额外 Python 包或 Unity 许可证。
 
 每个新克隆先安装一次本地提交钩子：
 
@@ -38,7 +38,9 @@ python RPG-Silent/Tools/Git/install_hooks.py
 
 安装只修改当前仓库的 Git 本地配置，记录当前 Python 路径，并把 `core.hooksPath` 指向仓库内的 `RPG-Silent/Tools/Git/hooks`。此后普通 `git commit` 会自动检查实际暂存区，检查失败则中止提交。Python 被移动或卸载后也会中止提交，重新安装钩子即可更新解释器路径。钩子文件使用 LF，可在 Windows Git 和 Linux/macOS 上执行。
 
-安装器遇到已有的钩子目录配置或 `.git/hooks` 中的非示例文件会停止，避免停用已有工具；重复安装本工具安全。需要移除时运行 `python RPG-Silent/Tools/Git/install_hooks.py --uninstall`，仅移除本工具的本地配置。Git clone 不会自动安装钩子；远端 CI 与本地钩子独立执行，作为合并的必要检查。
+安装器用 `git lfs install --local --skip-repo` 配置当前仓库的 LFS 过滤器；跟踪的 `pre-push` 将完整参数和标准输入交给 `git lfs pre-push`，先上传所需对象再推送提交。LFS 未安装时推送明确失败，避免远端只有指针。不要用其他钩子覆盖该文件。真实集成测试通过本地裸仓库推送 LFS 对象，再从全新克隆下载并逐字节比较，确保提交检查和对象上传共存。过滤器和钩子准备就绪不代表已有历史已迁移。
+
+安装器遇到已有的钩子目录配置或 `.git/hooks` 中的非示例文件会停止，避免停用已有工具；重复安装本工具安全。需要移除时运行 `python RPG-Silent/Tools/Git/install_hooks.py --uninstall`，仅移除本工具的钩子路径及 Python 配置，LFS 过滤器保留；若继续使用 LFS，需按现有钩子情况配置独立的 LFS pre-push。Git clone 不会自动安装本项目钩子；远端 CI 与本地钩子独立执行，作为合并的必要检查。
 
 ```powershell
 # 先显式暂存本次功能的文件；也可以在 commit 前手动提前检查
