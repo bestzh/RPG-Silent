@@ -232,6 +232,7 @@ GameObject:
   - component: {fileID: 4411781196753439523}
   - component: {fileID: 7995760636945378460}
   - component: {fileID: 3967942573982677993}
+  - component: {fileID: 5620781113781831881}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -314,20 +315,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c626f889d9954f44599a3a6ae14271b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Definition: {fileID: 0}
   MaxHealth: 20
   moveSpeed: 3
   turnSpeed: 8
   attackDistance: 2
   attackCooldown: 2
   damage: 10
+  attackHitNormalizedTime: 0.2345187
+  attackDuration: 2.1666667
+  attackHalfAngle: 60
+  detectionDistance: 12
+  leashDistance: 20
+  homeTolerance: 0.3
   rewardGold: 10
   rewardExp: 25
   useNavMeshAgent: 1
-  destroyDelay: 2
+  destroyDelay: 3
   hitStopDuration: 0.15
   knockbackDistance: 0.25
   hitEffectPrefab: {fileID: 0}
   deathEffectPrefab: {fileID: 0}
+  effectLifetime: 3
 --- !u!136 &3673497516657394594
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -409,8 +418,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 543997731894744870}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 3aaf38176678e1d4994b710ba08065f2, type: 3}
+  m_Controller: {fileID: 9100000, guid: f9222f75e7b037b40b7123a08b54b994, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -422,6 +431,38 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5620781113781831881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543997731894744870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cdaa3305fa954c45a80c9662aa6f425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_GraphName: Behavior Tree
+  m_Index: 0
+  m_Data:
+    m_TaskData: []
+    m_EventTaskData: []
+    m_SharedVariableData: []
+    m_DisabledEventNodesData: []
+    m_DisabledLogicNodesData: []
+    m_UniqueID: 5316254
+    m_LogicNodePropertiesData: []
+    m_EventNodePropertiesData: []
+    m_GroupPropertiesData: []
+    m_SharedVariableGroupsData: []
+  m_AuthoringLayer: {fileID: 0}
+  m_StartWhenEnabled: 0
+  m_PauseWhenDisabled: 0
+  m_UpdateMode: 0
+  m_EvaluationType: 0
+  m_MaxEvaluationCount: 1
+  m_Subtree: {fileID: 11400000, guid: bb1ddb226cfe8b54e9021c3232e6773c, type: 2}
 --- !u!1 &710716946094816327
 GameObject:
   m_ObjectHideFlags: 0
