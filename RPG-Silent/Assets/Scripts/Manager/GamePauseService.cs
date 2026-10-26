@@ -15,6 +15,7 @@ public class GamePauseService : IGamePauseService, IDisposable
     private readonly IUIService          _uiService;
     private readonly IPlayerInputActions _playerInputActions;
     private readonly ICursorService      _cursorService;
+    private readonly DungeonRunService _dungeonRun;
 
     private bool _inPauseMode;
     private bool _settingsFromPause;
@@ -24,11 +25,12 @@ public class GamePauseService : IGamePauseService, IDisposable
     public GamePauseService(
         IUIService uiService,
         IPlayerInputActions playerInputActions,
-        ICursorService cursorService)
+        ICursorService cursorService, DungeonRunService dungeonRun)
     {
         _uiService          = uiService;
         _playerInputActions = playerInputActions;
         _cursorService      = cursorService;
+        _dungeonRun = dungeonRun;
         _playerInputActions.PauseTriggered += OnPauseTriggered;
     }
 
@@ -42,12 +44,16 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     public void Toggle()
     {
+        if (_dungeonRun.HasResult) return;
+        if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_inPauseMode) Resume();
         else              Pause();
     }
 
     public void Pause()
     {
+        if (_dungeonRun.HasResult) return;
+        if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (IsPaused) return;
 
         _settingsFromPause = false;
@@ -72,6 +78,8 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     public void OpenSettings()
     {
+        if (_dungeonRun.HasResult) return;
+        if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (!_inPauseMode) return;
 
         _settingsFromPause = true;
@@ -85,7 +93,7 @@ public class GamePauseService : IGamePauseService, IDisposable
         if (_inPauseMode) return;
 
         _inPauseMode = true;
-        _playerInputActions.SetGameplayInputEnabled(false);
+        _playerInputActions.SetGameplayInputBlocked(this, true);
         _cursorService.EnterUICursor();
     }
 
@@ -94,12 +102,17 @@ public class GamePauseService : IGamePauseService, IDisposable
         if (!_inPauseMode) return;
 
         _inPauseMode = false;
-        _playerInputActions.SetGameplayInputEnabled(true);
-        _cursorService.EnterGameplayCursor(resetToHidden: true);
+        _playerInputActions.SetGameplayInputBlocked(this, false);
+        if (_playerInputActions.GameplayInputEnabled)
+            _cursorService.EnterGameplayCursor(resetToHidden: true);
+        else
+            _cursorService.EnterUICursor();
     }
 
     private void OnPauseTriggered()
     {
+        if (_dungeonRun.HasResult) return;
+        if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_uiService.IsUIOpen(SettingsUiKey))
         {
             bool returnToPause = _settingsFromPause;

@@ -1,3 +1,4 @@
+using System;
 using RPGSilent.Domain;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ using UnityEngine;
 /// 打开期间禁用玩家输入并显示光标，关闭（含进入副本）时恢复。
 /// 由 SceneLifetimeScope 以 Scoped 生命周期注册，随游戏场景卸载而销毁。
 /// </summary>
-public class PortalService : IPortalService
+public class PortalService : IPortalService, IDisposable
 {
     private const string PortalUiKey = "UI/PortalUI";
     private const string MainUiKey   = "UI/MainUI";
@@ -14,6 +15,7 @@ public class PortalService : IPortalService
     private readonly IUIService          _uiService;
     private readonly IPlayerInputActions _playerInputActions;
     private readonly ICursorService      _cursorService;
+    private readonly DungeonRunService _dungeonRun;
 
     private bool _inUIMode;
 
@@ -22,15 +24,18 @@ public class PortalService : IPortalService
     public PortalService(
         IUIService uiService,
         IPlayerInputActions playerInputActions,
-        ICursorService cursorService)
+        ICursorService cursorService, DungeonRunService dungeonRun)
     {
         _uiService          = uiService;
         _playerInputActions = playerInputActions;
         _cursorService      = cursorService;
+        _dungeonRun = dungeonRun;
     }
 
     public void OpenPortal(int portalId)
     {
+        if (_dungeonRun.HasResult) return;
+        if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (IsOpen) return;
 
         EnterUIMode();
@@ -49,12 +54,14 @@ public class PortalService : IPortalService
         Debug.Log("[PortalService] 关闭传送门 UI");
     }
 
+    public void Dispose() => ClosePortal();
+
     private void EnterUIMode()
     {
         if (_inUIMode) return;
 
         _inUIMode = true;
-        _playerInputActions.SetGameplayInputEnabled(false);
+        _playerInputActions.SetGameplayInputBlocked(this, true);
         _cursorService.EnterUICursor();
     }
 
@@ -63,7 +70,10 @@ public class PortalService : IPortalService
         if (!_inUIMode) return;
 
         _inUIMode = false;
-        _playerInputActions.SetGameplayInputEnabled(true);
-        _cursorService.EnterGameplayCursor(resetToHidden: true);
+        _playerInputActions.SetGameplayInputBlocked(this, false);
+        if (_playerInputActions.GameplayInputEnabled)
+            _cursorService.EnterGameplayCursor(resetToHidden: true);
+        else
+            _cursorService.EnterUICursor();
     }
 }

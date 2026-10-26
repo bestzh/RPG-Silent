@@ -16,6 +16,8 @@ using VContainer.Unity;
 public class SceneLifetimeScope : LifetimeScope
 {
     private const string PauseUiKey = "UI/PauseUI";
+    private UIManager _uiManager;
+    private DungeonRunService _dungeonRun;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -27,13 +29,17 @@ public class SceneLifetimeScope : LifetimeScope
 
         // 传送门服务（玩家进入传送门触发器时唤出 PortalUI）
         builder.Register<PortalService>(Lifetime.Scoped).As<IPortalService>();
+        builder.Register<DungeonRunService>(Lifetime.Scoped);
 
         // 场景容器构建完毕后，把场景级容器传给 UIManager
         // 这样 UIManager 加载 MainUI 时能解析全局注册的 IPlayerStatsReader 等类型
         builder.RegisterBuildCallback(container =>
         {
             var uiService = container.Resolve<IUIService>() as UIManager;
+            _uiManager = uiService;
             uiService?.SetSceneResolver(container);
+            _dungeonRun = container.Resolve<DungeonRunService>();
+            _dungeonRun.Changed += OnDungeonChanged;
 
             // 解析后订阅 ESC，并预加载 PauseUI，避免首次按键异步加载导致状态错乱
             container.Resolve<IGamePauseService>();
@@ -48,15 +54,32 @@ public class SceneLifetimeScope : LifetimeScope
         });
     }
 
+    private System.Collections.IEnumerator Start()
+    {
+        // 等待出生器及场景内对象的 Awake/Start 完成，再绑定本场战斗目标。
+        yield return null;
+        _dungeonRun?.Initialize(gameObject.scene);
+    }
+
+    private void OnDungeonChanged()
+    {
+        if (!_dungeonRun.HasResult) return;
+        Container.Resolve<IGamePauseService>().Resume();
+        Container.Resolve<IPortalService>().ClosePortal();
+        _uiManager.SetRaycastEnabled("UI/MainUI", false);
+    }
+
     protected override void OnDestroy()
     {
+        if (_dungeonRun != null) _dungeonRun.Changed -= OnDungeonChanged;
         // 场景卸载时，清除 UIManager 中的场景级容器引用，恢复使用全局容器
-        if (Container != null)
+        if (_uiManager != null && _uiManager.IsSceneResolver(Container))
         {
-            var uiService = Container.Resolve<IUIService>();
-            uiService?.CloseUI(PauseUiKey);
-            uiService?.SetRaycastEnabled("UI/MainUI", true);
-            (uiService as UIManager)?.SetSceneResolver(null);
+            _uiManager.ReleaseUI(PauseUiKey);
+            _uiManager.ReleaseUI(DungeonRunService.UiKey);
+            _uiManager.CloseUI("UI/PortalUI");
+            _uiManager.SetRaycastEnabled("UI/MainUI", true);
+            _uiManager.SetSceneResolver(null);
         }
 
         base.OnDestroy();
