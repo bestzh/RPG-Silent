@@ -33,7 +33,8 @@ class CommitHookTests(unittest.TestCase):
         for name in ("check_repository.py", "policy.json", "install_hooks.py"):
             shutil.copyfile(source / name, self.tool_dir / name)
         (self.tool_dir / "hooks").mkdir()
-        shutil.copyfile(source / "hooks/pre-commit", self.tool_dir / "hooks/pre-commit")
+        for name in ("pre-commit", "pre-push"):
+            shutil.copyfile(source / "hooks" / name, self.tool_dir / "hooks" / name)
         self.write(".gitignore", "__pycache__/\n*.pyc\n")
         check.git(self.root, "add", "-A")
         check.git(self.root, "-c", "core.hooksPath=", "commit", "-qm", "baseline")
@@ -110,6 +111,28 @@ class CommitHookTests(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertIn("未找到 Python".encode(), result.stderr)
         self.assertEqual(self.base, check.resolve(self.root, "HEAD"))
+
+    def test_lfs_push_transfers_objects_for_a_fresh_clone(self):
+        self.assertEqual(0, self.install().returncode)
+        self.write(".gitattributes", "*.dat filter=lfs diff=lfs merge=lfs -text\n")
+        payload = b"first-party LFS transfer fixture\x00" * 128
+        (self.root / "fixture.dat").write_bytes(payload)
+        check.git(self.root, "add", "-A")
+        self.assertEqual(0, self.commit().returncode)
+        pointer = check.git(self.root, "show", "HEAD:fixture.dat")
+        self.assertTrue(pointer.startswith(b"version https://git-lfs.github.com/spec/v1\n"))
+        with tempfile.TemporaryDirectory(prefix="lfs remote ") as directory:
+            remote = Path(directory) / "remote.git"
+            clone = Path(directory) / "fresh clone"
+            check.git(self.root, "init", "--bare", str(remote))
+            check.git(self.root, "remote", "add", "origin", remote.as_uri())
+            # Only the actual pre-push hook uploads the LFS object to this remote.
+            check.git(self.root, "push", "origin", "HEAD:refs/heads/main")
+            check.git(self.root, "clone", "--branch", "main", remote.as_uri(), str(clone))
+            check.git(clone, "lfs", "install", "--local", "--skip-repo")
+            check.git(clone, "lfs", "pull")
+            check.git(clone, "lfs", "fsck")
+            self.assertEqual(payload, (clone / "fixture.dat").read_bytes())
 
 
 if __name__ == "__main__":
