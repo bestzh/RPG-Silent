@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 concurrency:
   group: unity-validation-${{ github.ref }}
@@ -34,29 +33,33 @@ jobs:
         with:
           lfs: true
           persist-credentials: false
+      - name: Install verified GameCI CLI
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/game-ci"
+          archive="$RUNNER_TEMP/game-ci.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" https://github.com/game-ci/cli/releases/download/v0.1.72/game-ci-linux-x64.tar.gz
+          printf '%s  %s\n' '1de550a620ee92e05e920b6db7d431621440b60b2577f04b4a997dc92a58cb0a' "$archive" | sha256sum --check
+          tar -xzf "$archive" -C "$RUNNER_TEMP/game-ci"
       - name: Run first-party EditMode tests
-        uses: game-ci/unity-test-runner@32e57712352b500e17974b245a6dce9e11a73213 # v4
+        shell: bash
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-        with:
-          cliVersion: v0.1.72
-          projectPath: RPG-Silent
-          testMode: EditMode
-          customParameters: -assemblyNames RPGSilent.Tests.Editor
-          coverageEnabled: false
-          artifactsPath: artifacts/unity
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Unity test results
+        run: |
+          "$RUNNER_TEMP/game-ci/game-ci" test --docker --engine=unity RPG-Silent \
+            --testPlatforms=editmode --coverageEnabled=false \
+            --customParameters="-assemblyNames RPGSilent.Tests.Editor" \
+            --artifactsPath=Logs/CI --dockerShmSize=1025m
       - name: Require non-empty passing results
-        run: python3 RPG-Silent/Tools/Validation/check_test_results.py artifacts/unity
+        run: python3 RPG-Silent/Tools/Validation/check_test_results.py RPG-Silent/Logs/CI
       - name: Preserve test results and logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: unity-validation-${{ github.sha }}
-          path: artifacts/unity
+          path: RPG-Silent/Logs/CI
           if-no-files-found: warn
           retention-days: 14

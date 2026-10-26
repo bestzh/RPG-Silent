@@ -10,7 +10,9 @@
 
 ## GitHub Actions
 
-仓库根目录 `.github/workflows/unity-tests.yml` 提供手动 `Unity validation` 工作流。使用完整 SHA 固定 checkout、GameCI 和 artifact action，并固定 GameCI CLI v0.1.72。Unity 版本从工程文件读取；检出包含 LFS 内容；测试仅运行本项目测试程序集，不安装覆盖率包。结果必须包含实际执行且全部通过的第一方测试，日志保存 14 天。
+仓库根目录 `.github/workflows/unity-tests.yml` 提供手动 `Unity validation` 工作流。使用完整 SHA 固定 checkout 和 artifact action，直接运行 GameCI CLI v0.1.72，并核对官方发布包的 SHA-256。Unity 版本从工程文件读取；检出包含 LFS 内容；测试仅运行本项目测试程序集，不安装覆盖率包。结果必须包含实际执行且全部通过的第一方测试，日志保存 14 天。
+
+直接调用 CLI 时显式传入 `--coverageEnabled=false`。GameCI Action v4.4.0 会将该选项转换为 CLI 不支持的 `--no-coverageEnabled`；首次云端运行在启动 Unity 前因此失败。当前流程绕过该参数转换层，保留关闭覆盖率的原定配置。
 
 首次启用前，由维护者在 GitHub `Settings > Secrets and variables > Actions` 设置 `UNITY_EMAIL`、`UNITY_PASSWORD`，以及 Personal 的 `UNITY_LICENSE` 或 Pro 的 `UNITY_SERIAL`。不要把这些值提交到仓库或发到聊天中。具体激活方式见 [GameCI 官方文档](https://game.ci/docs/github/activation/)。
 
