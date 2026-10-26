@@ -90,3 +90,21 @@ Desktop.ini
 
 # Burst 本地缓存（部分版本）
 **/[Bb]urst[Cc]ache/
+
+# 仓库根目录的本地游戏构建输出
+/output/
+
+# Unity / IDE 自动生成的解决方案，以及 Python 检查器缓存
+*.slnx
+__pycache__/
+*.pyc
+
+# Unity Generate Core CommandBuffers 菜单生成的根目录副本
+# 只忽略这七个路径；Assets 和 Packages 中的同名脚本仍正常跟踪。
+/RPG-Silent/ComputeCommandBuffer.cs
+/RPG-Silent/IBaseCommandBuffer.cs
+/RPG-Silent/IComputeCommandBuffer.cs
+/RPG-Silent/IRasterCommandBuffer.cs
+/RPG-Silent/IUnsafeCommandBuffer.cs
+/RPG-Silent/RasterCommandBuffer.cs
+/RPG-Silent/UnsafeCommandBuffer.cs
