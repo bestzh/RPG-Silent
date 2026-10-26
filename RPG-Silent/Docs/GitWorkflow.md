@@ -63,7 +63,7 @@ python -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
 - 禁止提交 `output/`、工程缓存、生成的解决方案、七个根目录生成脚本，以及 Addressables 的 content state、自动 link.xml 和 StreamingAssets/aa 产物。
 - 检查新增或修改文件中的合并冲突标记；跳过二进制文件和 Markdown 的普通分隔线。
 - 检查本次改动涉及的 `Assets/` 资源、目录及 `.meta` 是否配对；资源删除时也需删除对应 `.meta`。允许 Unity 的空目录元数据，校验 `.meta` 的 GUID 格式，不对全仓库 GUID 唯一性作保证。
-- 普通文件上限为 50 MiB。`policy.json` 对三个尚未拆分/裁剪的场景逐路径记录原因，暂允至 75 MiB；三个大型二进制文件改为 LFS 后已移除例外。达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
+- 普通文件上限为 50 MiB。`policy.json` 仅对尚未拆分的 Dungeon01 场景暂允至 75 MiB；三个大型二进制文件改为 LFS、两个示例场景裁剪后均已移除例外。达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
 
 这是增量仓库卫生检查，不替代 Unity 编译、运行测试、构建或完整历史审计。修改检查策略前须运行检查器测试。
 
