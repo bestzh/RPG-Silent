@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RPGSilent.Combat;
 using UnityEngine;
 
 public class AttackHitboxController : MonoBehaviour
@@ -11,8 +12,9 @@ public class AttackHitboxController : MonoBehaviour
         DisableAll();
     }
 
-    public void EnableHitbox(AttackProfile profile, AttackExecutor owner)
+    public void EnableHitbox(AttackContext context)
     {
+        AttackProfile profile = context?.Profile;
         if (profile == null)
         {
             return;
@@ -33,7 +35,7 @@ public class AttackHitboxController : MonoBehaviour
                 continue;
             }
 
-            hitbox.EnableHitbox(profile, owner);
+            hitbox.EnableHitbox(context);
             enabledAny = true;
         }
 
@@ -65,6 +67,12 @@ public class AttackHitboxController : MonoBehaviour
         {
             hitbox?.DisableHitbox();
         }
+    }
+
+    public void DisableAttack(AttackContext context)
+    {
+        foreach (AttackHitbox hitbox in hitboxes)
+            hitbox?.DisableAttack(context);
     }
 
     private void RefreshHitboxes()

@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using RPGSilent.Combat;
 using RPGSilent.Domain;
 using UnityEngine;
 
@@ -11,105 +11,194 @@ public class AttackExecutor : MonoBehaviour
     [SerializeField] private Camera aimCamera;
     [SerializeField] private bool useDefaultMeleeFallback = true;
 
-    private readonly HashSet<IDamageable> hitTargets = new HashSet<IDamageable>();
+    [Tooltip("命中特效实例的最大存活时间（秒），避免循环粒子在场景中累积。")]
+    [SerializeField, Min(0.1f)] private float hitEffectLifetime = 5f;
+
+    private AttackContext normalAttack;
     private int currentComboIndex = 1;
     private AttackProfile defaultMeleeProfile;
+    private IDamageable selfDamageable;
+    private bool combatSuspended;
+    private bool enemyTargeting;
+    internal int CombatGeneration { get; private set; }
+
+    // 场景边界/结算使旧弹体和延迟攻击失效，普通连击收招不影响它们。
+    public void ResetCombat(bool suspended = false)
+    {
+        AttackEnd();
+        hitboxController?.DisableAll();
+        StopAllCoroutines();
+        normalAttack = null;
+        ++CombatGeneration;
+        combatSuspended = suspended;
+    }
 
     private void Awake()
     {
         if (attackLoadout == null)   attackLoadout   = GetComponent<PlayerAttackLoadout>();
         if (hitboxController == null) hitboxController = GetComponentInChildren<AttackHitboxController>();
         if (aimCamera == null)        aimCamera        = Camera.main;
+        selfDamageable = GetComponent<IDamageable>() ?? GetComponentInParent<IDamageable>();
     }
 
     public void SetCurrentComboIndex(int comboIndex)
     {
+        AttackEnd();
         currentComboIndex = Mathf.Max(1, comboIndex);
-        hitTargets.Clear();
+        normalAttack = CreateAttack(GetCurrentProfile());
+        if (normalAttack == null)
+            Debug.LogWarning($"[AttackExecutor] 当前姿态第 {currentComboIndex} 段攻击未配置 AttackProfile。", this);
     }
 
-    public AttackProfile GetCurrentAttackProfile() => GetCurrentProfile();
+    public AttackProfile GetCurrentAttackProfile() => normalAttack?.Profile ?? GetCurrentProfile();
+
+    public AttackContext CreateAttack(AttackProfile profile) =>
+        profile != null ? new AttackContext(profile, this) : null;
+
+    public AttackContext CreateAttack(AttackProfile profile, float damageMultiplier,
+        Vector3 aimPoint, Vector3? areaPoint = null) =>
+        profile != null ? new AttackContext(profile, this, damageMultiplier, aimPoint, areaPoint) : null;
+
+    public void ConfigureEnemyTargeting() => enemyTargeting = true;
+    public bool IsContextValid(AttackContext context) => Owns(context);
+
+    public bool CanDamage(IDamageable target)
+    {
+        if (target == null || target is Object obj && obj == null || target.IsDead || IsSelfTarget(target)) return false;
+        if (target is not Component component) return !enemyTargeting;
+        CombatTeam other = CombatFaction.Resolve(component);
+        CombatTeam own = enemyTargeting ? CombatTeam.Enemy : CombatFaction.Resolve(this);
+        if (enemyTargeting) return other == CombatTeam.Player;
+        return own == CombatTeam.Neutral || other == CombatTeam.Neutral || own != other;
+    }
+
+    /// <summary>按指定 Profile 立即结算（不依赖连招段数）。</summary>
+    public void ExecuteProfile(AttackProfile profile)
+    {
+        if (profile == null)
+        {
+            Debug.LogWarning("[AttackExecutor] ExecuteProfile 收到空 AttackProfile。", this);
+            return;
+        }
+
+        ReleaseAttack(CreateAttack(profile));
+    }
 
     public void AttackStart()
     {
-        AttackProfile profile = GetCurrentProfile();
-        if (profile == null) { WarnMissingProfile(); return; }
-
-        if (profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
-            hitboxController?.EnableHitbox(profile, this);
+        StartAttack(normalAttack);
     }
 
     public void AttackRelease()
     {
-        AttackProfile profile = GetCurrentProfile();
-        if (profile != null && profile.DeliveryType == AttackDeliveryType.MeleeHitbox) return;
-
-        ExecuteCurrentAttack();
+        ReleaseAttack(normalAttack);
     }
 
-    public void AttackEnd()    => hitboxController?.DisableAll();
+    public void AttackEnd()    => EndAttack(normalAttack);
     public void ExecuteHit()   => AttackRelease();
     public void ExecuteShoot() => AttackRelease();
     public void ExecuteAoe()   => AttackRelease();
 
-    public void ExecuteCurrentAttack()
-    {
-        AttackProfile profile = GetCurrentProfile();
-        if (profile == null) { WarnMissingProfile(); return; }
+    public void ExecuteCurrentAttack() => AttackRelease();
 
+    public void StartAttack(AttackContext context)
+    {
+        if (!Owns(context) || context.IsClosed || context.HasStarted) return;
+        context.HasStarted = true;
+        if (context.Profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
+            hitboxController?.EnableHitbox(context);
+    }
+
+    /// <summary>一个上下文只允许发射/结算一次，动画事件和兜底调用可以安全重入。</summary>
+    public void ReleaseAttack(AttackContext context)
+    {
+        if (!Owns(context) || context.IsClosed || context.HasReleased) return;
+        context.HasReleased = true;
+        if (context.Profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
+            StartAttack(context);
+        else
+            DispatchProfile(context);
+    }
+
+    public void EndAttack(AttackContext context)
+    {
+        if (!Owns(context) || context.IsClosed) return;
+        context.IsClosed = true;
+        hitboxController?.DisableAttack(context);
+        // 关闭释放入口和近战窗口，已发射的弹体/AOE 仍使用自己的命中记录。
+    }
+
+    private bool Owns(AttackContext context) =>
+        !combatSuspended && context != null && context.Owner == this && context.Profile != null
+        && context.Generation == CombatGeneration;
+
+    private void DispatchProfile(AttackContext context)
+    {
+        AttackProfile profile = context.Profile;
         switch (profile.DeliveryType)
         {
             case AttackDeliveryType.MeleeArc:
-                ExecuteMeleeArc(profile);
+                ExecuteMeleeArc(context);
                 break;
             case AttackDeliveryType.Raycast:
-                ExecuteRaycast(profile);
+                ExecuteRaycast(context);
                 break;
             case AttackDeliveryType.Projectile:
-                ExecuteProjectile(profile);
+                ExecuteProjectile(context);
                 break;
             case AttackDeliveryType.AoeAtPoint:
             case AttackDeliveryType.InstantAoe:
-                ExecuteAoeAtPoint(profile, transform.position + transform.rotation * profile.AoeOffset);
+                ExecuteAoeAtPoint(context, context.AreaPoint ?? transform.position + transform.rotation * profile.AoeOffset);
                 break;
             case AttackDeliveryType.SelfAoe:
-                ExecuteAoeAtPoint(profile, transform.position + profile.AoeOffset);
+                ExecuteAoeAtPoint(context, transform.position + profile.AoeOffset);
                 break;
             case AttackDeliveryType.PersistentAoe:
-                ExecutePersistentAoe(profile, transform.position + transform.rotation * profile.AoeOffset);
+                ExecutePersistentAoe(context, context.AreaPoint ?? transform.position + transform.rotation * profile.AoeOffset);
                 break;
             case AttackDeliveryType.MeleeHitbox:
-                AttackStart();
+                StartAttack(context);
                 break;
         }
     }
 
     // ── 伤害应用（接受接口，不依赖具体 EnemyController）──────────────────────
 
-    public void ApplyDamage(IDamageable target, AttackProfile profile, Vector3 hitPoint)
+    public bool ApplyDamage(IDamageable target, AttackContext context,
+                            Vector3 hitPoint, bool allowRepeatedDamage = false)
     {
-        ApplyDamage(target, profile, hitPoint, allowRepeatedDamage: false);
-    }
+        if (!Owns(context) || target == null || target is Object obj && obj == null) return false;
+        if (!CanDamage(target)) return false;
+        if (!allowRepeatedDamage && !context.TryRegisterHit(target)) return false;
 
-    public void ApplyDamage(IDamageable target, AttackProfile profile,
-                            Vector3 hitPoint, bool allowRepeatedDamage)
-    {
-        if (target == null || target.IsDead || profile == null) return;
-
-        if (!allowRepeatedDamage && hitTargets.Contains(target)) return;
-
-        if (!allowRepeatedDamage) hitTargets.Add(target);
-
-        target.TakeDamage(profile.Damage);
+        AttackProfile profile = context.Profile;
+        target.TakeDamage(context.Damage);
 
         if (profile.HitEffectPrefab != null)
-            Instantiate(profile.HitEffectPrefab, hitPoint, Quaternion.identity);
+        {
+            GameObject hitEffect = Instantiate(profile.HitEffectPrefab, hitPoint, Quaternion.identity);
+            Destroy(hitEffect, Mathf.Max(0.1f, hitEffectLifetime));
+        }
+        return true;
+    }
+
+    /// <summary>忽略自身与同层级子物体，避免技能/AOE 误伤施法者。</summary>
+    private bool IsSelfTarget(IDamageable target)
+    {
+        if (selfDamageable != null && ReferenceEquals(target, selfDamageable))
+            return true;
+
+        if (target is not Component targetComp) return false;
+
+        Transform targetRoot = targetComp.transform.root;
+        return targetRoot == transform.root;
     }
 
     // ── 各攻击执行实现 ──────────────────────────────────────────────────────
 
-    private void ExecuteMeleeArc(AttackProfile profile)
+    private void ExecuteMeleeArc(AttackContext context)
     {
+        AttackProfile profile = context.Profile;
         Vector3 center = transform.position + transform.forward * profile.Range;
         Collider[] hits = Physics.OverlapSphere(center, profile.Radius, profile.TargetLayers);
 
@@ -128,15 +217,16 @@ public class AttackExecutor : MonoBehaviour
                 if (angle > profile.Angle * 0.5f) continue;
             }
 
-            ApplyDamage(target, profile, hit.ClosestPoint(center));
+            ApplyDamage(target, context, hit.ClosestPoint(center));
         }
     }
 
-    private void ExecuteRaycast(AttackProfile profile)
+    private void ExecuteRaycast(AttackContext context)
     {
+        AttackProfile profile = context.Profile;
         Transform spawnPoint = ResolveSpawnPoint(profile);
         Vector3 origin    = spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
-        Vector3 direction = GetAimDirection(origin);
+        Vector3 direction = context.AimPoint.HasValue ? (context.AimPoint.Value - origin).normalized : GetAimDirection(origin);
         direction = ApplySpread(direction, profile.SpreadAngle);
 
         RaycastHit hit;
@@ -147,12 +237,13 @@ public class AttackExecutor : MonoBehaviour
         if (hasHit)
         {
             IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
-            ApplyDamage(target, profile, hit.point);
+            ApplyDamage(target, context, hit.point);
         }
     }
 
-    private void ExecuteProjectile(AttackProfile profile)
+    private void ExecuteProjectile(AttackContext context)
     {
+        AttackProfile profile = context.Profile;
         if (profile.ProjectilePrefab == null)
         {
             Debug.LogWarning($"[AttackExecutor] AttackProfile {profile.name} 未配置 ProjectilePrefab。", this);
@@ -161,7 +252,7 @@ public class AttackExecutor : MonoBehaviour
 
         Transform spawnPoint = ResolveSpawnPoint(profile);
         Vector3 origin    = spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
-        Vector3 direction = GetAimDirection(origin);
+        Vector3 direction = context.AimPoint.HasValue ? (context.AimPoint.Value - origin).normalized : GetAimDirection(origin);
         direction = ApplySpread(direction, profile.SpreadAngle);
 
         GameObject projectileObject = Instantiate(
@@ -170,23 +261,24 @@ public class AttackExecutor : MonoBehaviour
         AttackProjectile projectile = projectileObject.GetComponent<AttackProjectile>()
             ?? projectileObject.AddComponent<AttackProjectile>();
 
-        projectile.Initialize(profile, this, direction);
+        projectile.Initialize(context, direction);
     }
 
-    private void ExecuteAoeAtPoint(AttackProfile profile, Vector3 center)
+    private void ExecuteAoeAtPoint(AttackContext context, Vector3 center)
     {
-        if (profile.AoeDelay > 0f) { StartCoroutine(ExecuteAoeAfterDelay(profile, center)); return; }
-        ApplyAoeDamage(profile, center);
+        if (context.Profile.AoeDelay > 0f) { StartCoroutine(ExecuteAoeAfterDelay(context, center)); return; }
+        ApplyAoeDamage(context, center);
     }
 
-    private IEnumerator ExecuteAoeAfterDelay(AttackProfile profile, Vector3 center)
+    private IEnumerator ExecuteAoeAfterDelay(AttackContext context, Vector3 center)
     {
-        yield return new WaitForSeconds(profile.AoeDelay);
-        ApplyAoeDamage(profile, center);
+        yield return new WaitForSeconds(context.Profile.AoeDelay);
+        ApplyAoeDamage(context, center);
     }
 
-    private void ExecutePersistentAoe(AttackProfile profile, Vector3 center)
+    private void ExecutePersistentAoe(AttackContext context, Vector3 center)
     {
+        AttackProfile profile = context.Profile;
         GameObject areaObject;
         if (profile.AreaPrefab != null)
         {
@@ -203,16 +295,18 @@ public class AttackExecutor : MonoBehaviour
 
         AttackArea area = areaObject.GetComponent<AttackArea>()
             ?? areaObject.AddComponent<AttackArea>();
-        area.Initialize(profile, this);
+        area.Initialize(context);
     }
 
-    private void ApplyAoeDamage(AttackProfile profile, Vector3 center)
+    private void ApplyAoeDamage(AttackContext context, Vector3 center)
     {
+        AttackProfile profile = context.Profile;
         Collider[] hits = Physics.OverlapSphere(center, profile.AoeRadius, profile.TargetLayers);
         foreach (Collider hit in hits)
         {
             IDamageable target = hit.GetComponentInParent<IDamageable>();
-            ApplyDamage(target, profile, hit.ClosestPoint(center));
+            if (target == null) continue;
+            ApplyDamage(target, context, hit.ClosestPoint(center));
         }
     }
 
@@ -226,14 +320,9 @@ public class AttackExecutor : MonoBehaviour
         return defaultProjectileSpawnPoint != null ? defaultProjectileSpawnPoint : transform;
     }
 
-    private void WarnMissingProfile()
-    {
-        Debug.LogWarning($"[AttackExecutor] 当前姿态第 {currentComboIndex} 段攻击未配置 AttackProfile。", this);
-    }
-
     private Vector3 GetAimDirection(Vector3 origin)
     {
-        if (aimCamera == null) return transform.forward;
+        if (enemyTargeting || aimCamera == null) return transform.forward;
 
         Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))

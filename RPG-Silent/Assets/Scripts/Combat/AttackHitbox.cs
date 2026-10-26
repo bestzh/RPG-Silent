@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RPGSilent.Combat;
 using RPGSilent.Domain;
 using UnityEngine;
 
@@ -8,10 +9,8 @@ public class AttackHitbox : MonoBehaviour
     [SerializeField] private string hitboxName;
     [SerializeField] private string hitboxGroup;
 
-    private readonly HashSet<IDamageable> hitTargets = new HashSet<IDamageable>();
     private Collider        hitboxCollider;
-    private AttackExecutor  owner;
-    private AttackProfile   profile;
+    private readonly HashSet<AttackContext> attacks = new();
     private bool            isActive;
 
     public string HitboxName  => string.IsNullOrEmpty(hitboxName) ? name : hitboxName;
@@ -23,13 +22,12 @@ public class AttackHitbox : MonoBehaviour
         DisableHitbox();
     }
 
-    public void EnableHitbox(AttackProfile attackProfile, AttackExecutor attackOwner)
+    public void EnableHitbox(AttackContext attack)
     {
+        if (attack == null || attack.IsClosed) return;
         EnsureCollider();
-        profile   = attackProfile;
-        owner     = attackOwner;
+        attacks.Add(attack);
         isActive  = true;
-        hitTargets.Clear();
         hitboxCollider.enabled = true;
     }
 
@@ -38,23 +36,30 @@ public class AttackHitbox : MonoBehaviour
         EnsureCollider();
         isActive               = false;
         hitboxCollider.enabled = false;
-        hitTargets.Clear();
-        profile = null;
-        owner   = null;
+        attacks.Clear();
+    }
+
+    public void DisableAttack(AttackContext attack)
+    {
+        attacks.Remove(attack);
+        if (attacks.Count == 0) DisableHitbox();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isActive || profile == null || owner == null) return;
-
-        if ((profile.TargetLayers.value & (1 << other.gameObject.layer)) == 0) return;
-
+        if (!isActive) return;
         IDamageable target = other.GetComponentInParent<IDamageable>();
-        if (target == null || hitTargets.Contains(target)) return;
-
-        hitTargets.Add(target);
-        owner.ApplyDamage(target, profile, other.ClosestPoint(transform.position));
+        if (target == null) return;
+        foreach (AttackContext context in attacks)
+        {
+            if (context.Owner == null || context.Profile == null || context.IsClosed) continue;
+            if ((context.Profile.TargetLayers.value & (1 << other.gameObject.layer)) == 0) continue;
+            context.Owner.ApplyDamage(target, context, other.ClosestPoint(transform.position));
+        }
     }
+
+    // 新攻击开始时目标可能已在判定盒里；上下文负责去重，无需等重新进入。
+    private void OnTriggerStay(Collider other) => OnTriggerEnter(other);
 
     private void EnsureCollider()
     {

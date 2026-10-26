@@ -2,15 +2,13 @@ using UnityEngine;
 
 public class PlayerAnimationEventReceiver : MonoBehaviour
 {
-    private AttackExecutor attackExecutor;
+    private PlayerSkillController  skillController;
 
     private void Awake()
     {
-        attackExecutor = GetComponent<AttackExecutor>();
-        if (attackExecutor == null)
-        {
-            attackExecutor = GetComponentInParent<AttackExecutor>();
-        }
+        skillController = GetComponent<PlayerSkillController>();
+        if (skillController == null)
+            skillController = GetComponentInParent<PlayerSkillController>();
     }
 
     public void FootL()
@@ -30,32 +28,32 @@ public class PlayerAnimationEventReceiver : MonoBehaviour
 
     public void AttackStart()
     {
-        attackExecutor?.AttackStart();
+        // 普攻由 AttackState 的 Profile 时间线驱动；技能在释放时打开自己的 hitbox。
     }
 
-    public void AttackRelease()
+    public void AttackRelease(AnimationEvent animationEvent = null)
     {
-        attackExecutor?.AttackRelease();
+        skillController?.NotifySkillHitEvent(animationEvent);
     }
 
-    public void AttackEnd()
+    public void AttackEnd(AnimationEvent animationEvent = null)
     {
-        attackExecutor?.AttackEnd();
+        skillController?.NotifySkillAttackEnd(animationEvent);
     }
 
-    public void Hit()
+    public void Hit(AnimationEvent animationEvent = null)
     {
-        AttackRelease();
+        AttackRelease(animationEvent);
     }
 
-    public void Shoot()
+    public void Shoot(AnimationEvent animationEvent = null)
     {
-        AttackRelease();
+        AttackRelease(animationEvent);
     }
 
-    public void Aoe()
+    public void Aoe(AnimationEvent animationEvent = null)
     {
-        AttackRelease();
+        AttackRelease(animationEvent);
     }
 
     public void WeaponSwitch()
