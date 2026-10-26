@@ -79,6 +79,7 @@ public class PortalUI : UIBase
 
         okButton?.onClick.AddListener(OnConfirmClicked);
         quitButton?.onClick.AddListener(OnQuitClicked);
+        difficultyDropdown?.onValueChanged.AddListener(OnDifficultyChanged);
     }
 
     public override void OnOpen(params object[] args)
@@ -162,6 +163,7 @@ public class PortalUI : UIBase
             descriptionText.text = item.Dungeon.Description;
 
         PopulateDifficulties(item.Dungeon);
+        OnDifficultyChanged(difficultyDropdown != null ? difficultyDropdown.value : 0);
         if (okButton != null) okButton.interactable = _currentTiers.Count > 0;
     }
 
@@ -221,6 +223,15 @@ public class PortalUI : UIBase
         if (okButton != null) okButton.interactable = false;
     }
 
+    private void OnDifficultyChanged(int index)
+    {
+        if (_selectedDungeon == null || descriptionText == null || index < 0 || index >= _currentTiers.Count) return;
+        var tier = _currentTiers[index];
+        descriptionText.text = $"{_selectedDungeon.Description}\n\n清除全部敌人后统一获得奖励；失败不发奖。\n" +
+            $"敌人生命 ×{tier.EnemyHealthMultiplier:0.##}  攻击 ×{tier.EnemyDamageMultiplier:0.##}\n" +
+            $"通关奖励 ×{tier.RewardMultiplier:0.##}\n设置中的全局难度还会影响玩家承伤。";
+    }
+
     private void OnConfirmClicked()
     {
         if (_selectedDungeon == null || _currentTiers.Count == 0)
@@ -240,12 +251,20 @@ public class PortalUI : UIBase
             : 0;
         DungeonDatabase.DifficultyTier tier = _currentTiers[index];
 
+        bool previousHasValue = DungeonLaunchContext.HasValue;
+        int previousDungeonId = DungeonLaunchContext.DungeonId;
+        DungeonDifficulty previousDifficulty = DungeonLaunchContext.Difficulty;
+        System.Action restoreSelection = () =>
+        {
+            if (previousHasValue) DungeonLaunchContext.Set(previousDungeonId, previousDifficulty);
+            else DungeonLaunchContext.Clear();
+        };
         DungeonLaunchContext.Set(_selectedDungeon.Id, tier.Difficulty);
         Debug.Log($"[PortalUI] 进入副本「{_selectedDungeon.DisplayName}」难度：{tier.DifficultyLabel}");
 
         string sceneKey = _selectedDungeon.SceneKey;
         ClosePortalUI();
-        _uiService.OpenUI(loadingUiKey, sceneKey, dungeonHudUiKey);
+        _uiService.OpenUI(loadingUiKey, sceneKey, dungeonHudUiKey, restoreSelection);
     }
 
     private void OnQuitClicked()
