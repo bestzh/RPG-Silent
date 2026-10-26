@@ -14,8 +14,7 @@ namespace RPGSilent.Application
 
         public void Execute(int gold, int exp)
         {
-            if (gold > 0) _stats.AddGold(gold);
-            if (exp  > 0) _stats.AddExp(exp);
+            _stats.AddReward(gold, exp);
             Debug.Log($"[Player] 获得奖励: +{gold} 金币, +{exp} 经验。总计: {_stats.Gold} 金 / {_stats.Exp} 经验");
         }
     }
