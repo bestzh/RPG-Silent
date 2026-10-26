@@ -1,3 +1,60 @@
+# 仓库文本统一使用 LF；二进制由 Git 自动识别，不强制转换 .asset。
+* text=auto
+.gitattributes text eol=lf
+.gitignore text eol=lf
+*.cs text eol=lf
+*.py text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.json text eol=lf
+*.asmdef text eol=lf
+*.asmref text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.txt text=auto eol=lf
+*.shader text eol=lf
+*.hlsl text eol=lf
+*.cginc text eol=lf
+*.compute text eol=lf
+*.uxml text eol=lf
+*.uss text eol=lf
+*.meta text eol=lf
+*.unity text eol=lf
+*.prefab text eol=lf
+*.mat text=auto eol=lf
+*.asset text=auto eol=lf
+*.anim text=auto eol=lf
+*.controller text=auto eol=lf
+*.overrideController text=auto eol=lf
+*.renderTexture text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 模型、图像、音频及编译产物保持原始字节；此阶段尚未迁移到 LFS。
+*.[fF][bB][xX] binary
+*.blend binary
+*.[pP][nN][gG] binary
+*.[jJ][pP][gG] binary
+*.jpeg binary
+*.[tT][gG][aA] binary
+*.psd binary
+*.tif binary
+*.tiff binary
+*.gif binary
+*.[wW][aA][vV] binary
+*.mp3 binary
+*.ogg binary
+*.mp4 binary
+*.dll binary
+*.exe binary
+*.ttf binary
+*.otf binary
+*.zip binary
+*.7z binary
+*.pdf binary
+*.unitypackage binary
 RPG-Silent/Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampArmsLegs_S.tga filter=lfs diff=lfs merge=lfs -text
 RPG-Silent/Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampTorso_S.tga filter=lfs diff=lfs merge=lfs -text
 RPG-Silent/Assets/Suntail[[:space:]]Village/Audio/Suntail[[:space:]]-[[:space:]]Mild[[:space:]]Flight.wav filter=lfs diff=lfs merge=lfs -text
