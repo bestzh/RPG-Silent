@@ -40,15 +40,22 @@ def configure(root, uninstall=False):
         if existing:
             raise RuntimeError("已有本地钩子，未停用或覆盖：" + ", ".join(sorted(existing)))
 
-    hook = root / HOOKS_PATH / "pre-commit"
-    if not hook.is_file() or not (root / "RPG-Silent/Tools/Git/check_repository.py").is_file():
-        raise RuntimeError("缺少提交钩子或检查器，请完整检出 Tools/Git 后重试。")
-    if b"\r" in hook.read_bytes():
-        raise RuntimeError("pre-commit 必须使用 LF 换行，请按 .gitattributes 重新检出。")
-    hook.chmod(hook.stat().st_mode | 0o111)
+    hooks = [root / HOOKS_PATH / name for name in ("pre-commit", "pre-push")]
+    if any(not hook.is_file() for hook in hooks) or not (root / "RPG-Silent/Tools/Git/check_repository.py").is_file():
+        raise RuntimeError("缺少提交/推送钩子或检查器，请完整检出 Tools/Git 后重试。")
+    for hook in hooks:
+        if b"\r" in hook.read_bytes():
+            raise RuntimeError(hook.name + " 必须使用 LF 换行，请按 .gitattributes 重新检出。")
+    git(root, "lfs", "version")
+    # Configure filters only: our tracked pre-push forwards to Git LFS, so
+    # `git lfs install` must not replace the repository's shared hook files.
+    git(root, "lfs", "install", "--local", "--skip-repo")
+    for hook in hooks:
+        hook.chmod(hook.stat().st_mode | 0o111)
     git(root, "config", "--local", PYTHON_KEY, Path(sys.executable).resolve().as_posix())
     git(root, "config", "--local", "core.hooksPath", HOOKS_PATH)
     print("已启用提交前检查；每次 git commit 自动验证实际暂存区。")
+    print("已启用 Git LFS 本地过滤器和推送前对象上传。")
     print("Python：" + sys.executable)
 
 
