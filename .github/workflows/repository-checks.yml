@@ -36,10 +36,13 @@ jobs:
           sparse-checkout: |
             .github
             RPG-Silent/Tools/Git
+            RPG-Silent/Tools/Release
           # Keep the read-only checkout credential for on-demand blob fetches; checkout cleans it up.
           persist-credentials: true
       - name: Test the repository checker
         run: python3 -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
+      - name: Test release package gates
+        run: python3 -m unittest discover -s RPG-Silent/Tools/Release -p 'test_*.py' -v
       - name: Check every new commit
         shell: bash
         run: |
