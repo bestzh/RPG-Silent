@@ -32,8 +32,7 @@ RPG-Silent/Tools/Git/hooks/* text eol=lf
 *.renderTexture text=auto eol=lf
 *.bat text eol=crlf
 *.cmd text eol=crlf
-
-# 模型、图像、音频及编译产物保持原始字节；此阶段尚未迁移到 LFS。
+# 模型、图像、音频及编译产物保持原始字节；文末三个精确路径使用 LFS。
 *.[fF][bB][xX] binary
 *.blend binary
 *.[pP][nN][gG] binary
