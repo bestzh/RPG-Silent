@@ -40,6 +40,8 @@ python RPG-Silent/Tools/Git/install_hooks.py
 
 安装器用 `git lfs install --local --skip-repo` 配置当前仓库的 LFS 过滤器；跟踪的 `pre-push` 将完整参数和标准输入交给 `git lfs pre-push`，先上传所需对象再推送提交。LFS 未安装时推送明确失败，避免远端只有指针。不要用其他钩子覆盖该文件。真实集成测试通过本地裸仓库推送 LFS 对象，再从全新克隆下载并逐字节比较，确保提交检查和对象上传共存。过滤器和钩子准备就绪不代表已有历史已迁移。
 
+`post-checkout`、`post-commit`、`post-merge` 使用 Git LFS 标准脚本并一同跟踪、设置可执行位。这样 LFS 在检出过程中无需向共享钩子目录自动补写未跟踪文件；集成测试同时要求 LFS 提交后的工作区干净。
+
 安装器遇到已有的钩子目录配置或 `.git/hooks` 中的非示例文件会停止，避免停用已有工具；重复安装本工具安全。需要移除时运行 `python RPG-Silent/Tools/Git/install_hooks.py --uninstall`，仅移除本工具的钩子路径及 Python 配置，LFS 过滤器保留；若继续使用 LFS，需按现有钩子情况配置独立的 LFS pre-push。Git clone 不会自动安装本项目钩子；远端 CI 与本地钩子独立执行，作为合并的必要检查。
 
 ```powershell
