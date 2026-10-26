@@ -1,0 +1,50 @@
+name: Repository checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 比较基线（留空时检查最新一次提交）
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-hygiene:
+    name: Git hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      GIT_CHECK_BASE: ${{ github.event.inputs.base || github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - name: Checkout check scripts and Git metadata
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          # Sparse checkout also enables blob:none; large assets are fetched only when inspected.
+          sparse-checkout: |
+            .github
+            RPG-Silent/Tools/Git
+          # Keep the read-only checkout credential for on-demand blob fetches; checkout cleans it up.
+          persist-credentials: true
+      - name: Test the repository checker
+        run: python3 -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
+      - name: Check every new commit
+        shell: bash
+        run: |
+          args=(--head HEAD)
+          if [[ -n "$GIT_CHECK_BASE" ]]; then
+            args+=(--base "$GIT_CHECK_BASE")
+          fi
+          python3 RPG-Silent/Tools/Git/check_repository.py "${args[@]}"

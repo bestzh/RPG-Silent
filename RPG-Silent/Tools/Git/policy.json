@@ -1,0 +1,30 @@
+{
+  "max_file_mib": 50,
+  "hard_limit_mib": 100,
+  "existing_large_files": {
+    "RPG-Silent/Assets/Scenes/Dungeon01.unity": {
+      "max_mib": 75,
+      "reason": "现有 66.97 MiB 副本场景，场景拆分在第二阶段评估。"
+    },
+    "RPG-Silent/Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo.unity": {
+      "max_mib": 75,
+      "reason": "现有第三方演示场景，裁剪前需要核对资源引用。"
+    },
+    "RPG-Silent/Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo_URP.unity": {
+      "max_mib": 75,
+      "reason": "现有第三方 URP 演示场景，裁剪前需要核对资源引用。"
+    },
+    "RPG-Silent/Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampTorso_S.tga": {
+      "max_mib": 75,
+      "reason": "现有 64 MiB 贴图，LFS 迁移在第二阶段评估。"
+    },
+    "RPG-Silent/Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampArmsLegs_S.tga": {
+      "max_mib": 75,
+      "reason": "现有 64 MiB 贴图，LFS 迁移在第二阶段评估。"
+    },
+    "RPG-Silent/Assets/Suntail Village/Audio/Suntail - Mild Flight.wav": {
+      "max_mib": 75,
+      "reason": "现有 51.82 MiB 音频，LFS 迁移在第二阶段评估。"
+    }
+  }
+}
