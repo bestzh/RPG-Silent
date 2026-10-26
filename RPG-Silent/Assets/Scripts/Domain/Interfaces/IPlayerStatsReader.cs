@@ -11,11 +11,18 @@ namespace RPGSilent.Domain
         int  CurrentHealth { get; }
         int  Gold          { get; }
         int  Exp           { get; }
+        int  Level         { get; }
+        int  ExpInLevel    { get; }
+        int  ExpToNextLevel { get; }
         bool IsDead        { get; }
 
-        event Action<int, int> OnHealthChanged;  // (current, max)
-        event Action<int>      OnGoldChanged;
-        event Action<int>      OnExpChanged;
+        float MaxEnergy     { get; }
+        float CurrentEnergy { get; }
+
+        event Action<int, int>   OnHealthChanged;  // (current, max)
+        event Action<int>        OnGoldChanged;
+        event Action<int>        OnExpChanged;
+        event Action<float, float> OnEnergyChanged; // (current, max)
 
         /// <summary>重新触发所有事件，用于订阅方初始化时同步当前值。</summary>
         void Refresh();
