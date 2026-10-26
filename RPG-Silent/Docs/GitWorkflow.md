@@ -22,7 +22,7 @@ fix(副本): 修复失败后重试的输入恢复
 chore(仓库): 完善资源忽略规则
 ```
 
-合并前通过 PR 查看改动和 `Git hygiene` 检查。重要里程碑在功能验收后创建版本标签。此阶段提供 CI，不自动调整 GitHub 分支保护，也不自动合并 PR。
+合并前通过 PR 查看改动和 `Git hygiene` 检查。重要里程碑在功能验收后创建版本标签。CI 不会修改 GitHub 分支保护或自动合并 PR；合并由仓库维护者按任务授权执行。
 
 ## 本地检查
 
@@ -70,8 +70,46 @@ git mergetool
 
 工具路径写入本机仓库的 `.git/config`，不写死到共享配置。场景和预制体的合并结果仍需在 Unity 中复核。
 
-## 第二阶段
+## 固定 Git 包依赖
 
-大型二进制的 LFS 迁移、历史瘦身、第三方样例裁剪及场景拆分单独评估。仅增加忽略规则不会清理已经提交的历史；历史迁移前需备份并协调其他克隆。本阶段不执行这些操作。
+`com.coplaydev.unity-mcp` 的 manifest URL 和锁文件均固定到完整提交 `81542a7e86292b5c4c21b1782c5af23b567f45ce`。它与原锁文件及本机已安装的 MCP 10.3.0 完全一致。原锁文件本就能保持日常安装一致；同时固定 manifest 可避免重建锁文件或重新添加同一 URL 时跟随上游 `main` 更新。
+
+升级 Git 包应使用独立提交，同步 manifest 和锁文件，并在 Unity 解析完成后检查包哈希和 Console。不要只删除锁文件来尝试修复包问题。完整 SHA 的语法见 [Unity Git 依赖说明](https://docs.unity3d.com/6000.0/Documentation/Manual/upm-git.html#revision)。
+
+## 大文件与资源裁剪评估
+
+2026-10-26，以第一阶段合并提交 `fde403e06be0525e56c61b9cdfbe58a59a692f04` 为基线：当前树共 34,782 个文件，未压缩内容约 4,138.10 MiB；这不是克隆下载量。`git lfs ls-files` 为空。六个超过 50 MiB 的文件如下，路径相对于 `RPG-Silent/`：
+
+| 文件 | 大小（MiB） | 当前证据与处理结论 |
+| --- | ---: | --- |
+| `Assets/Scenes/Dungeon01.unity` | 66.97 | 项目副本场景，保留；场景拆分需要独立功能验证。 |
+| `Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo.unity` | 64.89 | 未出现在三个配置场景的依赖集合中，列为裁剪候选。 |
+| `Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo_URP.unity` | 64.89 | 同上，尚不能据此证明整个资源包可删除。 |
+| `Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampArmsLegs_S.tga` | 64.00 | 被配置场景依赖，保留；可评估 LFS。 |
+| `Assets/LongswordAnimsetPro/Models/Vampire/Textures/VampTorso_S.tga` | 64.00 | 被配置场景依赖，保留；可评估 LFS。 |
+| `Assets/Suntail Village/Audio/Suntail - Mild Flight.wav` | 51.82 | 被配置场景依赖，保留；可评估 LFS。 |
+
+依赖证据来自 Unity 6000.0.66f2 的 `AssetDatabase.GetDependencies`，对 `StartScene`、`Main`、`Dungeon01` 三个配置场景递归查询，共 3,884 条依赖；包含 Build Settings 中未勾选的 Dungeon01。项目还通过 Addressables 和 Resources 动态加载资源，场景依赖扫描不是完整的未使用资源证明，因此本轮保留全部美术资产。
+
+`Packages/com.opsive.behaviordesigner/Samples~/` 有 1,293 个跟踪文件，合计 94.73 MiB。其 `package.json` 仍声明此样例入口；直接删除会让样例导入入口失效。裁剪应作为单独的供应商包变更，同时处理样例入口、导入功能及更新方式。
+
+本轮完成上述评估，未执行 LFS 迁移、远端历史重写、第三方样例删除或场景拆分。仅增加忽略规则、删除最新版本资源或从新提交开始使用 LFS，都不会消除已经存在的历史 blob。
+
+如果后续决定迁移历史，应按以下步骤执行：
+
+1. 明确目标分支、标签和文件清单；优先评估上表三个仍在使用的二进制文件，当前版本合计约 179.82 MiB。场景文本保留差异审阅和 Unity 合并能力。
+2. 确认 GitHub LFS 可用额度与其他克隆使用情况，约定暂停推送的时间窗口。
+3. 在工作仓库之外保存远端镜像备份、所有分支和标签的旧 SHA；另行备份本地未提交文件和需要保留的编辑器快照。验证备份可读后，在独立副本中演练迁移。
+4. 比较迁移前后工作树内容哈希，执行 `git lfs fsck`，检查 LFS 对象上传，并用全新克隆验证资源检出和 Unity 导入。
+5. 审阅提交映射和验证结果后，再切换远端引用；通知其他克隆重新克隆或按映射迁移，防止重新推回旧历史。
+6. 保留旧镜像及引用清单作为恢复点；出现缺失对象时停止进一步写入，并按保存的旧 SHA 恢复受影响引用。
+
+LFS 迁移流程参考 [GitHub 官方说明](https://docs.github.com/en/repositories/working-with-files/managing-large-files/moving-a-file-in-your-repository-to-git-large-file-storage)。
+
+## 本地对象库维护记录
+
+2026-10-26，使用 `git verify-pack` 校验全部三个 pack 后，执行 `git prune-packed` 清理 4,931 个已存于 pack 的重复松散对象。松散对象占用由 508,774 KiB 降到 2,176 KiB，释放约 494.72 MiB；所有引用保持一致，`git fsck --connectivity-only --no-dangling` 通过。
+
+这项清理只影响本机重复存储，不减少远端历史体积。分支、标签、reflog 和 Codex 快照引用均保留。后续可先用 `git count-objects -vH` 和 `git prune-packed --dry-run` 检查；不要为缩减体积直接删除 `.git/refs`、过期 reflog 或执行即时强制清理。命令含义见 [Git prune-packed](https://git-scm.com/docs/git-prune-packed)。
 
 参考：[Git attributes](https://git-scm.com/docs/gitattributes)、[Unity Smart Merge](https://docs.unity3d.com/6000.0/Documentation/Manual/SmartMerge.html)、[GitHub 大文件说明](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)。
