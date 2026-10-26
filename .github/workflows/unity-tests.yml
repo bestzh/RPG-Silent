@@ -1,0 +1,62 @@
+name: Unity validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+concurrency:
+  group: unity-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  editmode:
+    name: Unity EditMode
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check license configuration
+        shell: bash
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        run: |
+          if [[ -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" || ( -z "$UNITY_LICENSE" && -z "$UNITY_SERIAL" ) ]]; then
+            echo '::error::Configure UNITY_EMAIL, UNITY_PASSWORD and UNITY_LICENSE (Personal) or UNITY_SERIAL (Pro) in Actions secrets. See RPG-Silent/Docs/UnityValidation.md.'
+            exit 1
+          fi
+      - name: Checkout project and LFS content
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          lfs: true
+          persist-credentials: false
+      - name: Run first-party EditMode tests
+        uses: game-ci/unity-test-runner@32e57712352b500e17974b245a6dce9e11a73213 # v4
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          cliVersion: v0.1.72
+          projectPath: RPG-Silent
+          testMode: EditMode
+          customParameters: -assemblyNames RPGSilent.Tests.Editor
+          coverageEnabled: false
+          artifactsPath: artifacts/unity
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Unity test results
+      - name: Require non-empty passing results
+        run: python3 RPG-Silent/Tools/Validation/check_test_results.py artifacts/unity
+      - name: Preserve test results and logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unity-validation-${{ github.sha }}
+          path: artifacts/unity
+          if-no-files-found: warn
+          retention-days: 14
