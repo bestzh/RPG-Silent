@@ -34,6 +34,8 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public event Action AttackTriggered;
     public event Action StanceToggleTriggered;
     public event Action PauseTriggered;
+    public event Action CursorToggleTriggered;
+    public event Action<int> SkillSlotTriggered;
 
     // ── 原始 Action ──────────────────────────────────────────────────────────────
     public InputAction Move         { get; private set; }
@@ -42,16 +44,25 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public InputAction Jump         { get; private set; }
     public InputAction Walk         { get; private set; }
     public InputAction Attack       { get; private set; }
+    public InputAction Look         { get; private set; }
+    private InputAction CursorToggle { get; set; }
     public InputAction StanceToggle { get; private set; }
     public InputAction Pause        { get; private set; }
+    public InputAction[] SkillSlots { get; private set; }
 
-    public Vector2 MoveInput => Move?.ReadValue<Vector2>() ?? Vector2.zero;
+    // 与项目旧 Mouse X/Y 轴的 sensitivity=0.1 对齐，保留现有灵敏度设置量级。
+    private const float MouseDeltaScale = 0.1f;
+    public Vector2 MoveInput => GameplayInputEnabled ? Move?.ReadValue<Vector2>() ?? Vector2.zero : Vector2.zero;
+    public Vector2 LookInput => GameplayInputEnabled ? (Look?.ReadValue<Vector2>() ?? Vector2.zero) * MouseDeltaScale : Vector2.zero;
+    public bool GameplayInputEnabled => _gameplayInputRequested && _gameplayInputBlockers.Count == 0;
 
     // ── 内部状态 ─────────────────────────────────────────────────────────────────
     private InputActionMap _map;
     private InputActionMap _uiMap;
     private InputActionRebindingExtensions.RebindingOperation _currentRebind;
     private float _sprintHoldTime = 0.5f;
+    private bool _gameplayInputRequested = true;
+    private readonly HashSet<object> _gameplayInputBlockers = new();
 
     // ── 生命周期 ─────────────────────────────────────────────────────────────────
 
@@ -61,7 +72,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         BuildMap(_sprintHoldTime);
         BuildUiMap();
         Load();
-        _map.Enable();
+        ApplyGameplayInputState();
         _uiMap.Enable();
     }
 
@@ -105,7 +116,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     {
         if (Mathf.Approximately(duration, _sprintHoldTime)) return;
 
-        bool wasEnabled  = _map.enabled;
+        CancelCurrentRebind();
         string savedJson = SaveBindingsToJson();
 
         _map.Disable();
@@ -116,7 +127,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         BuildMap(duration);
         LoadBindingsFromJson(savedJson);
 
-        if (wasEnabled) _map.Enable();
+        ApplyGameplayInputState();
     }
 
     public void StartRebind(InputAction action, int bindingIndex,
@@ -143,7 +154,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
                 if (action == Sprint)
                     MirrorSprintPathToRoll();
 
-                action.Enable();
+                if (GameplayInputEnabled) action.Enable();
                 string display = GetDisplayString(action, bindingIndex);
                 onComplete?.Invoke(display);
             })
@@ -151,7 +162,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
             {
                 op.Dispose();
                 _currentRebind = null;
-                action.Enable();
+                if (GameplayInputEnabled) action.Enable();
                 onCancel?.Invoke();
             })
             .Start();
@@ -202,10 +213,24 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
 
     public void SetGameplayInputEnabled(bool enabled)
     {
+        _gameplayInputRequested = enabled;
+        ApplyGameplayInputState();
+    }
+
+    public void SetGameplayInputBlocked(object owner, bool blocked)
+    {
+        if (owner == null) throw new ArgumentNullException(nameof(owner));
+        if (blocked) _gameplayInputBlockers.Add(owner);
+        else         _gameplayInputBlockers.Remove(owner);
+        ApplyGameplayInputState();
+    }
+
+    private void ApplyGameplayInputState()
+    {
         if (_map == null) return;
 
-        if (enabled) _map.Enable();
-        else         _map.Disable();
+        if (GameplayInputEnabled) _map.Enable();
+        else                      _map.Disable();
     }
 
     // ── 私有：构建 InputActionMap ─────────────────────────────────────────────────
@@ -244,9 +269,29 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         Attack = _map.AddAction("Attack", InputActionType.Button);
         Attack.AddBinding("<Mouse>/leftButton");
 
+        Look = _map.AddAction("Look", InputActionType.Value);
+        Look.AddBinding("<Mouse>/delta");
+
+        CursorToggle = _map.AddAction("CursorToggle", InputActionType.Button);
+        CursorToggle.AddBinding("<Keyboard>/leftCtrl");
+        CursorToggle.AddBinding("<Keyboard>/rightCtrl");
+
         // 姿态切换
         StanceToggle = _map.AddAction("StanceToggle", InputActionType.Button);
         StanceToggle.AddBinding("<Keyboard>/tab");
+
+        // 技能槽 0..9 → 键盘 1..9,0
+        SkillSlots = new InputAction[10];
+        string[] skillPaths =
+        {
+            "<Keyboard>/1", "<Keyboard>/2", "<Keyboard>/3", "<Keyboard>/4", "<Keyboard>/5",
+            "<Keyboard>/6", "<Keyboard>/7", "<Keyboard>/8", "<Keyboard>/9", "<Keyboard>/0"
+        };
+        for (int i = 0; i < SkillSlots.Length; i++)
+        {
+            SkillSlots[i] = _map.AddAction($"SkillSlot{i}", InputActionType.Button);
+            SkillSlots[i].AddBinding(skillPaths[i]);
+        }
 
         SubscribeHandlers();
     }
@@ -272,7 +317,20 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         Walk.performed        += OnWalkPerformed;
         Walk.canceled         += OnWalkCanceled;
         Attack.performed      += OnAttackPerformed;
+        CursorToggle.performed += OnCursorTogglePerformed;
         StanceToggle.performed += OnStanceTogglePerformed;
+
+        if (SkillSlots != null)
+        {
+            for (int i = 0; i < SkillSlots.Length; i++)
+            {
+                int slot = i;
+                SkillSlots[i].performed += _ =>
+                {
+                    if (GameplayInputEnabled) SkillSlotTriggered?.Invoke(slot);
+                };
+            }
+        }
     }
 
     private void UnsubscribeGameplayHandlers()
@@ -282,7 +340,10 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         if (Jump         != null)   Jump.performed         -= OnJumpPerformed;
         if (Walk         != null) { Walk.performed         -= OnWalkPerformed;        Walk.canceled   -= OnWalkCanceled; }
         if (Attack       != null)   Attack.performed       -= OnAttackPerformed;
+        if (CursorToggle != null)   CursorToggle.performed -= OnCursorTogglePerformed;
         if (StanceToggle != null)   StanceToggle.performed -= OnStanceTogglePerformed;
+
+        // SkillSlots 在 RebuildMap 时整表 Dispose，旧回调随 Action 一起丢弃
     }
 
     private void UnsubscribeHandlers()
@@ -291,15 +352,28 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         if (Pause != null) Pause.performed -= OnPausePerformed;
     }
 
-    private void OnSprintPerformed(InputAction.CallbackContext _)      => SprintStarted?.Invoke();
+    private void RaiseGameplayAction(Action action)
+    {
+        if (GameplayInputEnabled) action?.Invoke();
+    }
+
+    private void OnSprintPerformed(InputAction.CallbackContext _)      => RaiseGameplayAction(SprintStarted);
     private void OnSprintCanceled(InputAction.CallbackContext _)       => SprintEnded?.Invoke();
-    private void OnRollPerformed(InputAction.CallbackContext _)        => RollTriggered?.Invoke();
-    private void OnJumpPerformed(InputAction.CallbackContext _)        => JumpTriggered?.Invoke();
-    private void OnWalkPerformed(InputAction.CallbackContext _)        => WalkStarted?.Invoke();
+    private void OnRollPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(RollTriggered);
+    private void OnJumpPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(JumpTriggered);
+    private void OnWalkPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(WalkStarted);
     private void OnWalkCanceled(InputAction.CallbackContext _)         => WalkEnded?.Invoke();
-    private void OnAttackPerformed(InputAction.CallbackContext _)      => AttackTriggered?.Invoke();
-    private void OnStanceTogglePerformed(InputAction.CallbackContext _) => StanceToggleTriggered?.Invoke();
+    private void OnAttackPerformed(InputAction.CallbackContext _)      => RaiseGameplayAction(AttackTriggered);
+    private void OnStanceTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(StanceToggleTriggered);
+    private void OnCursorTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(CursorToggleTriggered);
     private void OnPausePerformed(InputAction.CallbackContext _)       => PauseTriggered?.Invoke();
+
+    public string GetSkillSlotDisplay(int slotIndex)
+    {
+        if (SkillSlots == null || slotIndex < 0 || slotIndex >= SkillSlots.Length)
+            return "—";
+        return GetDisplayString(SkillSlots[slotIndex], 0);
+    }
 
     // ── 私有：Sprint/Roll 路径镜像 ────────────────────────────────────────────────
 

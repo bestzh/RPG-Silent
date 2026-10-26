@@ -95,6 +95,8 @@ public class PlayerAnimationController : MonoBehaviour
         animator.Play("MoveTree");
     }
 
+    public void StopAnimation() => EndCurrentAnimation();
+
     public bool IsPlayingAnimation() => isPlaying;
     public string CurrentAnimationName() => currentAnimation != null ? currentAnimation.AnimationName : null;
 }

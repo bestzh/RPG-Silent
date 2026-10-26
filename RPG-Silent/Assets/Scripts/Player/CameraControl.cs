@@ -6,6 +6,7 @@ using VContainer;
 public class CameraControl : MonoBehaviour
 {
     [Inject] private ICursorService _cursorService;
+    [Inject] private IPlayerInputActions _input;
 
     public CinemachineCamera virtualCamera;
     public float rotationSpeed = 1f;
@@ -18,9 +19,15 @@ public class CameraControl : MonoBehaviour
         _cursorService?.EnterGameplayCursor(resetToHidden: true);
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
-            _cursorService?.ToggleGameplayCursor();
+        if (_input != null) _input.CursorToggleTriggered += OnCursorToggleTriggered;
     }
+
+    private void OnDisable()
+    {
+        if (_input != null) _input.CursorToggleTriggered -= OnCursorToggleTriggered;
+    }
+
+    private void OnCursorToggleTriggered() => _cursorService?.ToggleGameplayCursor();
 }

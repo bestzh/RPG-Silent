@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c011a6a7abd0f9d4bb448bb853cd8bb2, type: 3}
   m_Name: skill_first
   m_EditorClassIdentifier: 
-  SkillName: 
+  persistentId: 62b7e29a2995c5b41bc2751e7bc6bb2c
+  SkillName: skill_first
+  Icon: {fileID: 0}
   Animation: {fileID: 0}
   CastTime: 0
   CooldownTime: 5
+  EnergyCost: 20
   CanBeInterrupted: 1
+  AttackProfile: {fileID: 0}
+  TriggerTiming: 1
   EffectPrefab: {fileID: 0}
   EffectOffset: {x: 0, y: 0, z: 0}
   HitEffectPrefab: {fileID: 0}
@@ -28,7 +33,3 @@ MonoBehaviour:
   CanCombo: 0
   NextComboSkill: {fileID: 0}
   ComboInputWindow: 0.5
-  maxEnergy: 100
-  currentEnergy: 0
-  energyRecoveryRate: 10
-  EnergyCost: 20

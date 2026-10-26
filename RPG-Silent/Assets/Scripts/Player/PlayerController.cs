@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public bool IsRolling { get; private set; }
 
     public Vector2 InputDir  => _inputService?.MoveInput ?? Vector2.zero;
+    public bool GameplayInputEnabled => _playerInputActions?.GameplayInputEnabled ?? false;
     public bool    IsRunning => InputDir.magnitude > 0.5f;
 
     public bool IsSprinting => _sprintActive && CanSprint;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public bool IsGrounded => Physics.Raycast(transform.position, Vector3.down, 1.1f);
 
     public bool CanAttack => !IsDead && !IsRolling && !IsJumping
+        && (skillController == null || !skillController.IsCasting)
         && (StanceController == null || StanceController.MaxCombo > 0);
 
     // ── 子系统组件引用 ─────────────────────────────────────────────────────────
@@ -72,6 +74,9 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private bool _sprintActive;
     private bool _walkActive;
+    private PlayerSkillController skillController;
+    private bool combatLocked;
+    private bool wasKinematic;
 
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -82,6 +87,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
         StanceController    = GetComponent<PlayerStanceController>();
         rb                  = GetComponent<Rigidbody>();
         animator            = GetComponent<Animator>();
+        skillController     = GetComponent<PlayerSkillController>();
+        yaw = transform.eulerAngles.y;
     }
 
     private void OnEnable()
@@ -121,14 +128,15 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     {
         StateMachine.Update();
 
-        if (IsDead) return;
+        if (IsDead || !GameplayInputEnabled) return;
 
         // 鼠标视角（灵敏度与反转Y轴实时读取）
         float sensitivity = _controllerSettings?.CurrentSettings.MouseSensitivity ?? mouseSensitivity;
         bool  invertY     = _controllerSettings?.CurrentSettings.InvertY ?? false;
 
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+        Vector2 look = _playerInputActions.LookInput;
+        float mouseX = look.x * sensitivity;
+        float mouseY = look.y * sensitivity;
         yaw   += mouseX;
         pitch += invertY ? mouseY : -mouseY;
         pitch  = Mathf.Clamp(pitch, -35f, 60f);
@@ -139,11 +147,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void TakeDamage(int damage)
     {
-        if (IsDead || damage <= 0) return;
+        if (combatLocked || IsDead || damage <= 0) return;
 
         int scaledDamage = _gameSettings?.ScaleIncomingDamage(damage) ?? damage;
         _takeDamageUseCase.Execute(scaledDamage);
-        GetComponent<SkillCastManager>()?.InterruptSkill();
+        skillController?.InterruptSkill(force: IsDead);
 
         if (IsDead)
             StateMachine.ChangeState(new DeadState(this));
@@ -154,6 +162,55 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     // ── IRewardable ────────────────────────────────────────────────────────────
 
     public void AddReward(int gold, int exp) => _addRewardUseCase.Execute(gold, exp);
+
+    public void LockForDungeonResult()
+    {
+        if (combatLocked) return;
+        combatLocked = true;
+        skillController?.InterruptSkill(force: true);
+        GetComponent<AttackExecutor>()?.ResetCombat(suspended: true);
+        if (!IsDead)
+        {
+            StateMachine.ChangeState(new IdleState(this));
+            AnimationController?.StopAnimation();
+        }
+        if (rb != null)
+        {
+            wasKinematic = rb.isKinematic;
+            if (!rb.isKinematic) { rb.linearVelocity = Vector3.zero; rb.angularVelocity = Vector3.zero; }
+            rb.isKinematic = true;
+        }
+        enabled = false;
+    }
+
+    public void ResetForScene(Vector3 position, Quaternion rotation)
+    {
+        skillController?.ResetForScene();
+        GetComponent<AttackExecutor>()?.ResetCombat();
+        StateMachine.ChangeState(new IdleState(this));
+        IsJumping = IsRolling = _sprintActive = _walkActive = false;
+        animator.SetBool("IsDead", false);
+        animator.SetBool("IsRolling", false);
+        animator.ResetTrigger("Die");
+        animator.ResetTrigger("Attack");
+        animator.SetInteger("ComboIndex", 0);
+        AnimationController?.StopAnimation();
+        if (rb != null && combatLocked) rb.isKinematic = wasKinematic;
+        combatLocked = false;
+        Teleport(position, rotation);
+        enabled = true;
+    }
+
+    public void Teleport(Vector3 position, Quaternion rotation)
+    {
+        yaw = rotation.eulerAngles.y;
+        pitch = 0f;
+        transform.SetPositionAndRotation(position, rotation);
+        if (rb == null) return;
+        if (!rb.isKinematic) { rb.linearVelocity = Vector3.zero; rb.angularVelocity = Vector3.zero; }
+        rb.position = position;
+        rb.rotation = rotation;
+    }
 
     // ── 状态辅助方法 ───────────────────────────────────────────────────────────
 
@@ -169,17 +226,25 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private void OnAttackTriggered()
     {
-        if (CanAttack) StateMachine.ChangeState(new AttackState(this));
+        if (!GameplayInputEnabled || !CanAttack) return;
+
+        if (StateMachine.CurrentState is AttackState attackState)
+            attackState.RequestCombo();
+        else
+            StateMachine.ChangeState(new AttackState(this));
     }
 
     private void OnRollTriggered()
     {
-        if (CanRoll) StateMachine.ChangeState(new RollState(this));
+        if (!CanRoll || skillController != null && !skillController.TryInterruptSkill()) return;
+        StateMachine.ChangeState(new RollState(this));
     }
 
     private void OnJumpTriggered()
     {
-        if (IsRolling) return;
+        if (IsDead || IsRolling) return;
+        if (StanceController != null && !StanceController.CanJump) return;
+        if (skillController != null && !skillController.TryInterruptSkill()) return;
 
         if (StateMachine.CurrentState is JumpState jumpState)
         {
@@ -187,9 +252,11 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
             return;
         }
 
-        if (StanceController != null && !StanceController.CanJump) return;
         StateMachine.ChangeState(new JumpState(this));
     }
 
-    private void OnStanceToggleTriggered() => StanceController?.ToggleStance();
+    private void OnStanceToggleTriggered()
+    {
+        if (skillController == null || !skillController.IsCasting) StanceController?.ToggleStance();
+    }
 }

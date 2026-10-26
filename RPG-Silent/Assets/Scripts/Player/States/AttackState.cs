@@ -8,17 +8,17 @@ public class AttackState : PlayerState
 
     private const float ComboInputStart = 0.35f;
     private const float ComboInputEnd = 0.8f;
-    private const float AttackEndTime = 0.95f;
-    private const float MinStateTime = 0.1f;
 
     private int comboIndex;
     private int maxCombo;
-    private float stateTimer;
+    private int expectedAnimationHash;
+    private bool attackAnimationSeen;
     private AttackExecutor attackExecutor;
     private AttackProfile currentProfile;
     private bool attackStarted;
     private bool attackReleased;
     private bool attackEnded;
+    private bool comboRequested;
 
     public AttackState(PlayerController player) : base(player) { }
 
@@ -26,63 +26,69 @@ public class AttackState : PlayerState
     {
         comboIndex = 1;
         maxCombo = player.StanceController != null ? player.StanceController.MaxCombo : 1;
-        stateTimer = 0f;
+        attackAnimationSeen = false;
+        comboRequested = false;
         attackExecutor = player.GetComponent<AttackExecutor>();
 
         PlayCurrentAttack();
     }
 
+    /// <summary>首段与续段均由同一个 Attack InputAction 转发；下一次状态更新消费一次。</summary>
+    public void RequestCombo() => comboRequested = true;
+
     public override void Update()
     {
-        stateTimer += Time.deltaTime;
-
         AnimatorStateInfo stateInfo = player.animator.GetCurrentAnimatorStateInfo(0);
         bool isAttackAnimation = stateInfo.IsTag(AttackTag);
-        float normalizedTime = stateInfo.normalizedTime % 1f;
+        bool isTransitioning = player.animator.IsInTransition(0);
+        // 使用本段的绝对进度，避免动画超过一轮后重新打开输入窗口。
+        float normalizedTime = stateInfo.normalizedTime;
+        bool requested = comboRequested;
+        comboRequested = false;
 
-        if (Input.GetMouseButtonDown(0))
+        if (isTransitioning) return;
+        if (!isAttackAnimation)
         {
-            TryCombo(normalizedTime);
+            // 输入回调先于 Animator 更新；必须等实际进入过攻击动画后才能判定结束。
+            if (attackAnimationSeen) ChangeToLocomotionState();
+            return;
         }
 
+        // SetTrigger 到 Animator 真正切段之间，仍可能读到上一段动画。
+        if (stateInfo.shortNameHash != expectedAnimationHash) return;
+
+        attackAnimationSeen = true;
+        // 先结算本段已到达的伤害时间，再切换下一段的 Profile。
         UpdateAttackTiming(normalizedTime);
 
-        if (stateTimer < MinStateTime)
-        {
-            return;
-        }
-
-        if (isAttackAnimation && stateInfo.normalizedTime < AttackEndTime)
-        {
-            return;
-        }
-
-        if (!isAttackAnimation || stateInfo.normalizedTime >= AttackEndTime)
-        {
-            ChangeToLocomotionState();
-        }
+        if (requested && player.GameplayInputEnabled)
+            TryCombo(normalizedTime);
+        // 结束由 Animator 的 Attack -> MoveTree 过渡决定；不再维护第二份结束时间。
     }
 
-    private void TryCombo(float normalizedTime)
+    private bool TryCombo(float normalizedTime)
     {
         if (comboIndex >= maxCombo)
         {
-            return;
+            return false;
         }
 
         if (normalizedTime < ComboInputStart || normalizedTime > ComboInputEnd)
         {
-            return;
+            return false;
         }
 
         comboIndex++;
         PlayCurrentAttack();
+        return true;
     }
 
     private void PlayCurrentAttack()
     {
         Debug.Log($"攻击 {comboIndex}");
+        attackExecutor?.AttackEnd();
         attackExecutor?.SetCurrentComboIndex(comboIndex);
+        expectedAnimationHash = Animator.StringToHash($"Attack_{comboIndex}");
         currentProfile = attackExecutor != null ? attackExecutor.GetCurrentAttackProfile() : null;
         attackStarted = false;
         attackReleased = false;
@@ -130,6 +136,8 @@ public class AttackState : PlayerState
 
     public override void Exit()
     {
+        comboRequested = false;
+        player.animator.ResetTrigger(AttackTrigger);
         attackExecutor?.AttackEnd();
     }
 }

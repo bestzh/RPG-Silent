@@ -16,6 +16,7 @@ namespace RPGSilent.Domain
         InputAction Jump         { get; }
         InputAction Walk         { get; }
         InputAction Attack       { get; }
+        InputAction Look         { get; }
         InputAction StanceToggle { get; }
         InputAction Pause        { get; }
 
@@ -29,9 +30,15 @@ namespace RPGSilent.Domain
         event Action AttackTriggered;
         event Action StanceToggleTriggered;
         event Action PauseTriggered;
+        event Action CursorToggleTriggered;
+
+        /// <summary>技能槽触发，参数为槽位索引 0..9（对应按键 1..9,0）。</summary>
+        event Action<int> SkillSlotTriggered;
 
         // ── 移动轴（InputManager 每帧读取）──────────────────────────────────────
         Vector2 MoveInput { get; }
+        Vector2 LookInput { get; }
+        bool GameplayInputEnabled { get; }
 
         // ── 改键 API（ControllerPage 使用）──────────────────────────────────────
 
@@ -48,6 +55,9 @@ namespace RPGSilent.Domain
         /// <summary>获取指定 Action、指定绑定索引的可读按键名称。</summary>
         string GetDisplayString(InputAction action, int bindingIndex);
 
+        /// <summary>获取技能槽热键的可读名称（用于技能栏 UI）。</summary>
+        string GetSkillSlotDisplay(int slotIndex);
+
         // ── 冲刺持定时间（ControllerSettingsService 变更时通知）──────────────────
         void ApplySprintHoldTime(float duration);
 
@@ -58,5 +68,8 @@ namespace RPGSilent.Domain
 
         // ── 暂停时禁用游戏输入 ─────────────────────────────────────────────────────
         void SetGameplayInputEnabled(bool enabled);
+
+        /// <summary>菜单独立持有输入阻挡；关闭一个菜单不会解除其他菜单的阻挡。</summary>
+        void SetGameplayInputBlocked(object owner, bool blocked);
     }
 }
