@@ -1,0 +1,97 @@
+// MCP execute_code, Play Mode in Main. Real frame updates, Animator and NavMesh.
+// Use a disposable Play Mode session: this test defeats the existing enemy.
+// Poll AppDomain.CurrentDomain.GetData("H07.naturalResult"). No frame seeking.
+var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+var e=UnityEngine.Object.FindFirstObjectByType<EnemyController>();
+if(p==null||e==null||p.IsDead||!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Requires Main and a living player/enemy.");
+var stats=(RPGSilent.Domain.PlayerStats)GameLifetimeScope.Instance.Container.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var settings=(RPGSilent.Domain.IGameSettingsService)GameLifetimeScope.Instance.Container.Resolve(typeof(RPGSilent.Domain.IGameSettingsService));
+var agent=e.GetComponent<UnityEngine.AI.NavMeshAgent>();
+var a=e.GetComponent<Animator>();
+var oldPosition=p.transform.position;var oldRotation=p.transform.rotation;var oldVelocity=p.rb.linearVelocity;
+bool oldEnabled=p.enabled,oldKinematic=p.rb.isKinematic,oldBackground=UnityEngine.Application.runInBackground;
+int oldHealth=stats.CurrentHealth,oldGold=stats.Gold,oldExp=stats.Exp;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+UnityEngine.Application.runInBackground=true;p.enabled=false;p.rb.linearVelocity=UnityEngine.Vector3.zero;p.rb.isKinematic=true;
+var home=e.transform.position;var facing=e.transform.forward;int initialHealth=stats.CurrentHealth;
+int expected=settings.ScaleIncomingDamage(e.damage),passed=0;
+var result=new System.Text.StringBuilder();
+System.Action<bool,string> check=(ok,name)=>{result.AppendLine((ok?"PASS ":"FAIL ")+name);if(!ok)throw new System.Exception(name);++passed;};
+System.Action<UnityEngine.Vector3> place=pos=>{p.rb.position=pos;p.transform.position=pos;UnityEngine.Physics.SyncTransforms();};
+place(home+facing*1.5f);e.enabled=true;
+var steps=new System.Collections.Generic.List<System.Func<bool>>();
+steps.Add(()=>{
+ if(e.State!=EnemyState.Attack)return false;
+ var info=a.GetCurrentAnimatorStateInfo(0);
+ if(!info.IsName("Base Layer.Attack")||info.normalizedTime<=.05f)return false;
+ check(stats.CurrentHealth==initialHealth,"natural attack begins without instant damage");
+ place(home+facing*(e.attackDistance+2f));return true;
+});
+steps.Add(()=>{
+ if(e.State==EnemyState.Attack)return false;
+ check(stats.CurrentHealth==initialHealth,"walking out during real windup avoids damage");
+ check(UnityEngine.Vector3.Distance(e.transform.position,home)<.15f,"enemy remains stationary during windup and recovery");
+ place(e.transform.position+e.transform.forward*1.5f);return true;
+});
+steps.Add(()=>{
+ if(stats.CurrentHealth==initialHealth)return false;
+ check(initialHealth-stats.CurrentHealth==expected,"real Animator hit frame applies configured damage once");return true;
+});
+steps.Add(()=>{
+ if(e.State==EnemyState.Attack)return false;
+ check(initialHealth-stats.CurrentHealth==expected,"real attack recovery does not repeat damage");
+ e.TakeDamage(1);e.TakeDamage(1);
+ check(e.State==EnemyState.Hurt,"two real hits interrupt enemy into hurt");
+ place(home+facing*8f);return true;
+});
+steps.Add(()=>{
+ if(e.State!=EnemyState.Chase || UnityEngine.Vector3.Distance(e.transform.position,home)<2f)return false;
+ check(e.moveSpeed>0f&&agent.isOnNavMesh&&agent.velocity.sqrMagnitude>.01f,"after repeated hurt real NavMesh movement resumes");
+ place(home+facing*(e.leashDistance+5f));return true;
+});
+steps.Add(()=>{
+ if(e.State!=EnemyState.Return)return false;
+ check(!e.HasAggro,"real chase cancels aggro beyond leash");return true;
+});
+steps.Add(()=>{
+ if(e.State!=EnemyState.Idle||UnityEngine.Vector3.Distance(e.transform.position,home)>e.homeTolerance+.05f)return false;
+ check(agent.isStopped,"real NavMesh return reaches home and stops");
+ int gold=stats.Gold,exp=stats.Exp;
+ e.TakeDamage(100000);e.Die();
+ check(e.IsDead&&stats.Gold-gold==10&&stats.Exp-exp==25,"real death rewards once");
+ return true;
+});
+steps.Add(()=>{
+ if(e==null)throw new System.Exception("Enemy destroyed before death animation could be checked");
+ if(!a.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Dead"))return false;
+ check(a.GetCurrentAnimatorStateInfo(0).normalizedTime<1f,"natural death animation starts before despawn");return true;
+});
+steps.Add(()=>{
+ if(e!=null)return false;
+ check(initialHealth-stats.CurrentHealth==expected,"dead enemy never attacks and despawns after delay");return true;
+});
+int step=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+20;
+UnityEditor.EditorApplication.CallbackFunction tick=null;
+System.Action cleanup=()=>{
+ UnityEditor.EditorApplication.update-=tick;
+ if(e!=null)e.enabled=false;
+ if(p!=null){p.rb.isKinematic=oldKinematic;p.transform.position=oldPosition;p.transform.rotation=oldRotation;if(!oldKinematic)p.rb.linearVelocity=oldVelocity;p.StateMachine.ChangeState(new IdleState(p));p.enabled=oldEnabled;}
+ typeof(RPGSilent.Domain.PlayerStats).GetField("<CurrentHealth>k__BackingField",flags).SetValue(stats,oldHealth);
+ typeof(RPGSilent.Domain.PlayerStats).GetField("<Gold>k__BackingField",flags).SetValue(stats,oldGold);
+ typeof(RPGSilent.Domain.PlayerStats).GetField("<Exp>k__BackingField",flags).SetValue(stats,oldExp);stats.Refresh();
+ UnityEngine.Application.runInBackground=oldBackground;
+ System.AppDomain.CurrentDomain.SetData("H07.naturalTick",null);
+};
+tick=()=>{
+ try{
+  if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("stage "+step);
+  if(!steps[step]())return;
+  ++step;deadline=UnityEditor.EditorApplication.timeSinceStartup+20;
+  System.AppDomain.CurrentDomain.SetData("H07.naturalResult","Running "+step+"/"+steps.Count);
+  if(step==steps.Count){cleanup();System.AppDomain.CurrentDomain.SetData("H07.naturalResult","COMPLETE "+passed+" checks\n"+result);}
+ }catch(System.Exception ex){cleanup();System.AppDomain.CurrentDomain.SetData("H07.naturalResult","FAILED "+ex+"\n"+result);}
+};
+System.AppDomain.CurrentDomain.SetData("H07.naturalTick",tick);
+System.AppDomain.CurrentDomain.SetData("H07.naturalResult","Started");
+UnityEditor.EditorApplication.update+=tick;
+return "Natural enemy validation started.";

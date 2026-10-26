@@ -1,0 +1,205 @@
+// Unity MCP execute_code body, C# 6. Run from a fresh StartScene Play Mode.
+// Uses actual portal/result/loading buttons and Addressables scene loads.
+// No asset/PlayerPrefs writes. Poll AppDomain data H08.result; hooks clean up on all exits.
+if (!UnityEditor.EditorApplication.isPlaying || UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "StartScene")
+    throw new System.InvalidOperationException("Start from StartScene Play Mode.");
+if (System.AppDomain.CurrentDomain.GetData("H08.update") != null) throw new System.Exception("Already running.");
+var c = GameLifetimeScope.Instance.Container;
+var saveStore = (ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if (!saveStore.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp") + System.IO.Path.DirectorySeparatorChar)) throw new System.Exception("Configure isolated validation save storage before Play Mode.");
+var ui = (RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var input = (PlayerInputActionsService)c.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var session = (PlayerSessionService)c.Resolve(typeof(PlayerSessionService));
+var stats = (RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var loader = (RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var settings = (RPGSilent.Domain.IGameSettingsService)c.Resolve(typeof(RPGSilent.Domain.IGameSettingsService));
+var savedSettings = settings.CurrentSettings;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+System.Func<SceneLifetimeScope> scope = () => UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>();
+System.Func<DungeonRunService> run = () => (DungeonRunService)scope().Container.Resolve(typeof(DungeonRunService));
+System.Func<PlayerController> player = () => session.PlayerRig.GetComponentInChildren<PlayerController>(true);
+System.Func<EnemyController[]> enemies = () => UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None);
+System.Func<int> blockers = () => ((System.Collections.Generic.HashSet<object>)typeof(PlayerInputActionsService).GetField("_gameplayInputBlockers", flags).GetValue(input)).Count;
+System.Func<int> attackSubscribers = () => { var d = (System.Delegate)typeof(PlayerInputActionsService).GetField("AttackTriggered", flags).GetValue(input); return d == null ? 0 : d.GetInvocationList().Length; };
+System.Action<object,string> click = (view, field) => ((UnityEngine.UI.Button)view.GetType().GetField(field, flags).GetValue(view)).onClick.Invoke();
+System.Func<LoadingUI> loading = () => UnityEngine.Object.FindFirstObjectByType<LoadingUI>();
+System.Func<DungeonUI> dungeonView = () => UnityEngine.Object.FindFirstObjectByType<DungeonUI>();
+System.Action<System.Action> withoutCatalog = action => {
+    var locators = new System.Collections.Generic.List<UnityEngine.AddressableAssets.ResourceLocators.IResourceLocator>(UnityEngine.AddressableAssets.Addressables.ResourceLocators);
+    foreach(var l in locators) UnityEngine.AddressableAssets.Addressables.RemoveResourceLocator(l);
+    try { action(); } finally { foreach(var l in locators) UnityEngine.AddressableAssets.Addressables.AddResourceLocator(l); }
+};
+var log = new System.Text.StringBuilder(); int passed = 0;
+System.Action<bool,string> check = (ok, label) => { log.AppendLine((ok ? "PASS " : "FAIL ")+label); if(!ok)throw new System.Exception(label); ++passed; };
+bool background = UnityEngine.Application.runInBackground;
+UnityEngine.Application.runInBackground = true;
+UnityEditor.EditorWindow.GetWindow(typeof(UnityEditor.EditorWindow).Assembly.GetType("UnityEditor.GameView")).Focus();
+var keyboard = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+int pauseEvents = 0;
+System.Action observedPause = () => ++pauseEvents;
+input.PauseTriggered += observedPause;
+System.Action escape = () => {
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.Escape));
+    UnityEngine.InputSystem.InputSystem.Update();
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard,new UnityEngine.InputSystem.LowLevel.KeyboardState());
+    UnityEngine.InputSystem.InputSystem.Update();
+};
+var disabled = new System.Collections.Generic.List<EnemyController>();
+UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode> hook = (scene,mode) => {
+    foreach(var root in scene.GetRootGameObjects()) foreach(var e in root.GetComponentsInChildren<EnemyController>())
+        if(e.enabled) { e.enabled=false; disabled.Add(e); }
+};
+UnityEngine.SceneManagement.SceneManager.sceneLoaded += hook;
+System.Func<string,bool> arrived = name => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name==name && !loader.IsLoading && !ui.IsUIOpen("UI/LoadingUI") &&
+    (name=="StartScene" ? ui.IsUIOpen("UI/StartUI") : ui.IsUIOpen("UI/MainUI") && session.PlayerRig!=null && (name!="Dungeon01" || run().State!=DungeonRunState.Inactive && dungeonView()!=null));
+var steps = new System.Collections.Generic.List<System.Func<bool>>();
+int rigId=0, expectedGold=0, expectedExp=0;
+DungeonRunService previousRun=null;
+RPGSilent.Combat.AttackContext oldAttack=null;
+AttackExecutor executor=null;
+AttackProfile profile=null;
+steps.Add(()=>{if(!ui.IsUIOpen("UI/StartUI"))return false;UnityEngine.Object.FindFirstObjectByType<StartUI>().StartButton.onClick.Invoke();return true;});
+steps.Add(()=>{
+    if(!arrived("Main"))return false;
+    rigId=session.PlayerRig.GetInstanceID(); executor=player().GetComponent<AttackExecutor>();
+    profile=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>(); profile.Damage=1;
+    check(run().State==DungeonRunState.Inactive && !DungeonLaunchContext.HasValue && blockers()==0,"Main has no dungeon state or blockers");
+    return true;
+});
+int[] ids={1001,1001,1001,1002,1002,1002};
+DungeonDifficulty[] tiers={DungeonDifficulty.Easy,DungeonDifficulty.Normal,DungeonDifficulty.Hard,DungeonDifficulty.Normal,DungeonDifficulty.Hard,DungeonDifficulty.Nightmare};
+for(int caseIndex=0;caseIndex<ids.Length;caseIndex++) {
+    int n=caseIndex, id=ids[n]; DungeonDifficulty difficulty=tiers[n];
+    int hp=difficulty==DungeonDifficulty.Easy?15:difficulty==DungeonDifficulty.Normal?20:difficulty==DungeonDifficulty.Hard?30:40;
+    int damage=difficulty==DungeonDifficulty.Easy?8:difficulty==DungeonDifficulty.Normal?10:difficulty==DungeonDifficulty.Hard?15:20;
+    int gold=difficulty==DungeonDifficulty.Easy?40:difficulty==DungeonDifficulty.Normal?50:difficulty==DungeonDifficulty.Hard?75:100;
+    int exp=difficulty==DungeonDifficulty.Easy?100:difficulty==DungeonDifficulty.Normal?125:difficulty==DungeonDifficulty.Hard?190:250;
+    string label=id+"/"+difficulty;
+    steps.Add(()=>{
+        if(!arrived("Main"))return false;
+        oldAttack=executor.CreateAttack(profile);
+        ((RPGSilent.Domain.IPortalService)scope().Container.Resolve(typeof(RPGSilent.Domain.IPortalService))).OpenPortal(101); return true;
+    });
+    steps.Add(()=>{
+        var view=UnityEngine.Object.FindFirstObjectByType<PortalUI>(); if(view==null)return false;
+        var content=(UnityEngine.Transform)typeof(PortalUI).GetField("contentRoot",flags).GetValue(view);
+        var list=new System.Collections.Generic.List<UnityEngine.UI.Button>();
+        foreach(UnityEngine.Transform child in content) if(child.gameObject.activeSelf)list.Add(child.GetComponent<UnityEngine.UI.Button>());
+        list[id==1001?0:1].onClick.Invoke();
+        var dropdown=(TMPro.TMP_Dropdown)typeof(PortalUI).GetField("difficultyDropdown",flags).GetValue(view);
+        dropdown.value=id==1001?(int)difficulty-1:(int)difficulty-2;
+        check(((TMPro.TMP_Text)typeof(PortalUI).GetField("descriptionText",flags).GetValue(view)).text.Contains("全局难度"),label+" portal explains difficulty stacking");
+        click(view,"okButton"); return true;
+    });
+    steps.Add(()=>{
+        if(!arrived("Dungeon01"))return false;
+        check(run().State==DungeonRunState.Running && run().TotalEnemies==5 && run().DefeatedEnemies==0 && run().Dungeon.Id==id && run().Difficulty==difficulty,label+" fresh objective and selected tier");
+        check(System.Linq.Enumerable.All(enemies(),e=>e.MaxHealth==hp && e.CurrentHealth==hp && e.damage==damage),label+" scaled scene overrides (no cumulative scaling)");
+        check(session.PlayerRig.GetInstanceID()==rigId && stats.CurrentHealth==stats.MaxHealth && stats.CurrentEnergy==stats.MaxEnergy && player().enabled && !player().rb.isKinematic && attackSubscribers()==1,label+" same single player revived and subscribed once");
+        var target=enemies()[0]; int oldHp=target.CurrentHealth;
+        check(!executor.ApplyDamage(target,oldAttack,target.transform.position) && target.CurrentHealth==oldHp,label+" old scene attack cannot damage new enemies");
+        check(blockers()==0 && input.GameplayInputEnabled && UnityEngine.Object.FindObjectsByType<DungeonUI>(UnityEngine.FindObjectsSortMode.None).Length==1,label+" unique objective UI and active input");
+        if(n==0) {
+            for(int global=0;global<3;global++) {
+                settings.Apply(new RPGSilent.Domain.GameSettings{DifficultyIndex=global,ShowHud=savedSettings.ShowHud,ShowMiniMap=savedSettings.ShowMiniMap,ScreenShakeIntensity=savedSettings.ScreenShakeIntensity});
+                stats.RestoreVitals(); player().TakeDamage(damage);
+                int expected=UnityEngine.Mathf.RoundToInt(damage*(global==0?.75f:global==2?1.5f:1f));
+                check(stats.CurrentHealth==stats.MaxHealth-expected,"global difficulty "+global+" composes with dungeon attack");
+            }
+            settings.Apply(savedSettings); stats.RestoreVitals();
+        }
+        return true;
+    });
+    // Fail after partial progress, exercise failed retry + return to settlement, then actual retry.
+    if(n==2) {
+        steps.Add(()=>{
+            enemies()[0].TakeDamage(9999);
+            check(run().DefeatedEnemies==1 && stats.Gold==expectedGold && stats.Exp==expectedExp,"partial clear does not award currency");
+            player().TakeDamage(9999);
+            check(run().State==DungeonRunState.Failed && run().AwardedGold==0 && stats.Gold==expectedGold && stats.IsDead && !player().enabled,"death fails once and forfeits pending rewards");
+            int events=pauseEvents;escape();
+            ((RPGSilent.Domain.IPortalService)scope().Container.Resolve(typeof(RPGSilent.Domain.IPortalService))).OpenPortal(101);
+            check(pauseEvents==events+1 && !ui.IsUIOpen("UI/PauseUI") && !ui.IsUIOpen("UI/PortalUI") && blockers()==1 && !input.GameplayInputEnabled,"actual ESC callback and portal cannot cover result");
+            int defeated=run().DefeatedEnemies; foreach(var enemy in enemies())enemy.TakeDamage(9999);
+            check(run().DefeatedEnemies==defeated && stats.Gold==expectedGold,"late enemy damage after failure cannot change settlement");
+            previousRun=run(); withoutCatalog(()=>click(dungeonView(),"retryButton")); return true;
+        });
+        steps.Add(()=>{
+            var view=loading();if(view==null || !view.HasFailed)return false;
+            check(run()==previousRun && stats.IsDead && session.PlayerRig.GetInstanceID()==rigId && run().State==DungeonRunState.Leaving,"failed retry preserves dead player and old run");
+            check(((TMPro.TMP_Text)typeof(LoadingUI).GetField("returnButtonText",flags).GetValue(view)).text=="返回结算","loading failure identifies settlement return");
+            click(view,"returnButton");
+            check(run().State==DungeonRunState.Failed && !input.GameplayInputEnabled && blockers()==1 && !ui.IsUIOpen("UI/LoadingUI"),"cancel failed retry restores result and its blocker");
+            click(dungeonView(),"retryButton"); click(dungeonView(),"retryButton"); return true;
+        });
+        steps.Add(()=>{
+            if(!arrived("Dungeon01") || run()==previousRun)return false;
+            check(!stats.IsDead && stats.CurrentHealth==stats.MaxHealth && run().DefeatedEnemies==0 && run().TotalEnemies==5 && System.Linq.Enumerable.All(enemies(),e=>e.MaxHealth==hp),"same-difficulty retry revives with fresh targets");
+            check(attackSubscribers()==1 && blockers()==0 && stats.Gold==expectedGold,"retry keeps previous earnings and one input subscription");
+            return true;
+        });
+    }
+    steps.Add(()=>{
+        var targets=enemies(); var first=targets[0]; first.TakeDamage(9999); first.Die();
+        check(run().DefeatedEnemies==1 && stats.Gold==expectedGold,label+" duplicate death counts once; no per-kill payout");
+        foreach(var enemy in targets)enemy.TakeDamage(9999);
+        expectedGold+=gold; expectedExp+=exp;
+        check(run().Succeeded && run().DefeatedEnemies==5 && run().AwardedGold==gold && run().AwardedExp==exp && stats.Gold==expectedGold && stats.Exp==expectedExp,label+" clears and awards exactly once");
+        foreach(var enemy in targets)enemy.Die(); player().TakeDamage(9999);
+        check(run().Succeeded && !stats.IsDead && stats.Gold==expectedGold && blockers()==1 && !input.GameplayInputEnabled,label+" late callbacks cannot overwrite victory");
+        check(dungeonView().transform.Find("ResultPanel").gameObject.activeInHierarchy,label+" result panel visible");
+        previousRun=run();
+        if(n==0)withoutCatalog(()=>click(dungeonView(),"returnButton"));else click(dungeonView(),"returnButton");
+        return true;
+    });
+    if(n==0) {
+        steps.Add(()=>{
+            var view=loading();if(view==null || !view.HasFailed)return false;
+            click(view,"returnButton");
+            check(run()==previousRun && run().Succeeded && stats.Gold==expectedGold && blockers()==1,"failed return to Main retains victory without duplicate reward");
+            click(dungeonView(),"returnButton");return true;
+        });
+    }
+    steps.Add(()=>{
+        if(!arrived("Main"))return false;
+        check(!DungeonLaunchContext.HasValue && run().State==DungeonRunState.Inactive && !ui.IsUIOpen(DungeonRunService.UiKey),label+" Main clears context/result UI");
+        var p=player();var origin=UnityEngine.Resources.Load<UnityEngine.GameObject>("PlayerRig").GetComponentInChildren<PlayerController>(true).transform.position;
+        check(UnityEngine.Vector2.Distance(new UnityEngine.Vector2(p.transform.position.x,p.transform.position.z),new UnityEngine.Vector2(origin.x,origin.z))<.2f && stats.CurrentHealth==stats.MaxHealth && p.enabled,label+" returns to Main spawn alive");
+        check(stats.Gold==expectedGold && stats.Exp==expectedExp && blockers()==0 && attackSubscribers()==1 && UnityEngine.Object.FindObjectsByType<GameLifetimeScope>(UnityEngine.FindObjectsSortMode.None).Length==1,label+" earnings and unique services survive roundtrip");
+        return true;
+    });
+}
+steps.Add(()=>{((RPGSilent.Domain.IGamePauseService)scope().Container.Resolve(typeof(RPGSilent.Domain.IGamePauseService))).Pause();return true;});
+steps.Add(()=>{var view=UnityEngine.Object.FindFirstObjectByType<PauseUI>();if(view==null)return false;view.MainMenuButton.onClick.Invoke();return true;});
+steps.Add(()=>{
+    if(!arrived("StartScene"))return false;
+    check(!session.IsActive && session.PlayerRig==null && !DungeonLaunchContext.HasValue && blockers()==0 && attackSubscribers()==0,"menu ends session without stale player/listeners/context");
+    return true;
+});
+int step=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+40;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+System.Action cleanup=()=>{
+    UnityEditor.EditorApplication.update-=update;
+    UnityEngine.SceneManagement.SceneManager.sceneLoaded-=hook;
+    input.PauseTriggered-=observedPause;
+    if(keyboard!=null && keyboard.added)UnityEngine.InputSystem.InputSystem.RemoveDevice(keyboard);
+    settings.Apply(savedSettings);
+    foreach(var enemy in disabled)if(enemy!=null && !enemy.IsDead)enemy.enabled=true;
+    if(profile!=null)UnityEngine.Object.Destroy(profile);
+    UnityEngine.Application.runInBackground=background;
+    System.AppDomain.CurrentDomain.SetData("H08.update",null);
+};
+update=()=>{
+    try {
+        if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Play stopped");
+        if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("step "+step);
+        if(!steps[step]())return;
+        ++step;deadline=UnityEditor.EditorApplication.timeSinceStartup+40;
+        System.AppDomain.CurrentDomain.SetData("H08.result","Running "+step+"/"+steps.Count+" checks="+passed);
+        if(step==steps.Count){cleanup();System.AppDomain.CurrentDomain.SetData("H08.result","COMPLETE "+passed+" checks\n"+log);}
+    }catch(System.Exception e){cleanup();System.AppDomain.CurrentDomain.SetData("H08.result","FAILED at "+step+": "+e+"\n"+log);}
+};
+System.AppDomain.CurrentDomain.SetData("H08.update",update);
+System.AppDomain.CurrentDomain.SetData("H08.result","Started");
+UnityEditor.EditorApplication.update+=update;
+return "Started "+steps.Count+" stages";

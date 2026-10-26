@@ -1,0 +1,122 @@
+// MCP execute_code, from Main Play Mode. Natural enemy damage, real AOE delivery,
+// spawn/skill resets, empty objective guard. Temporary data restored on every exit.
+if(!UnityEditor.EditorApplication.isPlaying || UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main")throw new System.Exception("Requires Main Play Mode");
+if(System.AppDomain.CurrentDomain.GetData("H08.boundaryUpdate")!=null)throw new System.Exception("Boundary validation already running");
+var c=GameLifetimeScope.Instance.Container;
+var saveStore=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if(!saveStore.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp")+System.IO.Path.DirectorySeparatorChar))throw new System.Exception("Configure isolated validation save storage before Play Mode.");
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var input=(RPGSilent.Domain.IPlayerInputActions)c.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var session=(PlayerSessionService)c.Resolve(typeof(PlayerSessionService));
+var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var p=session.PlayerRig.GetComponentInChildren<PlayerController>(true);
+var skills=p.GetComponent<PlayerSkillController>();var executor=p.GetComponent<AttackExecutor>();
+var originalSkill=skills.GetEquippedSkill(9);
+var testProfile=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();testProfile.DeliveryType=AttackDeliveryType.SelfAoe;testProfile.Damage=9999;testProfile.AoeRadius=150;
+var testSkill=UnityEngine.ScriptableObject.CreateInstance<SkillData>();testSkill.SkillName="H08 casting reset";testSkill.CastTime=100;testSkill.CooldownTime=200;testSkill.EnergyCost=10;testSkill.AttackProfile=testProfile;testSkill.CanBeInterrupted=false;
+bool background=UnityEngine.Application.runInBackground;UnityEngine.Application.runInBackground=true;
+var constraints=p.rb.constraints;var owner=new object();int goldBefore=stats.Gold,expBefore=stats.Exp;
+bool lookEnabled=input.Look.enabled;
+System.Func<DungeonRunService> run=()=> (DungeonRunService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(DungeonRunService));
+System.Func<EnemyController[]> enemies=()=>UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None);
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Action<string> click=field=>{var view=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();((UnityEngine.UI.Button)typeof(DungeonUI).GetField(field,flags).GetValue(view)).onClick.Invoke();};
+var log=new System.Text.StringBuilder();int passed=0;
+System.Action<bool,string> check=(ok,label)=>{log.AppendLine((ok?"PASS ":"FAIL ")+label);if(!ok)throw new System.Exception(label);++passed;};
+System.Func<string,bool> arrived=scene=>UnityEngine.SceneManagement.SceneManager.GetActiveScene().name==scene && !loader.IsLoading && !ui.IsUIOpen("UI/LoadingUI") && (scene!="Dungeon01" || run().State!=DungeonRunState.Inactive && UnityEngine.Object.FindFirstObjectByType<DungeonUI>()!=null);
+bool removeTargets=false;
+var disabled=new System.Collections.Generic.List<EnemyController>();
+UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode> hook=(scene,mode)=>{
+    foreach(var root in scene.GetRootGameObjects())foreach(var enemy in root.GetComponentsInChildren<EnemyController>()) {
+        if(removeTargets && scene.name=="Dungeon01")enemy.gameObject.SetActive(false);
+        else {enemy.enabled=false;disabled.Add(enemy);}
+    }
+};
+UnityEngine.SceneManagement.SceneManager.sceneLoaded+=hook;
+foreach(var e in enemies()){e.enabled=false;disabled.Add(e);}
+var steps=new System.Collections.Generic.List<System.Func<bool>>();
+int frame=UnityEngine.Time.frameCount;double started=0;DungeonRunService oldRun=null;EnemyController naturalEnemy=null;
+steps.Add(()=>{
+    if(!arrived("Main") || UnityEngine.Time.frameCount<frame+3)return false;
+    input.Look.Disable();
+    p.Teleport(p.transform.position,UnityEngine.Quaternion.Euler(0,123,0));frame=UnityEngine.Time.frameCount;return true;
+});
+steps.Add(()=>{
+    if(UnityEngine.Time.frameCount<frame+3)return false;
+    check(UnityEngine.Mathf.Abs(UnityEngine.Mathf.DeltaAngle(p.transform.eulerAngles.y,123))<.1f,"teleport yaw survives later Update frames");
+    if(lookEnabled)input.Look.Enable();
+    skills.EquipSkill(9,testSkill);check(skills.TryCastSlot(9) && skills.IsCasting && skills.GetCooldownNormalized(9)>0,"non-interruptible cast/cooldown established before travel");
+    DungeonLaunchContext.Set(1001,DungeonDifficulty.Normal);ui.OpenUI("UI/LoadingUI","Scenes/Dungeon01","UI/MainUI");return true;
+});
+steps.Add(()=>{
+    if(!arrived("Dungeon01"))return false;
+    check(!skills.IsCasting && skills.GetCooldownNormalized(9)==0 && stats.CurrentHealth==stats.MaxHealth && stats.CurrentEnergy==stats.MaxEnergy,"scene activation cancels cast and clears cooldown/vitals");
+    check(skills.GetEquippedSkill(9)==testSkill,"scene reset preserves equipped skill loadout");
+    var db=UnityEngine.Resources.Load<DungeonDatabase>("DungeonDatabase");
+    check(UnityEngine.Mathf.Abs(UnityEngine.Mathf.DeltaAngle(p.transform.eulerAngles.y,db.GetById(1001).SpawnEulerAngles.y))<.1f,"configured spawn rotation applied over prior yaw");
+    var enemy=enemies()[0];enemy.ConfigureDungeon(db.GetById(1001).GetDifficultyTier(DungeonDifficulty.Hard));
+    check(enemy.MaxHealth==20 && enemy.damage==10,"second configure cannot multiply existing enemy stats");
+    // H11 validates all five enemies; this boundary test needs one natural attacker.
+    naturalEnemy=enemies()[0];
+    naturalEnemy.enabled=true;
+    input.SetGameplayInputBlocked(owner,true);stats.TakeDamage(stats.CurrentHealth-1);
+    p.Teleport(naturalEnemy.transform.position+naturalEnemy.transform.forward*.9f+UnityEngine.Vector3.up*.25f,UnityEngine.Quaternion.identity);
+    p.rb.constraints=UnityEngine.RigidbodyConstraints.FreezePositionX|UnityEngine.RigidbodyConstraints.FreezePositionZ|UnityEngine.RigidbodyConstraints.FreezeRotation;
+    started=UnityEditor.EditorApplication.timeSinceStartup;return true;
+});
+steps.Add(()=>{
+    if(run().State!=DungeonRunState.Failed)return false;
+    check(stats.IsDead && naturalEnemy.State!=EnemyState.Dead && !p.enabled && !input.GameplayInputEnabled,"natural NavMesh enemy attack triggers failed result");
+    check(stats.Gold==goldBefore && stats.Exp==expBefore,"natural death awards nothing");
+    started=UnityEditor.EditorApplication.timeSinceStartup;return true;
+});
+steps.Add(()=>{
+    if(UnityEditor.EditorApplication.timeSinceStartup<started+.5)return false;
+    check(p.animator.GetCurrentAnimatorStateInfo(0).IsName("Death"),"death animation still runs under result panel");
+    p.rb.constraints=constraints;input.SetGameplayInputBlocked(owner,false);oldRun=run();click("retryButton");return true;
+});
+steps.Add(()=>{
+    if(!arrived("Dungeon01") || run()==oldRun)return false;
+    check(!p.IsDead && p.enabled && !p.rb.isKinematic && !p.animator.GetBool("IsDead"),"retry exits death animation and restores physics");
+    UnityEngine.Physics.SyncTransforms();executor.ExecuteProfile(testProfile);
+    check(run().Succeeded && run().DefeatedEnemies==5 && stats.Gold==goldBefore+50 && stats.Exp==expBefore+125,"real overlap AOE clears targets and settles once");
+    oldRun=run();click("retryButton");return true;
+});
+steps.Add(()=>{
+    if(!arrived("Dungeon01") || run()==oldRun)return false;
+    check(run().State==DungeonRunState.Running && run().DefeatedEnemies==0 && !p.IsDead,"victory retry starts an independent fresh run");
+    p.TakeDamage(9999);click("returnButton");return true;
+});
+steps.Add(()=>{
+    if(!arrived("Main"))return false;
+    check(stats.CurrentHealth==stats.MaxHealth && !p.IsDead && !DungeonLaunchContext.HasValue && stats.Gold==goldBefore+50,"failure return to Main revives and retains earlier victory earnings");
+    removeTargets=true;DungeonLaunchContext.Set(1001,DungeonDifficulty.Normal);ui.OpenUI("UI/LoadingUI","Scenes/Dungeon01","UI/MainUI");return true;
+});
+steps.Add(()=>{
+    if(!arrived("Dungeon01"))return false;
+    check(run().State==DungeonRunState.Failed && run().TotalEnemies==0 && run().AwardedGold==0 && stats.Gold==goldBefore+50,"empty target configuration fails safely without free rewards");
+    check(run().FailureReason.Contains("目标"),"empty objective provides actionable result");
+    removeTargets=false;click("returnButton");return true;
+});
+steps.Add(()=>{if(!arrived("Main"))return false;check(input.GameplayInputEnabled && p.enabled && stats.CurrentHealth==stats.MaxHealth,"empty objective recovery returns to playable Main");return true;});
+int step=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+35;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+System.Action cleanup=()=>{
+    UnityEditor.EditorApplication.update-=update;UnityEngine.SceneManagement.SceneManager.sceneLoaded-=hook;
+    input.SetGameplayInputBlocked(owner,false);if(p!=null)p.rb.constraints=constraints;
+    if(lookEnabled && input.GameplayInputEnabled)input.Look.Enable();
+    if(skills!=null)skills.EquipSkill(9,originalSkill);
+    foreach(var e in disabled)if(e!=null && !e.IsDead)e.enabled=true;
+    UnityEngine.Object.Destroy(testSkill);UnityEngine.Object.Destroy(testProfile);UnityEngine.Application.runInBackground=background;
+    System.AppDomain.CurrentDomain.SetData("H08.boundaryUpdate",null);
+};
+update=()=>{try{
+    if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Play stopped");
+    if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("step "+step);
+    if(!steps[step]())return;++step;deadline=UnityEditor.EditorApplication.timeSinceStartup+35;
+    System.AppDomain.CurrentDomain.SetData("H08.boundaryResult","Running "+step+"/"+steps.Count+" checks="+passed);
+    if(step==steps.Count){cleanup();System.AppDomain.CurrentDomain.SetData("H08.boundaryResult","COMPLETE "+passed+" checks\n"+log);}
+}catch(System.Exception e){cleanup();System.AppDomain.CurrentDomain.SetData("H08.boundaryResult","FAILED at "+step+": "+e+"\n"+log);}};
+System.AppDomain.CurrentDomain.SetData("H08.boundaryUpdate",update);UnityEditor.EditorApplication.update+=update;
+return "Started boundary checks";

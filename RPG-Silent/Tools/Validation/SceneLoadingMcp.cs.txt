@@ -1,0 +1,245 @@
+// MCP execute_code method body (CodeDom/C# 6), disposable Play Mode from StartScene.
+// Runs asynchronously in Editor updates; query AppDomain.CurrentDomain.GetData("H06.result").
+// Real Addressables loads and actual UI buttons. Catalog removal is limited to the
+// synchronous request call and restored in finally; no assets or settings are saved.
+// Expected InvalidKeyException / [SceneLoader] failure logs are deliberate fault injection.
+if (!UnityEditor.EditorApplication.isPlaying || UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "StartScene")
+    throw new System.InvalidOperationException("Enter Play Mode from StartScene first.");
+if (System.AppDomain.CurrentDomain.GetData("H06.update") != null)
+    throw new System.InvalidOperationException("H06 validation is already running.");
+var container = GameLifetimeScope.Instance.Container;
+var saveStore = (ProgressSaveStore)container.Resolve(typeof(ProgressSaveStore));
+if (!saveStore.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp") + System.IO.Path.DirectorySeparatorChar)) throw new System.Exception("Configure isolated validation save storage before Play Mode.");
+var ui = (RPGSilent.Domain.IUIService)container.Resolve(typeof(RPGSilent.Domain.IUIService));
+var input = (PlayerInputActionsService)container.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var cursor = (RPGSilent.Domain.ICursorService)container.Resolve(typeof(RPGSilent.Domain.ICursorService));
+var session = (PlayerSessionService)container.Resolve(typeof(PlayerSessionService));
+var loader = (RPGSilent.Domain.ISceneLoader)container.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+System.Func<LoadingUI> loading = () => UnityEngine.Object.FindFirstObjectByType<LoadingUI>();
+System.Func<RPGSilent.Domain.IGamePauseService> pause = () => (RPGSilent.Domain.IGamePauseService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(RPGSilent.Domain.IGamePauseService));
+System.Func<RPGSilent.Domain.IPortalService> portal = () => (RPGSilent.Domain.IPortalService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(RPGSilent.Domain.IPortalService));
+System.Action<LoadingUI,string> click = (view, field) => ((UnityEngine.UI.Button)typeof(LoadingUI).GetField(field, flags).GetValue(view)).onClick.Invoke();
+System.Func<int> blockers = () => ((System.Collections.Generic.HashSet<object>)typeof(PlayerInputActionsService).GetField("_gameplayInputBlockers", flags).GetValue(input)).Count;
+System.Action<System.Action> withoutCatalog = action => {
+    var locators = new System.Collections.Generic.List<UnityEngine.AddressableAssets.ResourceLocators.IResourceLocator>(UnityEngine.AddressableAssets.Addressables.ResourceLocators);
+    foreach (var locator in locators) UnityEngine.AddressableAssets.Addressables.RemoveResourceLocator(locator);
+    try { action(); }
+    finally { foreach (var locator in locators) UnityEngine.AddressableAssets.Addressables.AddResourceLocator(locator); }
+};
+var result = new System.Text.StringBuilder();
+int passed = 0;
+System.Action<bool,string> check = (ok, name) => {
+    result.AppendLine((ok ? "PASS " : "FAIL ") + name);
+    if (!ok) throw new System.Exception(name);
+    ++passed;
+};
+bool oldBackground = UnityEngine.Application.runInBackground;
+UnityEngine.Application.runInBackground = true;
+var keyboard = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+System.Action escape = () => {
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.Escape));
+    UnityEngine.InputSystem.InputSystem.Update();
+    UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState());
+    UnityEngine.InputSystem.InputSystem.Update();
+};
+var disabledEnemies = new System.Collections.Generic.List<EnemyController>();
+UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode> sceneHook = (scene, mode) => {
+    foreach (var enemy in UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None))
+        if (enemy.enabled) { enemy.enabled = false; disabledEnemies.Add(enemy); }
+};
+UnityEngine.SceneManagement.SceneManager.sceneLoaded += sceneHook;
+var failedHandles = new System.Collections.Generic.List<UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationHandle>();
+var oldExceptionHandler = UnityEngine.ResourceManagement.ResourceManager.ExceptionHandler;
+UnityEngine.ResourceManagement.ResourceManager.ExceptionHandler = (operation, exception) => {
+    failedHandles.Add(operation);
+    if (oldExceptionHandler != null) oldExceptionHandler(operation, exception);
+};
+var owner = new object();
+int rigId = 0, secondRigId = 0, firstFailures = 0, busyFailures = 0;
+LoadingUI oldView = null;
+var steps = new System.Collections.Generic.List<System.Func<bool>>();
+System.Func<string,bool> arrived = scene => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == scene && !loader.IsLoading && !ui.IsUIOpen("UI/LoadingUI") && (scene == "StartScene" ? ui.IsUIOpen("UI/StartUI") : ui.IsUIOpen("UI/MainUI") && session.PlayerRig != null);
+steps.Add(() => {
+    if (!ui.IsUIOpen("UI/StartUI")) return false;
+    int failed = 0;
+    loader.LoadScene(null, onFailed: e => ++failed);
+    loader.LoadScene("  ", onFailed: e => ++failed);
+    check(failed == 2 && !loader.IsLoading, "empty addresses report failure and leave loader idle");
+    withoutCatalog(() => UnityEngine.Object.FindFirstObjectByType<StartUI>().StartButton.onClick.Invoke());
+    return true;
+});
+steps.Add(() => {
+    var view = loading(); if (view == null || !view.HasFailed) return false;
+    check(!input.GameplayInputEnabled && cursor.IsUICursor && !loader.IsLoading, "failed start keeps UI cursor and blocks gameplay");
+    check(view.transform.Find("FailurePanel").gameObject.activeInHierarchy && view.progressText.text == "加载失败", "failure panel and message visible");
+    click(view,"returnButton");
+    return true;
+});
+steps.Add(() => {
+    if (!arrived("StartScene")) return false;
+    check(!session.IsActive && session.PlayerRig == null && !input.GameplayInputEnabled && blockers() == 0, "return from failed start resets session and releases owned blocker");
+    withoutCatalog(() => UnityEngine.Object.FindFirstObjectByType<StartUI>().StartButton.onClick.Invoke());
+    return true;
+});
+steps.Add(() => {
+    var view = loading(); if (view == null || !view.HasFailed) return false;
+    click(view,"retryButton");
+    click(view,"retryButton");
+    click(view,"returnButton");
+    ui.OpenUI("UI/LoadingUI","Scenes/__WrongDuplicate_H06","UI/SettingsUI");
+    check(view.IsLoading && !view.HasFailed && view.progressText.text != "加载失败" && !input.GameplayInputEnabled && (string)typeof(LoadingUI).GetField("_nextScene", flags).GetValue(view) == "Scenes/Main", "retry clears failure; duplicate retry/return/open cannot replace active request");
+    return true;
+});
+steps.Add(() => {
+    if (!arrived("Main")) return false;
+    rigId = session.PlayerRig.GetInstanceID();
+    check(input.GameplayInputEnabled && !cursor.IsUICursor && blockers() == 0 && !ui.IsUIOpen("UI/SettingsUI"), "same-key retry succeeds and restores input/HUD");
+    DungeonLaunchContext.Set(77, default(DungeonDifficulty));
+    portal().OpenPortal(101);
+    return true;
+});
+steps.Add(() => {
+    var view = UnityEngine.Object.FindFirstObjectByType<PortalUI>(); if (view == null) return false;
+    var confirm = (UnityEngine.UI.Button)typeof(PortalUI).GetField("okButton",flags).GetValue(view);
+    withoutCatalog(() => confirm.onClick.Invoke());
+    escape(); portal().OpenPortal(101);
+    check(!ui.IsUIOpen("UI/PauseUI") && !ui.IsUIOpen("UI/PortalUI") && !input.GameplayInputEnabled, "ESC and portal cannot overlay active loading");
+    return true;
+});
+steps.Add(() => {
+    var view = loading(); if (view == null || !view.HasFailed) return false;
+    check(session.PlayerRig.GetInstanceID() == rigId && DungeonLaunchContext.DungeonId != 77, "portal failure retains player and pending selection for retry");
+    escape(); portal().OpenPortal(101);
+    check(!ui.IsUIOpen("UI/PauseUI") && !ui.IsUIOpen("UI/PortalUI"), "ESC and portal remain blocked on failure screen");
+    input.SetGameplayInputBlocked(owner,true);
+    click(view,"returnButton");
+    check(DungeonLaunchContext.HasValue && DungeonLaunchContext.DungeonId == 77 && !input.GameplayInputEnabled && blockers() == 1, "return rolls back dungeon selection and preserves another input owner");
+    input.SetGameplayInputBlocked(owner,false);
+    check(input.GameplayInputEnabled && session.PlayerRig.GetInstanceID() == rigId, "return to original game restores input and same player");
+    portal().OpenPortal(101);
+    return true;
+});
+steps.Add(() => {
+    var view=UnityEngine.Object.FindFirstObjectByType<PortalUI>(); if(view==null)return false;
+    ((UnityEngine.UI.Button)typeof(PortalUI).GetField("okButton",flags).GetValue(view)).onClick.Invoke();
+    return true;
+});
+steps.Add(() => {
+    if (!arrived("Dungeon01")) return false;
+    check(session.PlayerRig.GetInstanceID() == rigId && input.GameplayInputEnabled && blockers() == 0 && DungeonLaunchContext.DungeonId != 77, "successful portal retains selected dungeon and one player");
+    ui.OpenUI("UI/LoadingUI","Scenes/Main");
+    return true;
+});
+steps.Add(() => {
+    if (!arrived("Main")) return false;
+    check(session.PlayerRig.GetInstanceID() == rigId && input.GameplayInputEnabled && blockers() == 0, "Dungeon01 to Main roundtrip restores input without a new player");
+    pause().Pause();
+    return true;
+});
+steps.Add(() => {
+    var view = UnityEngine.Object.FindFirstObjectByType<PauseUI>(); if(view==null)return false;
+    withoutCatalog(() => view.MainMenuButton.onClick.Invoke());
+    return true;
+});
+steps.Add(() => {
+    var view=loading(); if(view==null || !view.HasFailed)return false;
+    check(session.IsActive && session.PlayerRig.GetInstanceID() == rigId && ui.IsUIOpen("UI/MainUI"), "failed main-menu load preserves session/player/HUD");
+    click(view,"returnButton");
+    check(input.GameplayInputEnabled && blockers() == 0 && !cursor.IsUICursor, "failed main-menu return restores gameplay");
+    ui.OpenUI("UI/LoadingUI","Scenes/__LateFailure_H06");
+    oldView=loading();
+    ui.CloseUI("UI/LoadingUI");
+    return true;
+});
+steps.Add(() => {
+    if(loader.IsLoading)return false;
+    check(!ui.IsUIOpen("UI/LoadingUI") && !oldView.HasFailed && input.GameplayInputEnabled && blockers() == 0, "closed UI ignores late failure and releases its blocker");
+    loader.LoadScene("Scenes/__First_H06",onFailed:e=>++firstFailures);
+    loader.LoadScene("Scenes/__Busy_H06",onFailed:e=>++busyFailures);
+    check(busyFailures == 1 && loader.IsLoading, "busy service request reports rejection without clearing original request");
+    return true;
+});
+steps.Add(() => {
+    if(loader.IsLoading)return false;
+    check(firstFailures == 1 && busyFailures == 1, "both concurrent callers receive exactly one terminal failure");
+    ui.OpenUI("UI/LoadingUI","Scenes/__RepeatFailure_H06");
+    return true;
+});
+steps.Add(() => {
+    var view=loading(); if(view==null || !view.HasFailed)return false;
+    click(view,"retryButton"); return true;
+});
+steps.Add(() => {
+    var view=loading(); if(view==null || !view.HasFailed)return false;
+    check(!loader.IsLoading && !input.GameplayInputEnabled, "repeat failure remains recoverable without releasing input early");
+    click(view,"returnButton"); pause().Pause(); return true;
+});
+steps.Add(() => {
+    var view=UnityEngine.Object.FindFirstObjectByType<PauseUI>(); if(view==null)return false;
+    view.MainMenuButton.onClick.Invoke(); return true;
+});
+steps.Add(() => {
+    if(!arrived("StartScene"))return false;
+    check(!session.IsActive && session.PlayerRig == null && !input.GameplayInputEnabled && blockers()==0 && UnityEngine.Object.FindObjectsByType<PlayerController>(UnityEngine.FindObjectsSortMode.None).Length==0, "successful return to menu ends player session and releases all input owners");
+    bool released=true; foreach(var handle in failedHandles)if(handle.IsValid())released=false;
+    check(failedHandles.Count>=6 && released, "all captured failed Addressables handles were released");
+    var startView = UnityEngine.Object.FindFirstObjectByType<StartUI>();
+    startView.StartButton.onClick.Invoke();
+    if (startView.NewGameConfirmation.activeSelf) startView.ConfirmNewGameButton.onClick.Invoke();
+    return true;
+});
+steps.Add(() => {
+    if(!arrived("Main"))return false;
+    secondRigId=session.PlayerRig.GetInstanceID();
+    check(secondRigId != rigId && input.GameplayInputEnabled && blockers()==0 && UnityEngine.Object.FindObjectsByType<PlayerController>(UnityEngine.FindObjectsSortMode.None).Length==1, "restart creates exactly one new player with working input");
+    ui.OpenUI("UI/LoadingUI","Scenes/Dungeon01"); return true;
+});
+steps.Add(() => {
+    if(!arrived("Dungeon01"))return false;
+    check(session.PlayerRig.GetInstanceID()==secondRigId && blockers()==0, "second game preserves its rig when entering dungeon");
+    ui.OpenUI("UI/LoadingUI","Scenes/Main"); return true;
+});
+steps.Add(() => {
+    if(!arrived("Main"))return false;
+    check(session.PlayerRig.GetInstanceID()==secondRigId && UnityEngine.Object.FindObjectsByType<GameLifetimeScope>(UnityEngine.FindObjectsSortMode.None).Length==1 && UnityEngine.Object.FindObjectsByType<SceneLoaderManager>(UnityEngine.FindObjectsSortMode.None).Length==1 && UnityEngine.Object.FindObjectsByType<UIManager>(UnityEngine.FindObjectsSortMode.None).Length==1 && blockers()==0, "second roundtrip keeps unique global services and no input blockers");
+    pause().Pause(); return true;
+});
+steps.Add(() => {
+    var view=UnityEngine.Object.FindFirstObjectByType<PauseUI>(); if(view==null)return false;
+    view.MainMenuButton.onClick.Invoke(); return true;
+});
+steps.Add(() => {
+    if(!arrived("StartScene"))return false;
+    check(!session.IsActive && blockers()==0 && !input.GameplayInputEnabled && cursor.IsUICursor, "final menu restored cleanly");
+    return true;
+});
+int step=0;
+double deadline=UnityEditor.EditorApplication.timeSinceStartup+30;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+System.Action cleanup=()=>{
+    UnityEditor.EditorApplication.update-=update;
+    UnityEngine.SceneManagement.SceneManager.sceneLoaded-=sceneHook;
+    UnityEngine.ResourceManagement.ResourceManager.ExceptionHandler=oldExceptionHandler;
+    input.SetGameplayInputBlocked(owner,false);
+    if(keyboard!=null && keyboard.added)UnityEngine.InputSystem.InputSystem.RemoveDevice(keyboard);
+    foreach(var enemy in disabledEnemies)if(enemy!=null)enemy.enabled=true;
+    UnityEngine.Application.runInBackground=oldBackground;
+    System.AppDomain.CurrentDomain.SetData("H06.update",null);
+};
+update=()=>{
+    try {
+        if(!UnityEditor.EditorApplication.isPlaying)throw new System.Exception("Play Mode stopped");
+        if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("step "+step);
+        if(!steps[step]())return;
+        ++step; deadline=UnityEditor.EditorApplication.timeSinceStartup+30;
+        System.AppDomain.CurrentDomain.SetData("H06.result","Running step "+step+"/"+steps.Count+"; checks="+passed);
+        if(step==steps.Count){cleanup();System.AppDomain.CurrentDomain.SetData("H06.result","COMPLETE "+passed+" checks\n"+result);}
+    } catch(System.Exception exception) {
+        cleanup();System.AppDomain.CurrentDomain.SetData("H06.result","FAILED at step "+step+": "+exception+"\n"+result);
+    }
+};
+System.AppDomain.CurrentDomain.SetData("H06.update",update);
+System.AppDomain.CurrentDomain.SetData("H06.result","Started");
+UnityEditor.EditorApplication.update+=update;
+return "H06 validation started ("+steps.Count+" asynchronous stages).";

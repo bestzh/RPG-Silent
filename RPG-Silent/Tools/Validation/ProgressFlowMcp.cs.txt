@@ -1,0 +1,79 @@
+// Main Play Mode, fresh new game; configure RPGSilent.Validation.SaveDirectory
+// to a unique Temp/CodexProgressValidation folder BEFORE entering Play Mode.
+var c=GameLifetimeScope.Instance.Container;
+var store=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if(!store.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp/CodexProgressValidation")+System.IO.Path.DirectorySeparatorChar))throw new System.Exception("Isolated test storage required");
+var progress=(PlayerProgressService)c.Resolve(typeof(PlayerProgressService));var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));var session=(PlayerSessionService)c.Resolve(typeof(PlayerSessionService));
+var input=(RPGSilent.Domain.IPlayerInputActions)c.Resolve(typeof(RPGSilent.Domain.IPlayerInputActions));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Func<PlayerController> player=()=>session.PlayerRig.GetComponentInChildren<PlayerController>(true);
+System.Func<DungeonRunService> run=()=> (DungeonRunService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(DungeonRunService));
+System.Func<string,bool> arrived=name=>UnityEngine.SceneManagement.SceneManager.GetActiveScene().name==name && !loader.IsLoading && !ui.IsUIOpen("UI/LoadingUI") && (name=="StartScene"?ui.IsUIOpen("UI/StartUI"):session.PlayerRig!=null && ui.IsUIOpen("UI/MainUI") && (name!="Dungeon01" || run().State!=DungeonRunState.Inactive && UnityEngine.Object.FindFirstObjectByType<DungeonUI>()!=null));
+System.Action<string> resultClick=name=>((UnityEngine.UI.Button)typeof(DungeonUI).GetField(name,flags).GetValue(UnityEngine.Object.FindFirstObjectByType<DungeonUI>())).onClick.Invoke();
+var disabled=new System.Collections.Generic.List<EnemyController>();
+UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode> hook=(scene,mode)=>{foreach(var root in scene.GetRootGameObjects())foreach(var e in root.GetComponentsInChildren<EnemyController>()){e.enabled=false;disabled.Add(e);}};
+UnityEngine.SceneManagement.SceneManager.sceneLoaded+=hook;foreach(var e in UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None)){e.enabled=false;disabled.Add(e);}
+bool background=UnityEngine.Application.runInBackground;UnityEngine.Application.runInBackground=true;
+var log=new System.Text.StringBuilder();int passed=0;System.Action<bool,string> check=(ok,label)=>{log.AppendLine((ok?"PASS ":"FAIL ")+label);if(!ok)throw new System.Exception(label);passed++;};
+var steps=new System.Collections.Generic.List<System.Func<bool>>();System.IO.FileStream locked=null;string before=null,settled=null;int rigId=0;DungeonRunService oldRun=null;
+steps.Add(()=>{
+ if(!arrived("Main"))return false;rigId=session.PlayerRig.GetInstanceID();
+ check(stats.Level==1 && stats.Gold==0 && stats.Exp==0 && store.Load().Data.totalExp==0,"new game commits initial checkpoint only after Main player exists");
+ var hud=UnityEngine.Object.FindFirstObjectByType<MainUI>();check(hud.levelText.text=="LV.1" && hud.expBar.value==0,"HUD initial level/progress wired");
+ stats.AddReward(40,99);check(hud.levelText.text=="LV.1" && UnityEngine.Mathf.Abs(hud.expBar.value-.99f)<.001f && store.Load().Data.gold==40,"below threshold updates HUD and disk");
+ stats.AddReward(10,1);check(stats.Level==2 && hud.levelText.text=="LV.2" && hud.expProgressText.text=="0 / 200" && store.Load().Data.totalExp==100,"threshold updates level, EXP bar and checkpoint");
+ var skills=player().GetComponent<PlayerSkillController>();skills.EquipSkill(0,UnityEngine.Resources.Load<SkillData>("Skills/Skill_Fireball"));skills.EquipSkill(1,null);skills.EquipSkill(9,UnityEngine.Resources.Load<SkillData>("Skills/Skill_FrostNova"));player().StanceController.SetStance(PlayerStance.Armed);
+ var d=store.Load().Data;check(d.skillIds[0]==skills.GetEquippedSkill(0).PersistentId && d.skillIds[1]=="" && d.skillIds[9]==skills.GetEquippedSkill(9).PersistentId && d.stance==(int)PlayerStance.Armed,"stable skill IDs, empty slot and stance autosaved");
+ before=System.IO.File.ReadAllText(store.PrimaryPath);locked=new System.IO.FileStream(store.PrimaryPath,System.IO.FileMode.Open,System.IO.FileAccess.Read,System.IO.FileShare.Read);
+ stats.AddReward(7,200);check(progress.HasUnsavedChanges && stats.Gold==57 && stats.Level==3 && System.IO.File.ReadAllText(store.PrimaryPath)==before,"IO failure keeps complete old disk snapshot and live new progress");
+ check(!string.IsNullOrEmpty(hud.saveStatusText.text),"HUD exposes save failure");
+ ((RPGSilent.Domain.IGamePauseService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(RPGSilent.Domain.IGamePauseService))).Pause();return true;
+});
+steps.Add(()=>{
+ var view=UnityEngine.Object.FindFirstObjectByType<PauseUI>();if(view==null)return false;
+ view.MainMenuButton.onClick.Invoke();check(!loader.IsLoading && session.PlayerRig!=null && ui.IsUIOpen("UI/PauseUI"),"failed save prevents menu exit from discarding live progress");
+ locked.Dispose();locked=null;view.SaveButton.onClick.Invoke();check(!progress.HasUnsavedChanges && store.Load().Data.gold==57 && store.Load().Data.totalExp==300 && view.SaveStatusText.text=="进度已保存","actual save button retries successfully");
+ view.ResumeButton.onClick.Invoke();DungeonLaunchContext.Set(1001,DungeonDifficulty.Normal);ui.OpenUI("UI/LoadingUI","Scenes/Dungeon01","UI/MainUI");return true;
+});
+steps.Add(()=>{
+ if(!arrived("Dungeon01"))return false;
+ check(stats.MaxHealth==120 && stats.CurrentHealth==120 && stats.CurrentEnergy==110 && session.PlayerRig.GetInstanceID()==rigId,"grown vitals and same rig survive scene travel");
+ before=System.IO.File.ReadAllText(store.PrimaryPath);var es=UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None);es[0].TakeDamage(9999);es[1].TakeDamage(9999);
+ check(run().DefeatedEnemies==2 && stats.Gold==57 && System.IO.File.ReadAllText(store.PrimaryPath)==before,"partial dungeon reward never enters save");
+ player().TakeDamage(9999);check(run().State==DungeonRunState.Failed && System.IO.File.ReadAllText(store.PrimaryPath)==before,"dungeon failure cannot persist pending rewards or death");oldRun=run();resultClick("retryButton");return true;
+});
+steps.Add(()=>{
+ if(!arrived("Dungeon01") || run()==oldRun)return false;
+ check(!player().IsDead && stats.CurrentHealth==stats.MaxHealth && run().DefeatedEnemies==0,"retry restores grown vitals without changing durable progress");
+ foreach(var e in UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None))e.TakeDamage(9999);
+ var d=store.Load().Data;check(run().Succeeded && stats.Gold==107 && stats.Exp==425 && d.gold==107 && d.totalExp==425,"victory atomically persists complete reward");
+ settled=System.IO.File.ReadAllText(store.PrimaryPath);foreach(var e in UnityEngine.Object.FindObjectsByType<EnemyController>(UnityEngine.FindObjectsSortMode.None))e.Die();
+ check(System.IO.File.ReadAllText(store.PrimaryPath)==settled && stats.Exp==425,"duplicate settlement writes no additional reward or checkpoint");
+ resultClick("returnButton");return true;
+});
+steps.Add(()=>{if(!arrived("Main"))return false;((RPGSilent.Domain.IGamePauseService)UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>().Container.Resolve(typeof(RPGSilent.Domain.IGamePauseService))).Pause();return true;});
+steps.Add(()=>{var v=UnityEngine.Object.FindFirstObjectByType<PauseUI>();if(v==null)return false;v.MainMenuButton.onClick.Invoke();return true;});
+steps.Add(()=>{
+ if(!arrived("StartScene"))return false;var v=UnityEngine.Object.FindFirstObjectByType<StartUI>();
+ check(v.ContinueButton.interactable && !session.IsActive && session.PlayerRig==null,"menu advertises saved progress and releases previous player");
+ v.StartButton.onClick.Invoke();check(v.NewGameConfirmation.activeSelf && System.IO.File.ReadAllText(store.PrimaryPath)==settled,"new game first asks before replacing existing progress");
+ v.CancelNewGameButton.onClick.Invoke();check(!v.NewGameConfirmation.activeSelf && System.IO.File.ReadAllText(store.PrimaryPath)==settled,"cancel new game preserves save bytes");
+ v.ContinueButton.onClick.Invoke();return true;
+});
+steps.Add(()=>{
+ if(!arrived("Main"))return false;var p=player();var skills=p.GetComponent<PlayerSkillController>();
+ check(session.PlayerRig.GetInstanceID()!=rigId && stats.Gold==107 && stats.Exp==425 && stats.Level==3,"continue creates one fresh rig and restores totals without replaying rewards");
+ check(skills.GetEquippedSkill(0).name=="Skill_Fireball" && skills.GetEquippedSkill(1)==null && skills.GetEquippedSkill(9).name=="Skill_FrostNova" && p.CurrentStance==PlayerStance.Armed,"continue restores skill layout including empty slots and stance");
+ check(!p.IsDead && stats.CurrentHealth==stats.MaxHealth && skills.GetCooldownNormalized(9)==0 && !DungeonLaunchContext.HasValue,"continue starts safe Main with clean transient state");
+ var hud=UnityEngine.Object.FindFirstObjectByType<MainUI>();ui.OpenUI("UI/MainUI");ui.OpenUI("UI/MainUI");stats.Refresh();
+ var subscribers=(System.Delegate)typeof(RPGSilent.Domain.PlayerStats).GetField("OnExpChanged",flags).GetValue(stats);check(subscribers.GetInvocationList().Length==1 && hud.expProgressText.text=="125 / 300","reopening HUD retains one EXP subscriber");
+ check(System.IO.File.ReadAllText(store.PrimaryPath)==settled,"continue and HUD refresh do not rewrite or multiply checkpoint");
+ check(skills.TryCastSlot(9),"transient cast/energy state established before restart");p.TakeDamage(10);
+ check(store.Load().Data.totalExp==425 && System.IO.File.ReadAllText(store.PrimaryPath)==settled,"damage, cooldown and energy are excluded from save");
+ System.IO.File.WriteAllText("Temp/CodexProgressValidation/expected-restart.json",UnityEngine.JsonUtility.ToJson(store.Load().Data));return true;
+});
+int step=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+45;UnityEditor.EditorApplication.CallbackFunction tick=null;
+System.Action cleanup=()=>{UnityEditor.EditorApplication.update-=tick;UnityEngine.SceneManagement.SceneManager.sceneLoaded-=hook;if(locked!=null)locked.Dispose();foreach(var e in disabled)if(e!=null && !e.IsDead)e.enabled=true;UnityEngine.Application.runInBackground=background;System.AppDomain.CurrentDomain.SetData("H09.flowTick",null);};
+tick=()=>{try{if(UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.TimeoutException("step "+step);if(!steps[step]())return;step++;deadline=UnityEditor.EditorApplication.timeSinceStartup+45;System.AppDomain.CurrentDomain.SetData("H09.flowResult","Running "+step+"/"+steps.Count);if(step==steps.Count){cleanup();var r="COMPLETE "+passed+" checks\n"+log;System.IO.File.WriteAllText("Temp/CodexProgressValidation/flow-result.txt",r);System.AppDomain.CurrentDomain.SetData("H09.flowResult",r);}}catch(System.Exception ex){cleanup();var r="FAILED "+ex+"\n"+log;System.IO.File.WriteAllText("Temp/CodexProgressValidation/flow-result.txt",r);System.AppDomain.CurrentDomain.SetData("H09.flowResult",r);}};
+UnityEditor.EditorApplication.update+=tick;System.AppDomain.CurrentDomain.SetData("H09.flowTick",tick);return "Started progress flow";

@@ -1,0 +1,83 @@
+// Pass this file to Unity MCP execute_code in a disposable Main Play Mode session.
+// Temporary runtime objects/settings only; no asset or PlayerPrefs writes.
+
+// MCP execute_code body. Play Mode only; creates isolated runtime objects and restores timeScale.
+if(!UnityEditor.EditorApplication.isPlaying) throw new System.InvalidOperationException("Enter Play Mode first.");
+float oldTimeScale=UnityEngine.Time.timeScale;
+UnityEngine.Time.timeScale=0;
+var cleanup=new System.Collections.Generic.List<UnityEngine.Object>();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var sb=new System.Text.StringBuilder();int passed=0,failed=0;
+System.Action<bool,string> check=(ok,name)=>{if(ok)passed++;else failed++;sb.AppendLine((ok?"PASS ":"FAIL ")+name);};
+AttackExecutor ex=null;
+try {
+var root=new UnityEngine.GameObject("DamageRegressionOwner");cleanup.Add(root);root.transform.position=new UnityEngine.Vector3(1000,1000,1000);
+var boxGO=new UnityEngine.GameObject("DamageRegressionHitbox");boxGO.transform.SetParent(root.transform,false);boxGO.AddComponent<UnityEngine.BoxCollider>();
+var box=boxGO.AddComponent<AttackHitbox>();var boxes=root.AddComponent<AttackHitboxController>();ex=root.AddComponent<AttackExecutor>();
+typeof(AttackExecutor).GetField("aimCamera",flags).SetValue(ex,null);
+var receiver=root.AddComponent<PlayerAnimationEventReceiver>();
+var targetGO=new UnityEngine.GameObject("DamageRegressionTarget");cleanup.Add(targetGO);targetGO.transform.position=root.transform.position;
+var target=targetGO.AddComponent<EnemyController>();target.enabled=false;target.MaxHealth=10000;
+var hp=typeof(EnemyController).GetField("<CurrentHealth>k__BackingField",flags);hp.SetValue(target,10000);
+var col=targetGO.AddComponent<UnityEngine.SphereCollider>();
+var child=new UnityEngine.GameObject("SecondCollider");child.transform.SetParent(targetGO.transform,false);var col2=child.AddComponent<UnityEngine.BoxCollider>();
+UnityEngine.Physics.SyncTransforms();
+System.Action reset=()=>hp.SetValue(target,10000);
+System.Func<int> damage=()=>10000-target.CurrentHealth;
+var shot=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(shot);shot.Damage=10;shot.DeliveryType=AttackDeliveryType.Projectile;shot.ProjectileSpeed=0;shot.TargetLayers=~0;shot.ProjectilePrefab=UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>("Assets/Combat/Prefabs/TestArrowProjectile.prefab");
+System.Func<AttackProjectile[]> ownedShots=()=>{var list=new System.Collections.Generic.List<AttackProjectile>();foreach(var projectile in UnityEngine.Object.FindObjectsByType<AttackProjectile>(UnityEngine.FindObjectsSortMode.None)){var c=(RPGSilent.Combat.AttackContext)typeof(AttackProjectile).GetField("context",flags).GetValue(projectile);if(c!=null&&c.Owner==ex)list.Add(projectile);}return list.ToArray();};
+var shotA=ex.CreateAttack(shot);var shotB=ex.CreateAttack(shot);
+ex.ReleaseAttack(shotA);ex.ReleaseAttack(shotB);
+var shots=ownedShots();
+foreach(var projectile in shots){typeof(AttackProjectile).GetMethod("OnTriggerEnter",flags).Invoke(projectile,new object[]{col});typeof(AttackProjectile).GetMethod("OnTriggerEnter",flags).Invoke(projectile,new object[]{col2});cleanup.Add(projectile.gameObject);}
+check(shots.Length==2&&damage()==20,"two independent projectiles + compound colliders: damage="+damage()+" expected=20");
+check(shotA.Id!=shotB.Id,"unique attack IDs");
+foreach(var projectile in shots)UnityEngine.Object.DestroyImmediate(projectile.gameObject);
+ex.ReleaseAttack(shotA);check(ownedShots().Length==0,"released context cannot emit twice");
+reset();typeof(AttackExecutor).GetField("defaultMeleeProfile",flags).SetValue(ex,shot);ex.SetCurrentComboIndex(1);
+ex.AttackRelease();receiver.Hit();receiver.Shoot();ex.AttackRelease();
+check(ownedShots().Length==1,"normal code release + animation callbacks + duplicate release emit once");
+foreach(var projectile in ownedShots()){cleanup.Add(projectile.gameObject);UnityEngine.Object.DestroyImmediate(projectile.gameObject);}
+ex.AttackEnd();ex.AttackRelease();check(ownedShots().Length==0,"closed normal attack cannot emit");
+var aoe=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(aoe);aoe.Damage=10;aoe.DeliveryType=AttackDeliveryType.SelfAoe;aoe.AoeRadius=2;
+reset();var ca=ex.CreateAttack(aoe);var cb=ex.CreateAttack(aoe);ex.ReleaseAttack(ca);ex.ReleaseAttack(cb);check(damage()==20,"two AOE, duplicate colliders deduplicated per attack");
+reset();var method=typeof(AttackExecutor).GetMethod("ExecuteAoeAfterDelay",flags);
+var da=ex.CreateAttack(aoe);var db=ex.CreateAttack(aoe);
+var first=(System.Collections.IEnumerator)method.Invoke(ex,new object[]{da,root.transform.position});
+var second=(System.Collections.IEnumerator)method.Invoke(ex,new object[]{db,root.transform.position});
+first.MoveNext();second.MoveNext();ex.SetCurrentComboIndex(2);ex.EndAttack(da);first.MoveNext();second.MoveNext();
+check(damage()==20,"two delayed AOE retain context across new combo / cast closure");
+reset();var persistent=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(persistent);persistent.Damage=7;persistent.DeliveryType=AttackDeliveryType.PersistentAoe;persistent.AreaDuration=60;
+var areaGO=new UnityEngine.GameObject("DamageRegressionArea");cleanup.Add(areaGO);areaGO.transform.position=root.transform.position;areaGO.AddComponent<UnityEngine.SphereCollider>();var area=areaGO.AddComponent<AttackArea>();
+area.Initialize(ex.CreateAttack(persistent));
+typeof(AttackArea).GetMethod("OnTriggerEnter",flags).Invoke(area,new object[]{col});typeof(AttackArea).GetMethod("OnTriggerEnter",flags).Invoke(area,new object[]{col2});
+var tick=(System.Collections.IEnumerator)typeof(AttackArea).GetMethod("TickDamage",flags).Invoke(area,null);tick.MoveNext();tick.MoveNext();
+check(damage()==14,"persistent AOE ticks twice, one damage per target per tick");
+typeof(AttackArea).GetMethod("OnTriggerExit",flags).Invoke(area,new object[]{col2});tick.MoveNext();
+check(damage()==21,"one collider leaving does not remove target's remaining collider");
+typeof(AttackArea).GetMethod("OnTriggerExit",flags).Invoke(area,new object[]{col});tick.MoveNext();
+check(damage()==21,"all colliders leaving stops area damage");
+reset();var hitboxProfile=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(hitboxProfile);hitboxProfile.DeliveryType=AttackDeliveryType.MeleeHitbox;hitboxProfile.Damage=10;
+var ha=ex.CreateAttack(hitboxProfile);var hb=ex.CreateAttack(hitboxProfile);ex.StartAttack(ha);ex.StartAttack(hb);
+typeof(AttackHitbox).GetMethod("OnTriggerEnter",flags).Invoke(box,new object[]{col});typeof(AttackHitbox).GetMethod("OnTriggerEnter",flags).Invoke(box,new object[]{col2});
+check(damage()==20,"overlapping hitbox contexts do not overwrite or double-hit");
+ex.EndAttack(ha);check(box.GetComponent<UnityEngine.Collider>().enabled,"closing one context preserves other hitbox");
+reset();var hc=ex.CreateAttack(hitboxProfile);ex.StartAttack(hc);typeof(AttackHitbox).GetMethod("OnTriggerStay",flags).Invoke(box,new object[]{col});check(damage()==10,"new context hits target already inside hitbox");
+ex.EndAttack(hc);ex.EndAttack(hb);check(!box.GetComponent<UnityEngine.Collider>().enabled,"closing final context disables hitbox");
+reset();var original=ex.CreateAttack(aoe);var skill=ex.CreateAttack(aoe);ex.ReleaseAttack(original);ex.ReleaseAttack(skill);ex.ReleaseAttack(original);
+check(damage()==20,"normal + skill + late normal duplicate: independent, exactly two hits");
+var selfGO=new UnityEngine.GameObject("OwnerCollider");selfGO.transform.SetParent(root.transform,false);var self=selfGO.AddComponent<EnemyController>();self.enabled=false;hp.SetValue(self,10000);
+check(!ex.ApplyDamage(self,ex.CreateAttack(aoe),root.transform.position)&&self.CurrentHealth==10000,"self damage rejected");
+typeof(EnemyController).GetField("<IsDead>k__BackingField",flags).SetValue(target,true);
+check(!ex.ApplyDamage(target,ex.CreateAttack(aoe),targetGO.transform.position),"dead target rejected");
+UnityEngine.Object.DestroyImmediate(targetGO);check(!ex.ApplyDamage(target,ex.CreateAttack(aoe),UnityEngine.Vector3.zero),"destroyed target rejected without exception");
+var foreignGO=new UnityEngine.GameObject("ForeignOwner");cleanup.Add(foreignGO);var foreign=foreignGO.AddComponent<AttackExecutor>();
+int before=ownedShots().Length;foreign.ReleaseAttack(ex.CreateAttack(shot));check(ownedShots().Length==before,"foreign executor cannot dispatch another owner's attack");
+sb.AppendLine("TOTAL passed="+passed+" failed="+failed);
+if(failed>0)throw new System.InvalidOperationException(sb.ToString());
+return sb.ToString();
+} finally {
+if(ex!=null)foreach(var projectile in UnityEngine.Object.FindObjectsByType<AttackProjectile>(UnityEngine.FindObjectsSortMode.None)){var c=(RPGSilent.Combat.AttackContext)typeof(AttackProjectile).GetField("context",flags).GetValue(projectile);if(c!=null&&c.Owner==ex)UnityEngine.Object.DestroyImmediate(projectile.gameObject);}
+foreach(var item in cleanup)if(item!=null)UnityEngine.Object.DestroyImmediate(item);
+UnityEngine.Time.timeScale=oldTimeScale;
+}

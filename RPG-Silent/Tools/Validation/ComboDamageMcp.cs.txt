@@ -1,0 +1,39 @@
+// Pass this file to Unity MCP execute_code in a disposable Main Play Mode session.
+// Temporary runtime objects/settings only; no asset or PlayerPrefs writes.
+
+var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();var a=p.animator;var ex=p.GetComponent<AttackExecutor>();var skills=p.GetComponent<PlayerSkillController>();
+var input=UnityEngine.Object.FindFirstObjectByType<PlayerInputActionsService>();var flags=System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+var oldLoadout=typeof(AttackExecutor).GetField("attackLoadout",flags).GetValue(ex);var oldProfile=typeof(AttackExecutor).GetField("defaultMeleeProfile",flags).GetValue(ex);var oldStance=p.CurrentStance;var oldOverride=input.Attack.bindings[0].overridePath;float oldTime=UnityEngine.Time.timeScale;var oldPosition=p.transform.position;var oldVelocity=p.rb.linearVelocity;var oldSkill=skills.GetEquippedSkill(9);
+var cleanup=new System.Collections.Generic.List<UnityEngine.Object>();var k=UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+var sb=new System.Text.StringBuilder();int passed=0,failed=0;
+System.Action press=()=>{UnityEngine.InputSystem.InputSystem.QueueStateEvent(k,new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.K));UnityEngine.InputSystem.InputSystem.Update();UnityEngine.InputSystem.InputSystem.QueueStateEvent(k,new UnityEngine.InputSystem.LowLevel.KeyboardState());UnityEngine.InputSystem.InputSystem.Update();};
+try{
+UnityEngine.Time.timeScale=0;p.transform.position=new UnityEngine.Vector3(1000,1000,1000);
+var profile=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(profile);profile.Damage=10;profile.DeliveryType=AttackDeliveryType.SelfAoe;profile.AoeRadius=2;
+typeof(AttackExecutor).GetField("attackLoadout",flags).SetValue(ex,null);typeof(AttackExecutor).GetField("defaultMeleeProfile",flags).SetValue(ex,profile);
+var skillProfile=UnityEngine.Object.Instantiate(profile);cleanup.Add(skillProfile);skillProfile.Damage=20;
+var skill=UnityEngine.ScriptableObject.CreateInstance<SkillData>();cleanup.Add(skill);skill.SkillName="Combo damage overlap";skill.AttackProfile=skillProfile;skill.TriggerTiming=SkillTriggerTiming.OnCastStart;skill.EnergyCost=0;skill.CooldownTime=0;
+skills.EquipSkill(9,skill);
+var targetGO=new UnityEngine.GameObject("ComboDamageTarget");cleanup.Add(targetGO);targetGO.transform.position=p.transform.position+UnityEngine.Vector3.forward;
+var target=targetGO.AddComponent<EnemyController>();target.enabled=false;target.MaxHealth=10000;targetGO.AddComponent<UnityEngine.SphereCollider>();var child=new UnityEngine.GameObject("CompoundCollider");child.transform.SetParent(targetGO.transform,false);child.AddComponent<UnityEngine.BoxCollider>();
+var hp=typeof(EnemyController).GetField("<CurrentHealth>k__BackingField",flags);
+UnityEngine.Physics.SyncTransforms();UnityEngine.InputSystem.InputActionRebindingExtensions.ApplyBindingOverride(input.Attack,0,new UnityEngine.InputSystem.InputBinding{overridePath="<Keyboard>/k"});
+foreach(var stance in new[]{PlayerStance.Unarmed,PlayerStance.Armed})foreach(bool interleave in new[]{false,true}){
+p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(stance);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);hp.SetValue(target,10000);press();
+int max=p.StanceController.MaxCombo,pressed=0,seen=0;bool cast=false;
+for(int i=0;i<600;i++){
+var s=a.GetCurrentAnimatorStateInfo(0);int index=a.GetInteger("ComboIndex");
+for(int j=1;j<=max;j++)if(s.shortNameHash==UnityEngine.Animator.StringToHash("Attack_"+j))seen|=1<<j;
+if(interleave&&!cast&&s.IsTag("Attack")&&!a.IsInTransition(0)&&s.normalizedTime>=0.5f){cast=skills.TryCastSlot(9);}
+if(!a.IsInTransition(0)&&s.shortNameHash==UnityEngine.Animator.StringToHash("Attack_"+index)&&index<max&&s.normalizedTime>=0.7f&&pressed<index){pressed=index;press();}
+if(p.StateMachine.CurrentState is AttackState)p.StateMachine.Update();a.Update(1f/60f);
+}
+int damage=10000-target.CurrentHealth,expected=max*10+(interleave?20:0);bool ok=damage==expected&&seen==((1<<(max+1))-2)&&!(p.StateMachine.CurrentState is AttackState)&&cast==interleave;
+if(ok)passed++;else failed++;sb.AppendLine((ok?"PASS ":"FAIL ")+stance+" interleavedSkill="+interleave+" damage="+damage+" expected="+expected+" animationMask="+seen);
+}
+sb.AppendLine("TOTAL passed="+passed+" failed="+failed);if(failed>0)throw new System.InvalidOperationException(sb.ToString());return sb.ToString();
+}finally{
+p.StateMachine.ChangeState(new IdleState(p));ex.AttackEnd();typeof(AttackExecutor).GetField("attackLoadout",flags).SetValue(ex,oldLoadout);typeof(AttackExecutor).GetField("defaultMeleeProfile",flags).SetValue(ex,oldProfile);p.StanceController.SetStance(oldStance);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);p.transform.position=oldPosition;p.rb.linearVelocity=oldVelocity;skills.EquipSkill(9,oldSkill);
+if(oldOverride==null)UnityEngine.InputSystem.InputActionRebindingExtensions.RemoveBindingOverride(input.Attack,0);else UnityEngine.InputSystem.InputActionRebindingExtensions.ApplyBindingOverride(input.Attack,0,new UnityEngine.InputSystem.InputBinding{overridePath=oldOverride});UnityEngine.InputSystem.InputSystem.RemoveDevice(k);
+foreach(var item in cleanup)if(item!=null)UnityEngine.Object.DestroyImmediate(item);UnityEngine.Time.timeScale=oldTime;
+}

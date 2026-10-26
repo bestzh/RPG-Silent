@@ -1,0 +1,47 @@
+// Pass this file to Unity MCP execute_code in a disposable Main Play Mode session.
+// Temporary runtime objects/settings only; no asset or PlayerPrefs writes.
+
+var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();if(p==null)throw new System.InvalidOperationException("Start Main first.");
+var skills=p.GetComponent<PlayerSkillController>();var ex=p.GetComponent<AttackExecutor>();var anim=p.AnimationController;var receiver=p.GetComponent<PlayerAnimationEventReceiver>();var a=p.animator;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var stats=(RPGSilent.Domain.PlayerStats)typeof(PlayerSkillController).GetField("_stats",flags).GetValue(skills);
+var input=UnityEngine.Object.FindFirstObjectByType<PlayerInputActionsService>();
+var dictionary=(System.Collections.Generic.Dictionary<string,AnimationData>)typeof(PlayerAnimationController).GetField("animationDict",flags).GetValue(anim);
+var oldSkill=skills.GetEquippedSkill(9);var oldStance=p.CurrentStance;float oldEnergy=stats.CurrentEnergy;float oldTime=UnityEngine.Time.timeScale;
+float oldRemaining=((float[])typeof(PlayerSkillController).GetField("_cooldownRemaining",flags).GetValue(skills))[9];float oldDuration=((float[])typeof(PlayerSkillController).GetField("_cooldownDuration",flags).GetValue(skills))[9];
+var cleanup=new System.Collections.Generic.List<UnityEngine.Object>();var initialShots=new System.Collections.Generic.HashSet<int>();foreach(var item in UnityEngine.Object.FindObjectsByType<AttackProjectile>(UnityEngine.FindObjectsSortMode.None))initialShots.Add(item.GetInstanceID());
+var sb=new System.Text.StringBuilder();int passed=0,failed=0;object blocker=new object();
+System.Action<bool,string> check=(ok,name)=>{if(ok)passed++;else failed++;sb.AppendLine((ok?"PASS ":"FAIL ")+name);};
+System.Func<AttackProjectile[]> shots=()=>{var list=new System.Collections.Generic.List<AttackProjectile>();foreach(var item in UnityEngine.Object.FindObjectsByType<AttackProjectile>(UnityEngine.FindObjectsSortMode.None))if(!initialShots.Contains(item.GetInstanceID()))list.Add(item);return list.ToArray();};
+System.Action clearShots=()=>{foreach(var item in shots())UnityEngine.Object.DestroyImmediate(item.gameObject);};
+System.Action tick=()=>typeof(PlayerSkillController).GetMethod("TickCasting",flags).Invoke(skills,null);
+try{
+UnityEngine.Time.timeScale=0;p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(PlayerStance.Armed);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);
+var profile=UnityEngine.ScriptableObject.CreateInstance<AttackProfile>();cleanup.Add(profile);profile.DeliveryType=AttackDeliveryType.Projectile;profile.ProjectileSpeed=0;profile.ProjectileLifeTime=60;profile.ProjectilePrefab=UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>("Assets/Combat/Prefabs/TestArrowProjectile.prefab");
+var data=UnityEngine.ScriptableObject.CreateInstance<AnimationData>();cleanup.Add(data);data.AnimationName="__DamageRegression";data.AnimatorStateName="Base Layer.Attack_1";data.Duration=1.1f;data.CanInterrupt=true;dictionary.Add(data.AnimationName,data);
+var skill=UnityEngine.ScriptableObject.CreateInstance<SkillData>();cleanup.Add(skill);skill.SkillName="Damage Regression";skill.AttackProfile=profile;skill.Animation=data;skill.EnergyCost=0;skill.CooldownTime=0;skill.TriggerTiming=SkillTriggerTiming.OnAnimationEvent;
+System.Action reset=()=>{skills.InterruptSkill(true);anim.StopAnimation();p.SetIsRolling(false);p.SetIsJumping(false);p.StateMachine.ChangeState(new IdleState(p));a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);clearShots();skills.EquipSkill(9,skill);};
+reset();check(skills.TryCastSlot(9)&&skills.IsCasting&&!p.CanAttack,"animated skill owns attack input");
+a.Update(0);a.Update(0.3f);check(shots().Length==1,"first real Armed animation Hit emits once");
+a.Update(0.3f);receiver.Hit();receiver.Shoot();check(shots().Length==1,"second real Hit and duplicate callbacks do not emit again");
+anim.StopAnimation();tick();receiver.Hit();check(shots().Length==1&&!skills.IsCasting,"animation completion and late event cannot re-release or trigger normal");
+reset();p.StateMachine.ChangeState(new AttackState(p));a.Update(0);skills.TryCastSlot(9);check(!(p.StateMachine.CurrentState is AttackState)&&skills.IsCasting,"animated skill closes previous normal attack");
+a.Update(0);skills.InterruptSkill();receiver.Hit();a.Update(0.6f);check(shots().Length==0&&!skills.IsCasting&&!anim.IsPlayingAnimation(),"interrupt before hit cancels emission and old animation timer");
+reset();skill.TriggerTiming=SkillTriggerTiming.OnCastStart;skills.TryCastSlot(9);a.Update(0);a.Update(0.6f);receiver.Hit();anim.StopAnimation();tick();check(shots().Length==1,"OnCastStart animation events cannot duplicate immediate effect");
+reset();skill.TriggerTiming=SkillTriggerTiming.OnAnimationEvent;data.AnimatorStateName="Base Layer.MoveTree";skills.TryCastSlot(9);a.Update(0);a.Update(0.6f);check(shots().Length==0,"no hit event means no early emission");anim.StopAnimation();tick();tick();check(shots().Length==1&&!skills.IsCasting,"missing-event fallback emits once and finishes");
+reset();data.AnimatorStateName="Base Layer.Attack_1";skill.CastTime=1;skills.TryCastSlot(9);receiver.Hit();check(!anim.IsPlayingAnimation()&&shots().Length==0,"casting delay does not play or release attack early");
+typeof(PlayerSkillController).GetField("_castTimer",flags).SetValue(skills,1f);tick();a.Update(0);a.Update(0.6f);check(shots().Length==1,"cast completes then real animation events emit once");
+reset();skill.CastTime=0;skill.CanBeInterrupted=false;skills.TryCastSlot(9);check(!skills.TryInterruptSkill()&&skills.IsCasting&&!p.CanAttack,"non-interruptible cast rejects voluntary cancel / normal attack");
+typeof(PlayerController).GetMethod("OnRollTriggered",flags).Invoke(p,null);typeof(PlayerController).GetMethod("OnJumpTriggered",flags).Invoke(p,null);check(skills.IsCasting&&!p.IsRolling&&!p.IsJumping,"non-interruptible cast blocks roll / jump");
+skills.InterruptSkill(true);check(!skills.IsCasting&&!anim.IsPlayingAnimation(),"forced interruption clears non-interruptible cast");
+reset();skill.CanBeInterrupted=true;skills.TryCastSlot(9);typeof(PlayerController).GetMethod("OnJumpTriggered",flags).Invoke(p,null);check(!skills.IsCasting&&p.IsJumping,"jump cancels interruptible cast");
+reset();skills.TryCastSlot(9);typeof(PlayerController).GetMethod("OnRollTriggered",flags).Invoke(p,null);check(!skills.IsCasting&&p.IsRolling,"roll cancels interruptible cast");
+reset();skill.Animation=null;skill.EnergyCost=5;skill.CooldownTime=3;float energy=stats.CurrentEnergy;bool first=skills.TryCastSlot(9),second=skills.TryCastSlot(9);check(first&&!second&&shots().Length==1&&UnityEngine.Mathf.Approximately(stats.CurrentEnergy,energy-5),"one energy charge / emission; cooldown rejects repeat");
+reset();skill.EnergyCost=stats.MaxEnergy+1;check(!skills.TryCastSlot(9)&&shots().Length==0,"insufficient energy rejects without effect");
+reset();skill.EnergyCost=0;input.SetGameplayInputBlocked(blocker,true);check(!skills.TryCastSlot(9)&&shots().Length==0,"blocked gameplay rejects skill");input.SetGameplayInputBlocked(blocker,false);
+sb.AppendLine("TOTAL passed="+passed+" failed="+failed);if(failed>0)throw new System.InvalidOperationException(sb.ToString());return sb.ToString();
+}finally{
+input.SetGameplayInputBlocked(blocker,false);skills.InterruptSkill(true);anim.StopAnimation();p.SetIsRolling(false);p.SetIsJumping(false);p.StateMachine.ChangeState(new IdleState(p));p.StanceController.SetStance(oldStance);a.Rebind();a.Play("Base Layer.MoveTree",0,0);a.Update(0);
+clearShots();dictionary.Remove("__DamageRegression");skills.EquipSkill(9,oldSkill);((float[])typeof(PlayerSkillController).GetField("_cooldownRemaining",flags).GetValue(skills))[9]=oldRemaining;((float[])typeof(PlayerSkillController).GetField("_cooldownDuration",flags).GetValue(skills))[9]=oldDuration;typeof(RPGSilent.Domain.PlayerStats).GetField("<CurrentEnergy>k__BackingField",flags).SetValue(stats,oldEnergy);stats.Refresh();
+foreach(var item in cleanup)if(item!=null)UnityEngine.Object.DestroyImmediate(item);UnityEngine.Time.timeScale=oldTime;
+}

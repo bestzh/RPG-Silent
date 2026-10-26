@@ -1,0 +1,41 @@
+COMPLETE 38 checks
+PASS three initial enemies, four total targets
+PASS melee detects and chases before attacking
+PASS melee natural attack deals one scaled hit
+PASS melee recovery does not hit repeatedly
+PASS player attack pipeline accepted 1 damage
+PASS ordinary hit interrupts unreleased attack
+PASS interrupted attack has no delayed hit
+PASS caster fires a traveling projectile that hits player
+PASS caster retreats when player closes distance
+PASS enemy projectile context cannot damage allies
+PASS per-instance damage snapshot leaves shared skill unchanged
+PASS reset invalidates released attack contexts
+PASS player attack pipeline accepted 9999 damage
+PASS player attack pipeline accepted 9999 damage
+PASS player attack pipeline accepted 9999 damage
+PASS wave one counts once and does not settle rewards
+PASS delayed wave spawns phase-one boss with 600 HP
+PASS boss wave preserves total progress
+PASS boss health UI appears
+PASS phase one excludes meteor
+PASS boss phase-one attack lands
+PASS player attack pipeline accepted 310 damage
+PASS half-health threshold triggers phase transition exactly once
+Meteor telegraph=(-39.79, 3.52, -13.43) observed player=(-35.31, 3.98, -17.43)
+PASS player attack pipeline accepted 1 damage
+PASS armored meteor resists ordinary stagger
+PASS locked meteor area can be dodged after telegraph
+PASS boss remains in phase two
+VISUAL CHECKPOINT: phase-two boss alive; set EC.continue=true to finish
+PASS player attack pipeline accepted 9999 damage
+PASS all four targets settle 130 gold / 275 XP exactly once
+PASS victory panel visible
+PASS duplicate death cannot duplicate reward
+PASS retry resets waves, phase and enemy count
+PASS retry revives player
+PASS player attack pipeline accepted 9999 damage
+PASS player death forfeits partial-run rewards
+PASS failure cancels remaining wave flow
+PASS return to town clears encounter UI/context and restores player
+PASS scene unload removes enemy projectiles

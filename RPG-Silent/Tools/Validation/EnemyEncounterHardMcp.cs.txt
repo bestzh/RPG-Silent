@@ -1,0 +1,49 @@
+// Run in Main after starting a fresh isolated-save Play Mode session.
+// Uses portal/result buttons and validates difficulty scaling plus saved HUD layout.
+var c=GameLifetimeScope.Instance.Container;
+var save=(ProgressSaveStore)c.Resolve(typeof(ProgressSaveStore));
+if(!save.PrimaryPath.StartsWith(System.IO.Path.GetFullPath("Temp")+System.IO.Path.DirectorySeparatorChar))throw new System.Exception("Isolated save required");
+var ui=(RPGSilent.Domain.IUIService)c.Resolve(typeof(RPGSilent.Domain.IUIService));
+var stats=(RPGSilent.Domain.PlayerStats)c.Resolve(typeof(RPGSilent.Domain.PlayerStats));
+var loader=(RPGSilent.Domain.ISceneLoader)c.Resolve(typeof(RPGSilent.Domain.ISceneLoader));
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+System.Func<SceneLifetimeScope> scope=()=>UnityEngine.Object.FindFirstObjectByType<SceneLifetimeScope>();
+System.Func<DungeonRunService> run=()=> (DungeonRunService)scope().Container.Resolve(typeof(DungeonRunService));
+var log=new System.Text.StringBuilder();int checks=0;
+System.Action<bool,string> check=(ok,s)=>{log.AppendLine((ok?"PASS ":"FAIL ")+s);if(!ok)throw new System.Exception(s);++checks;};
+var stages=new System.Collections.Generic.List<System.Func<bool>>();
+int gold=stats.Gold,exp=stats.Exp;EnemyController boss=null;
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading)return false;((RPGSilent.Domain.IPortalService)scope().Container.Resolve(typeof(RPGSilent.Domain.IPortalService))).OpenPortal(101);return true;});
+stages.Add(()=>{var v=UnityEngine.Object.FindFirstObjectByType<PortalUI>();if(v==null)return false;((TMPro.TMP_Dropdown)typeof(PortalUI).GetField("difficultyDropdown",flags).GetValue(v)).value=2;((UnityEngine.UI.Button)typeof(PortalUI).GetField("okButton",flags).GetValue(v)).onClick.Invoke();return true;});
+stages.Add(()=>{
+ if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Dungeon01"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI")||run().State!=DungeonRunState.Running)return false;
+ check(run().Difficulty==DungeonDifficulty.Hard,"actual portal selected Hard");
+ var enemies=UnityEngine.Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None);
+ check(enemies.Length==3 && System.Linq.Enumerable.All(enemies,e=>e.MaxHealth==(e.Definition.Behavior==EnemyBehaviorStyle.Melee?98:75) && Mathf.Approximately(e.DamageMultiplier,1.5f)),"hard initial health and per-instance damage multiplier");
+ check(System.Linq.Enumerable.All(enemies,e=>e.Definition.Health==(e.Definition.Behavior==EnemyBehaviorStyle.Melee?65:50)),"hard spawn leaves shared health definitions unchanged");
+ var encounter=UnityEngine.Object.FindFirstObjectByType<DungeonEncounter>();
+ var p=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+ var filter=new UnityEngine.AI.NavMeshQueryFilter{agentTypeID=1479372276,areaMask=UnityEngine.AI.NavMesh.AllAreas};UnityEngine.AI.NavMeshHit start;
+ check(UnityEngine.AI.NavMesh.SamplePosition(p.transform.position,out start,2f,filter),"player entry lies on dungeon navigation");
+ foreach(var wave in encounter.Waves)foreach(var spawn in wave.Enemies){var path=new UnityEngine.AI.NavMeshPath();check(UnityEngine.AI.NavMesh.CalculatePath(start.position,spawn.Point.position,filter,path)&&path.status==UnityEngine.AI.NavMeshPathStatus.PathComplete,"complete route to "+spawn.Point.name);}
+ foreach(var e in enemies)e.TakeDamage(99999);return true;
+});
+stages.Add(()=>{
+ boss=run().Boss;if(boss==null)return false;
+ check(boss.MaxHealth==900 && boss.RewardGold==150 && boss.RewardExp==300,"hard boss health and rewards");
+ var v=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();var b=(RectTransform)v.transform.Find("Boss Health");var o=(RectTransform)v.transform.Find("Objective");
+ var bc=new Vector3[4];var oc=new Vector3[4];b.GetWorldCorners(bc);o.GetWorldCorners(oc);
+ check(bc[1].y<oc[0].y && Mathf.Approximately(b.anchoredPosition.y,-174f),"saved boss bar stays below objective without overlap");
+ boss.TakeDamage(460);return true;
+});
+stages.Add(()=>{if(boss.Phase!=2||boss.State==EnemyState.PhaseTransition)return false;check(boss.CurrentHealth==440,"phase threshold scales with hard maximum health");boss.TakeDamage(99999);return true;});
+stages.Add(()=>{
+ if(!run().HasResult)return false;
+ check(run().Succeeded&&run().AwardedGold==195&&run().AwardedExp==414&&stats.Gold==gold+195&&stats.Exp==exp+414,"hard victory rewards include rounded per-enemy multipliers");
+ var v=UnityEngine.Object.FindFirstObjectByType<DungeonUI>();((UnityEngine.UI.Button)typeof(DungeonUI).GetField("returnButton",flags).GetValue(v)).onClick.Invoke();return true;
+});
+stages.Add(()=>{if(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name!="Main"||loader.IsLoading||ui.IsUIOpen("UI/LoadingUI"))return false;check(!DungeonLaunchContext.HasValue&&!ui.IsUIOpen(DungeonRunService.UiKey),"hard run returns cleanly to Main");return true;});
+int stage=0;double deadline=UnityEditor.EditorApplication.timeSinceStartup+30;
+UnityEditor.EditorApplication.CallbackFunction update=null;
+update=()=>{try{if(!UnityEditor.EditorApplication.isPlaying||UnityEditor.EditorApplication.timeSinceStartup>deadline)throw new System.Exception("Timeout or Play stopped at stage "+stage);if(!stages[stage]())return;++stage;deadline=UnityEditor.EditorApplication.timeSinceStartup+30;System.AppDomain.CurrentDomain.SetData("ECH.result","Running "+stage+"/"+stages.Count);if(stage==stages.Count){UnityEditor.EditorApplication.update-=update;System.AppDomain.CurrentDomain.SetData("ECH.result","COMPLETE "+checks+" checks\n"+log);}}catch(System.Exception e){UnityEditor.EditorApplication.update-=update;System.AppDomain.CurrentDomain.SetData("ECH.result","FAILED "+e+"\n"+log);}};
+UnityEditor.EditorApplication.update+=update;return "Started Hard validation";

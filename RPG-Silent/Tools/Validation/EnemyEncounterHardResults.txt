@@ -1,0 +1,14 @@
+COMPLETE 13 checks
+PASS actual portal selected Hard
+PASS hard initial health and per-instance damage multiplier
+PASS hard spawn leaves shared health definitions unchanged
+PASS player entry lies on dungeon navigation
+PASS complete route to Spawn_1
+PASS complete route to Spawn_2
+PASS complete route to Spawn_3
+PASS complete route to Spawn_4
+PASS hard boss health and rewards
+PASS saved boss bar stays below objective without overlap
+PASS phase threshold scales with hard maximum health
+PASS hard victory rewards include rounded per-enemy multipliers
+PASS hard run returns cleanly to Main
