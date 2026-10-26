@@ -24,12 +24,24 @@ chore(仓库): 完善资源忽略规则
 
 合并前通过 PR 查看改动和 `Git hygiene` 检查。重要里程碑在功能验收后创建版本标签。CI 不会修改 GitHub 分支保护或自动合并 PR；合并由仓库维护者按任务授权执行。
 
+`main` 的远端保护要求：必须通过 PR 合并，`Git hygiene` 成功且源分支包含最新 `main`，所有审阅讨论已解决。规则同样适用于管理员；禁止强制推送和删除 `main`。当前不强制另一位成员批准，个人维护者可以在检查通过后合并自己的 PR。允许 merge commit，以保留按功能拆分的提交。
+
 ## 本地检查
 
 需要 Git 和 Python 3.10 或更新版本，不需要额外 Python 包或 Unity 许可证。
 
+每个新克隆先安装一次本地提交钩子：
+
 ```powershell
-# 先显式暂存本次功能的文件，再检查实际即将提交的内容
+python RPG-Silent/Tools/Git/install_hooks.py
+```
+
+安装只修改当前仓库的 Git 本地配置，记录当前 Python 路径，并把 `core.hooksPath` 指向仓库内的 `RPG-Silent/Tools/Git/hooks`。此后普通 `git commit` 会自动检查实际暂存区，检查失败则中止提交。Python 被移动或卸载后也会中止提交，重新安装钩子即可更新解释器路径。钩子文件使用 LF，可在 Windows Git 和 Linux/macOS 上执行。
+
+安装器遇到已有的钩子目录配置或 `.git/hooks` 中的非示例文件会停止，避免停用已有工具；重复安装本工具安全。需要移除时运行 `python RPG-Silent/Tools/Git/install_hooks.py --uninstall`，仅移除本工具的本地配置。Git clone 不会自动安装钩子；远端 CI 与本地钩子独立执行，作为合并的必要检查。
+
+```powershell
+# 先显式暂存本次功能的文件；也可以在 commit 前手动提前检查
 git add -- <本次功能的文件或目录>
 python RPG-Silent/Tools/Git/check_repository.py --staged
 
@@ -55,7 +67,7 @@ python -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
 
 `.github/workflows/repository-checks.yml` 在推送到 `main`、PR 更新及手动触发时运行。PR 比较基线与源分支的共同祖先；手动运行可指定基线，留空检查最后一次提交。
 
-工作流只有仓库读取权限，固定 checkout Action 的完整提交哈希；采用稀疏检出及按需读取 blob，不为运行检查器检出全部美术资源。先运行检查器测试，再检查本次提交范围。没有自动部署、Unity 构建或写入仓库的步骤。
+工作流只有仓库读取权限，固定 checkout Action 的完整提交哈希；采用稀疏检出及按需读取 blob，不为运行检查器检出全部美术资源。先运行检查器和真实提交钩子测试，再检查本次提交范围。钩子测试使用临时 Git 仓库，覆盖实际暂存内容、缺失 `.meta`、已有钩子保护、重复安装与卸载、Python 不可用。没有自动部署、Unity 构建或写入仓库的步骤。
 
 ## 换行与 Unity 合并
 
