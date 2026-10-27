@@ -63,7 +63,7 @@ python -m unittest discover -s RPG-Silent/Tools/Git -p 'test_*.py' -v
 - 禁止提交 `output/`、工程缓存、生成的解决方案、七个根目录生成脚本，以及 Addressables 的 content state、自动 link.xml 和 StreamingAssets/aa 产物。
 - 检查新增或修改文件中的合并冲突标记；跳过二进制文件和 Markdown 的普通分隔线。
 - 检查本次改动涉及的 `Assets/` 资源、目录及 `.meta` 是否配对；资源删除时也需删除对应 `.meta`。允许 Unity 的空目录元数据，校验 `.meta` 的 GUID 格式，不对全仓库 GUID 唯一性作保证。
-- 普通文件上限为 50 MiB。`policy.json` 仅对尚未拆分的 Dungeon01 场景暂允至 75 MiB；三个大型二进制文件改为 LFS、两个示例场景裁剪后均已移除例外。达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
+- 普通文件上限为 50 MiB。三个大型二进制文件已改为 LFS，两个示例场景已裁剪，Dungeon01 已拆分为场景及两个环境预制体；`policy.json` 不再保留大文件例外。达到 100 MiB 一律失败。新例外应单独说明用途并经过审阅。
 
 这是增量仓库卫生检查，不替代 Unity 编译、运行测试、构建或完整历史审计。修改检查策略前须运行检查器测试。
 
@@ -100,9 +100,9 @@ git mergetool
 
 首次克隆后安装 Git LFS 和本仓库钩子，运行 `git lfs pull`，再打开 Unity。遇到缺失资源时先检查 `git lfs ls-files`、`git lfs status` 和 `git lfs fsck`，不要让 Unity 导入指针文本。暂不按扩展名把所有贴图、音频或场景整体转入 LFS。
 
-2026-10-26，以第一阶段合并提交 `fde403e06be0525e56c61b9cdfbe58a59a692f04` 为基线：当前树共 34,782 个文件，未压缩内容约 4,138.10 MiB；这不是克隆下载量。`git lfs ls-files` 为空。六个超过 50 MiB 的文件如下，路径相对于 `RPG-Silent/`：
+以下保留 2026-10-26 第一阶段合并提交 `fde403e06be0525e56c61b9cdfbe58a59a692f04` 的历史评估：当时树共 34,782 个文件，未压缩内容约 4,138.10 MiB；这不是克隆下载量。当时 `git lfs ls-files` 为空。六个超过 50 MiB 的文件如下，路径相对于 `RPG-Silent/`：
 
-| 文件 | 大小（MiB） | 当前证据与处理结论 |
+| 文件 | 大小（MiB） | 首次评估时的证据与结论 |
 | --- | ---: | --- |
 | `Assets/Scenes/Dungeon01.unity` | 66.97 | 项目副本场景，保留；场景拆分需要独立功能验证。 |
 | `Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo.unity` | 64.89 | 未出现在三个配置场景的依赖集合中，列为裁剪候选。 |
@@ -115,7 +115,7 @@ git mergetool
 
 `Packages/com.opsive.behaviordesigner/Samples~/` 有 1,293 个跟踪文件，合计 94.73 MiB。其 `package.json` 仍声明此样例入口；直接删除会让样例导入入口失效。裁剪应作为单独的供应商包变更，同时处理样例入口、导入功能及更新方式。
 
-本轮完成上述评估，未执行 LFS 迁移、远端历史重写、第三方样例删除或场景拆分。仅增加忽略规则、删除最新版本资源或从新提交开始使用 LFS，都不会消除已经存在的历史 blob。
+该次评估之后已完成三个文件的当前版本 LFS 转换、示例裁剪及场景拆分，详见 `ResourcePruning.md`、`DungeonSceneSplit.md` 和 `GitMaintenancePlan.md`。远端历史尚未重写；增加忽略规则、删除当前文件或仅从新提交开始使用 LFS，都不会消除旧历史中的完整 blob。
 
 如果后续决定迁移历史，应按以下步骤执行：
 
