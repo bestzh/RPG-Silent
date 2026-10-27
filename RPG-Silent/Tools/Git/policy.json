@@ -1,10 +1,5 @@
 {
   "max_file_mib": 50,
   "hard_limit_mib": 100,
-  "existing_large_files": {
-    "RPG-Silent/Assets/Scenes/Dungeon01.unity": {
-      "max_mib": 75,
-      "reason": "现有 66.97 MiB 副本场景，场景拆分在第二阶段评估。"
-    }
-  }
+  "existing_large_files": {}
 }
