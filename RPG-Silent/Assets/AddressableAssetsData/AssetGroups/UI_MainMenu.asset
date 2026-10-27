@@ -50,6 +50,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df31b31ca74b97541b0cc1644d034db1
+    m_Address: UI/TownNpcUI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 2d0dbc6babe9e9140b73e9ca57e15c3f, type: 2}
   m_SchemaSet:

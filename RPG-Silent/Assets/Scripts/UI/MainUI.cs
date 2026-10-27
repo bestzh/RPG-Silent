@@ -25,6 +25,15 @@ public class MainUI : UIBase
     public Slider          expBar;
     public TMP_Text        expProgressText;
     public TMP_Text        saveStatusText;
+    public TMP_Text npcPromptText;
+    public TMP_Text classNameText;
+    private PlayerNpcInteraction npcInteraction;
+
+    private void Update()
+    {
+        if (npcPromptText != null) npcPromptText.text = npcInteraction != null ? npcInteraction.Prompt : string.Empty;
+        if (classNameText != null) classNameText.text = _progress?.CurrentClass?.DisplayName ?? string.Empty;
+    }
 
     [Header("Skill Bar")]
     [Tooltip("可选：用于 HUD 显隐。在 Inspector 拖 SkillBar 节点。")]
@@ -84,6 +93,7 @@ public class MainUI : UIBase
             Debug.LogWarning("[MainUI] skillSlots 列表为空，请在 Inspector 拖入 10 个 SkillSlotUI。");
 
         _stats.Refresh();
+        npcInteraction = _session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerNpcInteraction>(true) : null;
         RefreshSaveStatus();
         if (weaponEquipment != null)
             weaponEquipment.Bind(_session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerWeaponEquipment>(true) : null);

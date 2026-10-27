@@ -57,6 +57,7 @@ public class ControllerPage : MonoBehaviour
     [SerializeField] private Button rollKeyButton;
     [SerializeField] private Button jumpKeyButton;
     [SerializeField] private Button walkKeyButton;
+    [SerializeField] private Button interactKeyButton;
 
     [Header("确认 / 重置按钮")]
     [SerializeField] private Button okButton;
@@ -186,6 +187,7 @@ public class ControllerPage : MonoBehaviour
         BindRebindButton(rollKeyButton,   _playerInputActions.Roll,         0);
         BindRebindButton(jumpKeyButton,   _playerInputActions.Jump,         0);
         BindRebindButton(walkKeyButton,   _playerInputActions.Walk,         0);
+        BindRebindButton(interactKeyButton, _playerInputActions.Interact, 0);
     }
 
     private void BindRebindButton(Button button, InputAction action, int bindingIndex)
@@ -236,7 +238,7 @@ public class ControllerPage : MonoBehaviour
     {
         Button[] all = {
             forwardKeyButton, backwardKeyButton, toLeftKeyButton, toRightKeyButton,
-            attackKeyButton, sprintKeyButton, rollKeyButton, jumpKeyButton, walkKeyButton
+            attackKeyButton, sprintKeyButton, rollKeyButton, jumpKeyButton, walkKeyButton, interactKeyButton
         };
         foreach (var b in all)
             if (b != null) b.interactable = interactable;
@@ -257,6 +259,7 @@ public class ControllerPage : MonoBehaviour
         RefreshKeyLabel(rollKeyButton,     _playerInputActions.Roll,   0);
         RefreshKeyLabel(jumpKeyButton,     _playerInputActions.Jump,   0);
         RefreshKeyLabel(walkKeyButton,     _playerInputActions.Walk,   0);
+        RefreshKeyLabel(interactKeyButton, _playerInputActions.Interact, 0);
     }
 
     private void RefreshKeyLabel(Button button, InputAction action, int bindingIndex)

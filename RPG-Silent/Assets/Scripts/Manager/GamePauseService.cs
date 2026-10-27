@@ -111,6 +111,7 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     private void OnPauseTriggered()
     {
+        if (_uiService.IsUIOpen("UI/TownNpcUI")) { _uiService.CloseUI("UI/TownNpcUI"); return; }
         if (_dungeonRun.HasResult) return;
         if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_uiService.IsUIOpen(SettingsUiKey))
