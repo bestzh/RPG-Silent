@@ -56,8 +56,10 @@ public static class EnemyBehaviorTreeAuthoring
         if (existing != null) return existing;
 
         var combat = new List<Branch>();
+        if (isBoss) combat.Add(Action(new TryEnemyAttackSequence(), "第二阶段：连斩与终结重击"));
         if (retreats) combat.Add(new Branch(new Sequence(), "拉开距离",
             Condition(new ShouldEnemyRetreat(), "玩家太近？"), Action(new RetreatFromEnemyTarget(), "撤退 / 寻找侧后方路径")));
+        if (!isBoss) combat.Add(Action(new CoordinateEnemyPosition(), "小队：包围站位 / 寻找射击空隙"));
         combat.Add(Action(new TryEnemyAttack(), "按射程、冷却与阶段选招"));
         combat.Add(Action(new ApproachEnemyTarget(), "追击 / 保持攻击距离"));
         var priorities = new List<Branch>

@@ -187,7 +187,7 @@ public class StanceOverrideAutoFiller : EditorWindow
     // 返回纯动作名（"Walk-Forward"）。
     private static readonly string[] KnownStancePrefixes = new[]
     {
-        "Relax-", "Unarmed-", "Armed-", "Armed-Shield-",
+        "Relax-", "Unarmed-", "Armed-Shield-", "Armed-",
         "1Hand-Dagger-", "1Hand-Item-", "1Hand-Mace-", "1Hand-Pistol-", "1Hand-Spear-", "1Hand-Sword-",
         "2Hand-Axe-", "2Hand-Bow-", "2Hand-Crossbow-", "2Hand-Shooting-", "2Hand-Spear-", "2Hand-Staff-", "2Hand-Sword-",
         "Climb-Ladder-", "Climb-Ledge-", "Crawl-", "Swimming-",
@@ -213,6 +213,15 @@ public class StanceOverrideAutoFiller : EditorWindow
         if (exact != null) return exact;
 
         if (!fuzzyMatch) return null;
+
+        // Combat locomotion uses upright strafing, never crouch-walk as a fuzzy
+        // substitute for ordinary walking. One-hand weapons share Armed clips.
+        if (action.StartsWith("Walk-", System.StringComparison.OrdinalIgnoreCase))
+        {
+            string strafe = stancePrefix + "Strafe-" + action.Substring("Walk-".Length);
+            return candidates.FirstOrDefault(c => string.Equals(c.name, strafe,
+                System.StringComparison.OrdinalIgnoreCase));
+        }
 
         // 2) 模糊：以 -<action> 结尾（任何子姿态）
         var endsWith = candidates

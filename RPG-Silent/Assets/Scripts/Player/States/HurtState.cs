@@ -18,7 +18,9 @@ public class HurtState : PlayerState
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
-            player.StateMachine.ChangeState(new IdleState(player));
+            player.ReturnToLocomotion();
         }
     }
+
+    public override void FixedUpdate() => player.Motor.Move(Vector3.zero, Time.fixedDeltaTime);
 }

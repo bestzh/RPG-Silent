@@ -21,7 +21,7 @@ namespace RPGSilent.Enemies.BehaviorDesigner
     }
 
     [Category("RPG Silent/Enemies")]
-    [Description("等待 0.15 秒决策节拍；攻击、硬直、转阶段期间等待动作完成。每轮只发出一个命令。")]
+    [Description("等待 0.15 秒决策节拍；攻击、硬直、恢复、转阶段期间等待动作完成。每轮只发出一个命令。")]
     public sealed class WaitForEnemyDecision : EnemyAction
     {
         public override TaskStatus OnUpdate() => Enemy != null && Enemy.TryBeginDecision() ? TaskStatus.Success : TaskStatus.Running;
@@ -61,7 +61,7 @@ namespace RPGSilent.Enemies.BehaviorDesigner
     }
 
     [Category("RPG Silent/Enemies")]
-    [Description("按射程、冷却、Boss 阶段和权重选招。成功表示技能已启动；节拍节点等待整个动作结束。")]
+    [Description("按射程、冷却、阶段和权重选招；小队敌人申请共享攻击名额。成功后等待动作及恢复结束。")]
     public sealed class TryEnemyAttack : EnemyAction
     {
         public override TaskStatus OnUpdate() => Enemy != null && Enemy.CanDecide ? Command(Enemy.DecideAttack()) : TaskStatus.Failure;
@@ -71,6 +71,13 @@ namespace RPGSilent.Enemies.BehaviorDesigner
     public sealed class ApproachEnemyTarget : EnemyAction
     {
         public override TaskStatus OnUpdate() => Enemy != null && Enemy.CanDecide ? Command(Enemy.DecideApproach()) : TaskStatus.Failure;
+    }
+
+    [Category("RPG Silent/Enemies")]
+    [Description("近战寻找独立包围站位；远程在队友挡住射线时侧移。没有可达站位则继续原追击分支。")]
+    public sealed class CoordinateEnemyPosition : EnemyAction
+    {
+        public override TaskStatus OnUpdate() => Enemy != null && Enemy.CanDecide ? Command(Enemy.DecideGroupPosition()) : TaskStatus.Failure;
     }
 
     [Category("RPG Silent/Enemies")]
@@ -84,5 +91,12 @@ namespace RPGSilent.Enemies.BehaviorDesigner
     public sealed class TryBossPhaseTransition : EnemyAction
     {
         public override TaskStatus OnUpdate() => Enemy != null && Enemy.TryChangeBossPhase() ? TaskStatus.Success : TaskStatus.Failure;
+    }
+
+    [Category("RPG Silent/Enemies")]
+    [Description("按阶段与独立冷却启动配置的连招；每段重新检查距离，结束后进入可反击的恢复窗口。")]
+    public sealed class TryEnemyAttackSequence : EnemyAction
+    {
+        public override TaskStatus OnUpdate() => Enemy != null && Enemy.TryBeginSequence() ? TaskStatus.Success : TaskStatus.Failure;
     }
 }

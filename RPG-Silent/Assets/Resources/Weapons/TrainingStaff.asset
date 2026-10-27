@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef1bbb05581cd64a9ac9c10648948d9, type: 3}
+  m_Name: TrainingStaff
+  m_EditorClassIdentifier: 
+  PersistentId: training-staff
+  DisplayName: "\u8BAD\u7EC3\u6CD5\u6756"
+  Stance: 45
+  ComboProfiles:
+  - {fileID: 11400000, guid: f43c9b1dde88c3e4684536d131988d66, type: 2}
+  ModelPrefab: {fileID: 1367188017501208, guid: 7618bf1eceed7fd4786bae1d1976ef37, type: 3}
+  HandBone: 18
+  HandPosition: {x: 0, y: 0, z: 0}
+  HandRotation: {x: 0, y: 0, z: 90}
+  ModelScale: {x: 1, y: 1, z: 1}
+  SheathBone: 8
+  SheathPosition: {x: -0.00386, y: -0.29993, z: -0.14798}
+  SheathRotation: {x: 77.595, y: 312.281, z: 230.688}
+  DrawFromRelax: {fileID: 7400000, guid: 487e3ff7d49855749b63ca4166bfccef, type: 3}
+  DrawFromUnarmed: {fileID: 7400000, guid: 64b826e2cfd53fe44925f54f3af986ae, type: 3}
+  SheathToRelax: {fileID: 7400000, guid: 3694d4624243fe24b8d6abd1fe714c15, type: 3}
+  SheathToUnarmed: {fileID: 7400000, guid: 7dc4b6c333abbab4390b26e7a4f01493, type: 3}

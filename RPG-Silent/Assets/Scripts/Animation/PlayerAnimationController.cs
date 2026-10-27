@@ -56,7 +56,7 @@ public class PlayerAnimationController : MonoBehaviour
         }
     }
 
-    public bool PlayAnimation(string name)
+    public bool PlayAnimation(string name, float durationOverride = -1f)
     {
         if (!animationDict.TryGetValue(name, out var anim))
         {
@@ -74,9 +74,9 @@ public class PlayerAnimationController : MonoBehaviour
             return false;
         }
 
-        animator.Play(anim.AnimatorStateName);
+        animator.CrossFadeInFixedTime(anim.AnimatorStateName, 0.06f);
         currentAnimation = anim;
-        currentDuration = anim.Duration;
+        currentDuration = durationOverride > 0f ? durationOverride : anim.Duration;
         currentTimer = 0f;
         isPlaying = true;
         return true;
@@ -84,15 +84,20 @@ public class PlayerAnimationController : MonoBehaviour
 
     private void EndCurrentAnimation()
     {
+        CancelAnimation();
+        ReturnToMoveTree();
+    }
+
+    public void CancelAnimation()
+    {
         isPlaying = false;
         currentAnimation = null;
         currentDuration = 0f;
         currentTimer = 0f;
-        ReturnToMoveTree();
     }
     public void ReturnToMoveTree()
     {
-        animator.Play("MoveTree");
+        animator.CrossFadeInFixedTime("MoveTree", 0.08f);
     }
 
     public void StopAnimation() => EndCurrentAnimation();

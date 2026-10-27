@@ -10,6 +10,8 @@ public sealed class DungeonEncounter : MonoBehaviour
     [Serializable] public sealed class Wave { public string Name; public Spawn[] Enemies; }
     public Wave[] Waves;
     public float WaveDelay = 2.5f;
+    public EnemyGroupSettings GroupCombat = new();
+    public EnemyCombatGroup CombatGroup { get; private set; }
     private readonly HashSet<EnemyController> alive = new();
     private bool running;
     private int waveIndex = -1;
@@ -42,11 +44,14 @@ public sealed class DungeonEncounter : MonoBehaviour
     {
         if (!running) return;
         ++waveIndex;
+        CombatGroup?.Stop();
+        CombatGroup = new EnemyCombatGroup(GroupCombat ?? new EnemyGroupSettings());
         var wave = Waves[waveIndex];
         Objective = $"第 {waveIndex + 1}/{Waves.Length} 波 · {wave.Name}";
         foreach (var spawn in wave.Enemies)
         {
             var enemy = Instantiate(spawn.Prefab, spawn.Point.position, spawn.Point.rotation, transform);
+            if (!enemy.IsBoss) enemy.BindCombatGroup(CombatGroup);
             alive.Add(enemy);
             enemy.Died += OnEnemyDied;
             Spawned?.Invoke(enemy);
@@ -87,6 +92,7 @@ public sealed class DungeonEncounter : MonoBehaviour
     {
         running = false;
         StopAllCoroutines();
+        CombatGroup?.Stop();
         foreach (var enemy in alive) if (enemy != null) enemy.Died -= OnEnemyDied;
         alive.Clear();
     }

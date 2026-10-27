@@ -34,6 +34,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public event Action AttackTriggered;
     public event Action StanceToggleTriggered;
     public event Action PauseTriggered;
+    public event Action InteractTriggered;
     public event Action CursorToggleTriggered;
     public event Action<int> SkillSlotTriggered;
 
@@ -48,6 +49,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     private InputAction CursorToggle { get; set; }
     public InputAction StanceToggle { get; private set; }
     public InputAction Pause        { get; private set; }
+    public InputAction Interact     { get; private set; }
     public InputAction[] SkillSlots { get; private set; }
 
     // 与项目旧 Mouse X/Y 轴的 sensitivity=0.1 对齐，保留现有灵敏度设置量级。
@@ -279,6 +281,8 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         // 姿态切换
         StanceToggle = _map.AddAction("StanceToggle", InputActionType.Button);
         StanceToggle.AddBinding("<Keyboard>/tab");
+        Interact = _map.AddAction("Interact", InputActionType.Button);
+        Interact.AddBinding("<Keyboard>/e");
 
         // 技能槽 0..9 → 键盘 1..9,0
         SkillSlots = new InputAction[10];
@@ -319,6 +323,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         Attack.performed      += OnAttackPerformed;
         CursorToggle.performed += OnCursorTogglePerformed;
         StanceToggle.performed += OnStanceTogglePerformed;
+        Interact.performed += OnInteractPerformed;
 
         if (SkillSlots != null)
         {
@@ -342,6 +347,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         if (Attack       != null)   Attack.performed       -= OnAttackPerformed;
         if (CursorToggle != null)   CursorToggle.performed -= OnCursorTogglePerformed;
         if (StanceToggle != null)   StanceToggle.performed -= OnStanceTogglePerformed;
+        if (Interact != null) Interact.performed -= OnInteractPerformed;
 
         // SkillSlots 在 RebuildMap 时整表 Dispose，旧回调随 Action 一起丢弃
     }
@@ -367,6 +373,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     private void OnStanceTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(StanceToggleTriggered);
     private void OnCursorTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(CursorToggleTriggered);
     private void OnPausePerformed(InputAction.CallbackContext _)       => PauseTriggered?.Invoke();
+    private void OnInteractPerformed(InputAction.CallbackContext _) => RaiseGameplayAction(InteractTriggered);
 
     public string GetSkillSlotDisplay(int slotIndex)
     {

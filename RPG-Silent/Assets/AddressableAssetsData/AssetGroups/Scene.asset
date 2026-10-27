@@ -20,6 +20,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75e3436367da18d4b9cb054b5d356412
+    m_Address: Scenes/Dungeon02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c0d88f7a4a8e18b40ae584043bc602fc
     m_Address: Scenes/Main
     m_ReadOnly: 0

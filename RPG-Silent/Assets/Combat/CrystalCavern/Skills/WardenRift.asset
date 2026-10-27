@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d1670afed44cb45a957f6978721b73, type: 3}
+  m_Name: WardenRift
+  m_EditorClassIdentifier: 
+  DisplayName: "\u788E\u6676\u9886\u57DF"
+  Attack: {fileID: 11400000, guid: b3e6f302fe0b5be4794cf5be3134d2eb, type: 2}
+  AnimationState: Rift
+  Duration: 2.4
+  ReleaseTime: 0.65
+  Cooldown: 10
+  RecoveryDuration: 0.35
+  MinRange: 0
+  MaxRange: 18
+  RequiredPhase: 2
+  Weight: 2
+  SuperArmor: 1
+  AimAtTargetGround: 1
+  WindupEffect: {fileID: 0}
+  ReleaseEffect: {fileID: 0}
+  TelegraphMaterial: {fileID: 2100000, guid: f0a1ebbcc5a8b3448a100a187f5ac845, type: 2}
+  TelegraphColor: {r: 0.25, g: 0.8, b: 1, a: 0.9}

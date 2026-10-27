@@ -33,6 +33,8 @@ public class AttackState : PlayerState
         PlayCurrentAttack();
     }
 
+    public override void FixedUpdate() => player.Motor.Move(Vector3.zero, Time.fixedDeltaTime);
+
     /// <summary>首段与续段均由同一个 Attack InputAction 转发；下一次状态更新消费一次。</summary>
     public void RequestCombo() => comboRequested = true;
 

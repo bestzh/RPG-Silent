@@ -19,6 +19,7 @@ namespace RPGSilent.Domain
         InputAction Look         { get; }
         InputAction StanceToggle { get; }
         InputAction Pause        { get; }
+        InputAction Interact     { get; }
 
         // ── 离散动作事件（PlayerController 订阅）────────────────────────────────
         event Action SprintStarted;
@@ -30,6 +31,7 @@ namespace RPGSilent.Domain
         event Action AttackTriggered;
         event Action StanceToggleTriggered;
         event Action PauseTriggered;
+        event Action InteractTriggered;
         event Action CursorToggleTriggered;
 
         /// <summary>技能槽触发，参数为槽位索引 0..9（对应按键 1..9,0）。</summary>

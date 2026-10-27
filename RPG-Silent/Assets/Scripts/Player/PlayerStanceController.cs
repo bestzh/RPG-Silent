@@ -26,14 +26,17 @@ public class PlayerStanceController : MonoBehaviour
     private readonly Dictionary<PlayerStance, AnimatorOverrideController> overrideMap = new Dictionary<PlayerStance, AnimatorOverrideController>();
 
     public PlayerStance CurrentStance { get; private set; }
+    // CurrentStance is the persistent selection; scene rules only change presentation.
+    public PlayerStance EffectiveStance => combatAllowed ? CurrentStance : PlayerStance.Relax;
+    private bool combatAllowed = true;
 
     public event Action<PlayerStance, PlayerStance> OnStanceChanged;
 
-    public int MaxCombo => stanceDatabase != null ? stanceDatabase.GetMaxCombo(CurrentStance) : 1;
-    public bool CanRoll => stanceDatabase == null || stanceDatabase.CanRoll(CurrentStance);
-    public bool CanJump => stanceDatabase == null || stanceDatabase.CanJump(CurrentStance);
-    public int MaxJumpCount => stanceDatabase != null ? stanceDatabase.GetMaxJumpCount(CurrentStance) : 1;
-    public bool CanSprint => stanceDatabase == null || stanceDatabase.CanSprint(CurrentStance);
+    public int MaxCombo => !combatAllowed ? 0 : stanceDatabase != null ? stanceDatabase.GetMaxCombo(EffectiveStance) : 1;
+    public bool CanRoll => stanceDatabase == null || stanceDatabase.CanRoll(EffectiveStance);
+    public bool CanJump => stanceDatabase == null || stanceDatabase.CanJump(EffectiveStance);
+    public int MaxJumpCount => stanceDatabase != null ? stanceDatabase.GetMaxJumpCount(EffectiveStance) : 1;
+    public bool CanSprint => stanceDatabase == null || stanceDatabase.CanSprint(EffectiveStance);
 
     private void Awake()
     {
@@ -54,6 +57,10 @@ public class PlayerStanceController : MonoBehaviour
     }
 
     public void SetStance(PlayerStance stance, bool force = false)
+        => SetStancePresentation(stance, force, true);
+
+    // Equipment actions can commit gameplay data before the visible animation finishes.
+    public void SetStancePresentation(PlayerStance stance, bool force, bool applyAnimator)
     {
         if (!force && stance == CurrentStance)
         {
@@ -62,6 +69,24 @@ public class PlayerStanceController : MonoBehaviour
 
         PlayerStance previous = CurrentStance;
         CurrentStance = stance;
+
+        if (applyAnimator) ApplyAnimator();
+        OnStanceChanged?.Invoke(previous, stance);
+    }
+
+    public void SetCombatAllowed(bool allowed)
+        => SetCombatPolicy(allowed, true);
+
+    public void SetCombatPolicy(bool allowed, bool applyAnimator)
+    {
+        if (combatAllowed == allowed) return;
+        combatAllowed = allowed;
+        if (applyAnimator) ApplyAnimator();
+    }
+
+    private void ApplyAnimator()
+    {
+        PlayerStance stance = EffectiveStance;
 
         bool isConfigured;
         AnimatorOverrideController overrideController = ResolveOverride(stance, out isConfigured);
@@ -81,7 +106,6 @@ public class PlayerStanceController : MonoBehaviour
             }
         }
 
-        OnStanceChanged?.Invoke(previous, stance);
     }
 
     // 切到下一个姿态：
@@ -89,6 +113,7 @@ public class PlayerStanceController : MonoBehaviour
     // 2. 没配数据库则回落到 Relax → Unarmed → Armed → Relax 的硬编码循环
     public void ToggleStance()
     {
+        if (!combatAllowed) return;
         PlayerStance next;
 
         if (stanceDatabase != null)

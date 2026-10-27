@@ -27,9 +27,13 @@ public sealed class PlayerSessionService
     }
 
     public void BeginNewGame()
+        => BeginNewGameAs("swordsman");
+
+    public void BeginNewGameAs(string classId) => BeginNewCharacter(classId, PlayerGender.Male);
+    public void BeginNewCharacter(string classId, PlayerGender gender)
     {
         EndSession();
-        _progress.BeginNewGame();
+        _progress.BeginNewCharacter(classId, gender);
         IsActive = true;
         _input.SetGameplayInputEnabled(true);
         _cursor.EnterGameplayCursor();
@@ -59,6 +63,7 @@ public sealed class PlayerSessionService
     {
         _progress.Detach();
         _ui.CloseUI("UI/MainUI");
+        _ui.CloseUI("UI/TownNpcUI");
         _ui.CloseUI("UI/PortalUI");
         _ui.CloseUI("UI/PauseUI");
         _ui.CloseUI("UI/SettingsUI");

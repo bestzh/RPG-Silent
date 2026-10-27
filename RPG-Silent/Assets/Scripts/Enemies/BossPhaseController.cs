@@ -15,14 +15,19 @@ public sealed class BossPhaseController : MonoBehaviour
         if (Phase != 1 || healthFraction > SecondPhaseThreshold) return false;
         Phase = 2;
         EnemySkillRunner.SpawnEffect(TransitionEffect, transform.position, Quaternion.identity, 4f);
-        if (EnrageAura != null)
+        RestoreEffects();
+        return true;
+    }
+
+    public void RestoreEffects()
+    {
+        if (Phase == 2 && EnrageAura != null && aura == null)
         {
             aura = Instantiate(EnrageAura, transform);
             aura.transform.localPosition = Vector3.zero;
         }
-        return true;
     }
 
-    public void ClearEffects() { if (aura != null) Destroy(aura); }
+    public void ClearEffects() { if (aura != null) Destroy(aura); aura = null; }
     private void OnDisable() => ClearEffects();
 }

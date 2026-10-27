@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c011a6a7abd0f9d4bb448bb853cd8bb2, type: 3}
+  m_Name: shaman-2
+  m_EditorClassIdentifier: 
+  persistentId: 3bd24c374271967409a27b9e1d9cbb9c
+  SkillName: "\u5927\u5730\u9707\u51FB"
+  RequiredLevel: 12
+  LearnCost: 230
+  UpgradeCost: 80
+  MaxRank: 5
+  LevelsPerRank: 2
+  DamagePerRank: 0.2
+  Icon: {fileID: 21300000, guid: 2b6c59ad1eb582247ab26d7153a798e9, type: 3}
+  Animation: {fileID: 0}
+  CastTime: 0
+  CooldownTime: 6
+  EnergyCost: 23
+  CanBeInterrupted: 1
+  AttackProfile: {fileID: 11400000, guid: d72151adca232cd458c3c9260bdd7e9b, type: 2}
+  TriggerTiming: 1
+  EffectPrefab: {fileID: 299294641580072937, guid: 3dd50886582244645be87adb42aa8528, type: 3}
+  EffectOffset: {x: 0, y: 0, z: 2}
+  HitEffectPrefab: {fileID: 0}
+  HitEffectOffset: {x: 0, y: 0, z: 0}
+  HasChainEffect: 0
+  ChainCount: 3
+  ChainRadius: 5
+  ChainEffectPrefab: {fileID: 0}
+  CanCombo: 0
+  NextComboSkill: {fileID: 0}
+  ComboInputWindow: 0.5

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd2226f033f2e64d97f81e51a69fc64, type: 3}
+  m_Name: CrystalWarden
+  m_EditorClassIdentifier: 
+  DisplayName: "\u6676\u6838\u5B88\u671B\u8005 \xB7 \u745F\u83B1\u6069"
+  Behavior: 2
+  Health: 900
+  MoveSpeed: 2.5
+  DetectionDistance: 22
+  LeashDistance: 32
+  PreferredDistance: 3.5
+  RetreatDistance: 0
+  AttackFacingAngle: 25
+  ApproachHysteresis: 0.5
+  RecoveryDamageMultiplier: 1.3
+  RewardGold: 160
+  RewardExp: 360
+  StaggerThreshold: 90
+  Skills:
+  - {fileID: 11400000, guid: 19e873a321e93f944b654dfa884104dc, type: 2}
+  - {fileID: 11400000, guid: 9b574e4bf755736479de8e278e9a1edf, type: 2}
+  - {fileID: 11400000, guid: 0ff061b9a19837e4ba267ab4d819c86a, type: 2}
+  - {fileID: 11400000, guid: 7867cb79d6fe45e41b3494b6bb73f873, type: 2}
+  AttackSequences:
+  - {fileID: 11400000, guid: ab188f03fa4f31847b9aae5d9abac20b, type: 2}
+  HitEffect: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
+  DeathEffect: {fileID: 5610560069491694539, guid: 0def5d88622eaa74681191f2c29a1126, type: 3}

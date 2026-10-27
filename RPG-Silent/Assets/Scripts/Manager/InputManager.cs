@@ -28,6 +28,6 @@ public class InputManager : MonoBehaviour, IInputService
 
     private void Update()
     {
-        MoveInput = (_playerInputActions?.MoveInput ?? Vector2.zero).normalized;
+        MoveInput = Vector2.ClampMagnitude(_playerInputActions?.MoveInput ?? Vector2.zero, 1f);
     }
 }

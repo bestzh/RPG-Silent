@@ -1,4 +1,5 @@
 using RPGSilent.Domain;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ public class StartUI : UIBase
     [Inject] private PlayerSessionService _playerSession;
     [Inject] private PlayerProgressService _progress;
     private bool _starting;
+    private CharacterCreationView classSelection;
 
     public Button StartButton;
     public Button ContinueButton;
@@ -64,7 +66,18 @@ public class StartUI : UIBase
     {
         if (_starting) return;
         NewGameConfirmation.SetActive(false);
-        _playerSession.BeginNewGame();
+        if (classSelection != null) { classSelection.gameObject.SetActive(true); return; }
+        var overlay = ProgressionUIWidgets.Panel(transform, "ClassSelection", new Color(.025f, .04f, .055f, 1));
+        classSelection = overlay.gameObject.AddComponent<CharacterCreationView>();
+        classSelection.Initialize(_progress.Classes, SaveStatusText.font, SelectCharacter,
+            () => classSelection.gameObject.SetActive(false));
+    }
+
+    public void SelectClass(string classId) => SelectCharacter(classId, PlayerGender.Male);
+    public void SelectCharacter(string classId, PlayerGender gender)
+    {
+        if (_starting || !_progress.Classes.Any(c => c.Id == classId && !c.IsAdvanced)) return;
+        _playerSession.BeginNewCharacter(classId, gender);
         LoadMain();
     }
 
@@ -87,6 +100,7 @@ public class StartUI : UIBase
     {
         base.OnOpen(args);
         _starting = false;
+        if (classSelection != null) classSelection.gameObject.SetActive(false);
         NewGameConfirmation.SetActive(false);
         RefreshSaveState();
         Debug.Log("[StartUI] 已打开。");
@@ -94,6 +108,7 @@ public class StartUI : UIBase
 
     public override void OnClose()
     {
+        if (classSelection != null) classSelection.gameObject.SetActive(false);
         base.OnClose();
         Debug.Log("[StartUI] 已关闭。");
     }

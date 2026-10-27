@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd2226f033f2e64d97f81e51a69fc64, type: 3}
+  m_Name: CrystalSeer
+  m_EditorClassIdentifier: 
+  DisplayName: "\u6676\u5492\u796D\u53F8"
+  Behavior: 1
+  Health: 70
+  MoveSpeed: 3
+  DetectionDistance: 15
+  LeashDistance: 28
+  PreferredDistance: 9
+  RetreatDistance: 4.5
+  AttackFacingAngle: 25
+  ApproachHysteresis: 0.5
+  RecoveryDamageMultiplier: 1
+  RewardGold: 22
+  RewardExp: 55
+  StaggerThreshold: 0
+  Skills:
+  - {fileID: 11400000, guid: 877c11a9a5fb3e648b235300b6b7e62e, type: 2}
+  AttackSequences: []
+  HitEffect: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
+  DeathEffect: {fileID: 5610560069491694539, guid: 0def5d88622eaa74681191f2c29a1126, type: 3}
