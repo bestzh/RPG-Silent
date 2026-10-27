@@ -21,6 +21,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
     [Inject] private PlayerStats         _stats;
     [Inject] private IPlayerInputActions _input;
     [Inject] private PlayerSkillAccess   _skillAccess;
+    [Inject] private PlayerProgressService _progress;
 
     private PlayerController          _player;
     private PlayerAnimationController _animationController;
@@ -130,6 +131,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
     public void EquipSkill(int slotIndex, SkillData skill)
     {
         if (!IsValidSlot(slotIndex)) return;
+        if (skill != null && _progress != null && _progress.GetSkillRank(skill) == 0) return;
         equippedSkills[slotIndex] = skill;
         _cooldownRemaining[slotIndex] = 0f;
         _cooldownDuration[slotIndex]  = 0f;
@@ -146,6 +148,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
 
         SkillData skill = equippedSkills[slotIndex];
         if (skill == null) return false;
+        if (_progress != null && _progress.GetSkillRank(skill) == 0) return false;
         if (_cooldownRemaining[slotIndex] > 0f) return false;
         if (_stats == null || !_stats.TrySpendEnergy(skill.EnergyCost)) return false;
 
@@ -231,7 +234,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
 
         StartCooldown(slotIndex, skill.CooldownTime);
 
-        _attackContext = _attackExecutor?.CreateAttack(skill.AttackProfile);
+        _attackContext = _attackExecutor?.CreateScaledAttack(skill.AttackProfile, _progress?.SkillDamageMultiplier(skill) ?? 1f);
 
         SpawnCastEffect(skill);
 

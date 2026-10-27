@@ -12,6 +12,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public PlayerStance Stance = PlayerStance.OneHandSword;
     public AttackProfile[] ComboProfiles;
     public GameObject ModelPrefab;
+    public HumanBodyBones HandBone = HumanBodyBones.RightHand;
     public Vector3 HandPosition;
     public Vector3 HandRotation;
     public Vector3 ModelScale = Vector3.one;

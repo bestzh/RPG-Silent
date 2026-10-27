@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: berserker
+  m_EditorClassIdentifier: 
+  Id: berserker
+  DisplayName: "\u72C2\u6218\u58EB"
+  Description: "\u4EE5\u91CD\u51FB\u548C\u6218\u543C\u538B\u5236\u654C\u4EBA\uFF0C\u4F24\u5BB3\u63D0\u9AD8
+    10%\u3002"
+  BaseClass: {fileID: 11400000, guid: d4c43b7cc705c1046952112f49405b04, type: 2}
+  ModelPrefab: {fileID: 1462432058118554, guid: dc6170fded71bf944b115160ab2cae64, type: 3}
+  MaleModelPrefab: {fileID: 1217388468843375474, guid: 76f7426b23e6e0b40ae0f0f3bcc9755c, type: 3}
+  FemaleModelPrefab: {fileID: 7128590512451728831, guid: 2cd606630d7a8a946b98685f050f8747, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: 5c0b1be3522a16f4c8519b02a90a980d, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: 654c1a9dfbfc2de4180d69b22d18fe4e, type: 2}
+  - {fileID: 11400000, guid: 147d4661533e6f04a956e0f5279b4a40, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300

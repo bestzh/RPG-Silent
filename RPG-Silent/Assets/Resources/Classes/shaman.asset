@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: shaman
+  m_EditorClassIdentifier: 
+  Id: shaman
+  DisplayName: "\u8428\u6EE1"
+  Description: "\u9A7E\u9A6D\u96F7\u9706\u4E0E\u5927\u5730\u6CD5\u672F\uFF0C\u4F24\u5BB3\u63D0\u9AD8
+    10%\u3002"
+  BaseClass: {fileID: 11400000, guid: 78df8540891975e4e9dafec75d6cd234, type: 2}
+  ModelPrefab: {fileID: 1111599145953978, guid: f30534c3df593c848ab209d140941eb4, type: 3}
+  MaleModelPrefab: {fileID: 3923610439250812040, guid: 2891b48eb6ebbf9488aaf25c9c31c511, type: 3}
+  FemaleModelPrefab: {fileID: 2212720583520826137, guid: 7c806670fe6252e46b79dc26fef58bf5, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: b320c1eda692a2649b10f2d8dbb19bb1, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: d310254c50f587345865d7a70d5fb181, type: 2}
+  - {fileID: 11400000, guid: 3bd24c374271967409a27b9e1d9cbb9c, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300

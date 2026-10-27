@@ -27,6 +27,15 @@ public class SkillData : ScriptableObject
     }
 #endif
     public string SkillName;
+    [Header("导师与成长")]
+    [Min(1)] public int RequiredLevel = 1;
+    [Min(0)] public int LearnCost = 50;
+    [Min(1)] public int UpgradeCost = 60;
+    [Range(1, 5)] public int MaxRank = 5;
+    [Min(1)] public int LevelsPerRank = 2;
+    [Range(0f, 1f)] public float DamagePerRank = 0.2f;
+    public int LevelForRank(int rank) => RequiredLevel + (rank - 1) * LevelsPerRank;
+    public int CostForRank(int rank) => rank == 1 ? LearnCost : UpgradeCost * rank;
 
     [Header("UI")]
     public Sprite Icon;

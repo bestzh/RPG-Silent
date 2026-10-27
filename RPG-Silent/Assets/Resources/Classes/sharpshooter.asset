@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: sharpshooter
+  m_EditorClassIdentifier: 
+  Id: sharpshooter
+  DisplayName: "\u795E\u5C04\u624B"
+  Description: "\u7CBE\u786E\u5C04\u51FB\u4E0E\u8303\u56F4\u7BAD\u96E8\uFF0C\u4F24\u5BB3\u63D0\u9AD8
+    10%\u3002"
+  BaseClass: {fileID: 11400000, guid: f2c1190f39ac97641b082b9f7bccb373, type: 2}
+  ModelPrefab: {fileID: 1116677665208918, guid: e11051163540ebf4884417f50c226d1c, type: 3}
+  MaleModelPrefab: {fileID: 2878635798750348893, guid: 5431506b9daf88c4eb4d56c0ee5751ee, type: 3}
+  FemaleModelPrefab: {fileID: 8624683976145495849, guid: ba13096d48fee7241aed05f238e4fe19, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: 601ee7f1bd0dfcc45b53cb118d6d3e58, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: bc6df1a99d020224c98926932d50f472, type: 2}
+  - {fileID: 11400000, guid: 7b85b132150f572409e581048714c053, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300

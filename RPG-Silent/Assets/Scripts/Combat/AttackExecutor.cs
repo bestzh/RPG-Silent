@@ -21,6 +21,7 @@ public class AttackExecutor : MonoBehaviour
     private bool combatSuspended;
     private bool enemyTargeting;
     private PlayerController playerOwner;
+    private readonly RaycastHit[] aimHits = new RaycastHit[32];
     internal int CombatGeneration { get; private set; }
 
     // 场景边界/结算使旧弹体和延迟攻击失效，普通连击收招不影响它们。
@@ -47,7 +48,7 @@ public class AttackExecutor : MonoBehaviour
     {
         AttackEnd();
         currentComboIndex = Mathf.Max(1, comboIndex);
-        normalAttack = CreateAttack(GetCurrentProfile());
+        normalAttack = CreateScaledAttack(GetCurrentProfile(), attackLoadout != null ? attackLoadout.DamageMultiplier : 1f);
         if (normalAttack == null)
             Debug.LogWarning($"[AttackExecutor] 当前姿态第 {currentComboIndex} 段攻击未配置 AttackProfile。", this);
     }
@@ -56,6 +57,9 @@ public class AttackExecutor : MonoBehaviour
 
     public AttackContext CreateAttack(AttackProfile profile) =>
         profile != null ? new AttackContext(profile, this) : null;
+
+    public AttackContext CreateScaledAttack(AttackProfile profile, float multiplier) =>
+        profile != null ? new AttackContext(profile, this, multiplier) : null;
 
     public AttackContext CreateAttack(AttackProfile profile, float damageMultiplier,
         Vector3 aimPoint, Vector3? areaPoint = null) =>
@@ -329,10 +333,16 @@ public class AttackExecutor : MonoBehaviour
         if (enemyTargeting || aimCamera == null) return transform.forward;
 
         Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
-            return (hit.point - origin).normalized;
-
-        return ray.direction.normalized;
+        int count = Physics.RaycastNonAlloc(ray, aimHits, 1000f, ~0, QueryTriggerInteraction.Ignore);
+        float distance = float.PositiveInfinity;
+        Vector3 aimPoint = ray.GetPoint(100f);
+        for (int i = 0; i < count; i++)
+        {
+            if (aimHits[i].transform.IsChildOf(transform) || aimHits[i].distance >= distance) continue;
+            distance = aimHits[i].distance;
+            aimPoint = aimHits[i].point;
+        }
+        return (aimPoint - origin).normalized;
     }
 
     private static Vector3 ApplySpread(Vector3 direction, float spreadAngle)

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c011a6a7abd0f9d4bb448bb853cd8bb2, type: 3}
+  m_Name: assassin-1
+  m_EditorClassIdentifier: 
+  persistentId: 82dab7a03d73db943ab91e617f70a6bc
+  SkillName: "\u81F4\u547D\u7A81\u88AD"
+  RequiredLevel: 10
+  LearnCost: 180
+  UpgradeCost: 80
+  MaxRank: 5
+  LevelsPerRank: 2
+  DamagePerRank: 0.2
+  Icon: {fileID: 21300000, guid: 1f6c8a479e8e8824c8f2e38ac45cc109, type: 3}
+  Animation: {fileID: 0}
+  CastTime: 0
+  CooldownTime: 4
+  EnergyCost: 15
+  CanBeInterrupted: 1
+  AttackProfile: {fileID: 11400000, guid: 8cfe66bd4a154424da57df5e5e46aa3b, type: 2}
+  TriggerTiming: 1
+  EffectPrefab: {fileID: 789151080725526719, guid: 000832214335ffd4782827d2a4510f4a, type: 3}
+  EffectOffset: {x: 0, y: 1.2, z: 1}
+  HitEffectPrefab: {fileID: 0}
+  HitEffectOffset: {x: 0, y: 0, z: 0}
+  HasChainEffect: 0
+  ChainCount: 3
+  ChainRadius: 5
+  ChainEffectPrefab: {fileID: 0}
+  CanCombo: 0
+  NextComboSkill: {fileID: 0}
+  ComboInputWindow: 0.5

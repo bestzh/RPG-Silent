@@ -13,5 +13,14 @@ namespace RPGSilent.Domain
         public string[] skillIds;
         public string[] weaponIds;
         public int activeWeaponSlot;
+        public string classId;
+        public int gender;
+        public SkillProgressData[] learnedSkills;
+        public WeaponUpgradeData[] weaponUpgrades;
     }
+
+    [Serializable]
+    public sealed class SkillProgressData { public string skillId; public int rank; }
+    [Serializable]
+    public sealed class WeaponUpgradeData { public string weaponId; public int level; }
 }

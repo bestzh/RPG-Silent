@@ -53,3 +53,19 @@ MonoBehaviour:
     CanJump: 1
     MaxJumpCount: 2
     CanSprint: 0
+  - Stance: 45
+    OverrideController: {fileID: 22100000, guid: c5c9a9c073d806d43bf5e3730519c096, type: 2}
+    DisplayName: "\u6CD5\u6756"
+    MaxComboCount: 1
+    CanRoll: 1
+    CanJump: 1
+    MaxJumpCount: 1
+    CanSprint: 1
+  - Stance: 41
+    OverrideController: {fileID: 22100000, guid: 7999477dab2741e439cc6beef68f13d8, type: 2}
+    DisplayName: "\u5F13"
+    MaxComboCount: 1
+    CanRoll: 1
+    CanJump: 1
+    MaxJumpCount: 1
+    CanSprint: 1

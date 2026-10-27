@@ -25,6 +25,7 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
     private PlayerStanceController stance;
     private Animator animator;
     private AttackExecutor attacks;
+    private PlayerClassAppearance appearance;
     private GameObject model;
     private WeaponDefinition modelDefinition;
     private bool combatAllowed = true;
@@ -62,12 +63,21 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
     public event Action EquipmentChanged;
     public event Action PresentationChanged;
 
+    public void PrepareAppearanceChange()
+    {
+        CancelTransition();
+        if (model != null) { model.SetActive(false); Destroy(model); }
+        model = null;
+        modelDefinition = null;
+    }
+
     private void Awake()
     {
         player = GetComponent<PlayerController>();
         stance = GetComponent<PlayerStanceController>();
         animator = GetComponent<Animator>();
         attacks = GetComponent<AttackExecutor>();
+        appearance = GetComponent<PlayerClassAppearance>();
         ApplyStablePresentation();
     }
 
@@ -97,8 +107,8 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
         if (!blendingAttachment || model == null || !player.GameplayInputEnabled) return;
         attachmentElapsed += Time.deltaTime;
         float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(attachmentElapsed / attachmentBlend));
-        var targetPosition = modelDrawn ? modelDefinition.HandPosition : modelDefinition.SheathPosition;
-        var targetRotation = Quaternion.Euler(modelDrawn ? modelDefinition.HandRotation : modelDefinition.SheathRotation);
+        var targetPosition = MountPosition(modelDefinition, modelDrawn);
+        var targetRotation = MountRotation(modelDefinition, modelDrawn);
         model.transform.localPosition = Vector3.Lerp(attachmentStartPosition, targetPosition, t);
         model.transform.localRotation = Quaternion.Slerp(attachmentStartRotation, targetRotation, t);
         if (t >= 1f) blendingAttachment = false;
@@ -382,7 +392,7 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
         }
         modelDrawn = drawn && model != null;
         if (model == null) return;
-        Transform bone = animator.isHuman ? animator.GetBoneTransform(modelDrawn ? HumanBodyBones.RightHand : definition.SheathBone) : null;
+        Transform bone = animator.isHuman ? animator.GetBoneTransform(modelDrawn ? definition.HandBone : definition.SheathBone) : null;
         model.SetActive(bone != null);
         if (bone == null) return;
         model.transform.SetParent(bone, blendAttachment);
@@ -395,9 +405,21 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
         }
         else
         {
-            model.transform.localPosition = modelDrawn ? definition.HandPosition : definition.SheathPosition;
-            model.transform.localRotation = Quaternion.Euler(modelDrawn ? definition.HandRotation : definition.SheathRotation);
+            model.transform.localPosition = MountPosition(definition, modelDrawn);
+            model.transform.localRotation = MountRotation(definition, modelDrawn);
         }
-        model.transform.localScale = definition.ModelScale;
+        model.transform.localScale = appearance != null && appearance.RigProfile != null ? appearance.RigProfile.Scale(definition.ModelScale) : definition.ModelScale;
+    }
+    Vector3 MountPosition(WeaponDefinition definition, bool drawn)
+    {
+        var position = drawn ? definition.HandPosition : definition.SheathPosition;
+        var profile = appearance != null ? appearance.RigProfile : null;
+        return profile != null ? profile.MountPosition(definition, drawn) : position;
+    }
+    Quaternion MountRotation(WeaponDefinition definition, bool drawn)
+    {
+        var rotation = drawn ? definition.HandRotation : definition.SheathRotation;
+        var profile = appearance != null ? appearance.RigProfile : null;
+        return profile != null ? profile.MountRotation(definition, drawn) : Quaternion.Euler(rotation);
     }
 }

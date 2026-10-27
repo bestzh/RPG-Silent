@@ -22,6 +22,8 @@ public class PlayerAttackLoadout : MonoBehaviour
     [SerializeField] private AttackProfile fallbackProfile;
     [SerializeField] private List<StanceAttackProfileSet> stanceProfiles = new List<StanceAttackProfileSet>();
     private PlayerWeaponEquipment weapons;
+    [VContainer.Inject] private PlayerProgressService progress;
+    public float DamageMultiplier => progress?.WeaponDamageMultiplier(weapons != null ? weapons.ActiveWeapon : null) ?? 1f;
 
     private void Awake()
     {

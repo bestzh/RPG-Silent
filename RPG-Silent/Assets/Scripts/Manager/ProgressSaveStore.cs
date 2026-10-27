@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using RPGSilent.Domain;
@@ -18,7 +19,7 @@ public sealed class ProgressLoadResult
 /// <summary>Single local slot. Writes a flushed temporary file, then atomically replaces it.</summary>
 public sealed class ProgressSaveStore
 {
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 4;
     private const int MaxFileBytes = 64 * 1024;
     private readonly string directory;
     public string PrimaryPath => Path.Combine(directory, "progress.json");
@@ -120,7 +121,7 @@ public sealed class ProgressSaveStore
             if (new FileInfo(path).Length > MaxFileBytes) throw new InvalidDataException();
             var envelope = JsonUtility.FromJson<Envelope>(File.ReadAllText(path, Encoding.UTF8));
             if (envelope == null) throw new InvalidDataException();
-            if (envelope.version != 1 && envelope.version != CurrentVersion)
+            if (envelope.version < 1 || envelope.version > CurrentVersion)
                 return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported,
                     Message = "存档版本不兼容，原文件已保留，请使用对应版本的游戏。" };
             if (string.IsNullOrEmpty(envelope.payload) || envelope.checksum != Hash(envelope.payload)) throw new InvalidDataException();
@@ -132,6 +133,14 @@ public sealed class ProgressSaveStore
                 if (data.stance == (int)PlayerStance.Unarmed || data.stance == (int)PlayerStance.Relax)
                     data.weaponIds[0] = string.Empty;
             }
+            if (data != null && envelope.version < 3)
+            {
+                data.classId = "swordsman";
+                data.learnedSkills = (data.skillIds ?? new string[0]).Where(id => !string.IsNullOrEmpty(id)).Distinct()
+                    .Select(id => new SkillProgressData { skillId = id, rank = 1 }).ToArray();
+                data.weaponUpgrades = new WeaponUpgradeData[0];
+            }
+            if (data != null && envelope.version < 4) data.gender = (int)PlayerGender.Legacy;
             Validate(data);
             return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、武器和技能装配。" };
         }
@@ -155,6 +164,21 @@ public sealed class ProgressSaveStore
             throw new InvalidDataException("存档武器装备无效，原文件已保留。");
         foreach (string id in data.weaponIds)
             if (id == null || id.Length > 128) throw new InvalidDataException("存档武器标识无效，原文件已保留。");
+        if (string.IsNullOrEmpty(data.classId) || data.classId.Length > 128 || data.learnedSkills == null ||
+            data.weaponUpgrades == null || data.learnedSkills.Length > 128 || data.weaponUpgrades.Length > 128)
+            throw new InvalidDataException("存档职业或成长记录不完整，原文件已保留。");
+        if (!Enum.IsDefined(typeof(PlayerGender), data.gender))
+            throw new InvalidDataException("存档角色外观无效，原文件已保留。");
+        var skillSet = new System.Collections.Generic.HashSet<string>();
+        foreach (var entry in data.learnedSkills)
+            if (entry == null || string.IsNullOrEmpty(entry.skillId) || entry.skillId.Length > 128 || entry.rank < 1 || entry.rank > 5 || !skillSet.Add(entry.skillId))
+                throw new InvalidDataException("存档技能等级无效，原文件已保留。");
+        foreach (string id in data.skillIds)
+            if (id.Length > 0 && !skillSet.Contains(id)) throw new InvalidDataException("装备了尚未学会的技能，原文件已保留。");
+        var weaponSet = new System.Collections.Generic.HashSet<string>();
+        foreach (var entry in data.weaponUpgrades)
+            if (entry == null || string.IsNullOrEmpty(entry.weaponId) || entry.weaponId.Length > 128 || entry.level < 1 || entry.level > 5 || !weaponSet.Add(entry.weaponId))
+                throw new InvalidDataException("存档武器强化等级无效，原文件已保留。");
     }
 
     private static string Hash(string payload)

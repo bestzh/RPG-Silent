@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: mage
+  m_EditorClassIdentifier: 
+  Id: mage
+  DisplayName: "\u6CD5\u5E08"
+  Description: "\u7528\u5143\u7D20\u6CD5\u672F\u653B\u51FB\u8FDC\u8FD1\u76EE\u6807\uFF0C\u638C\u63A7\u6218\u573A\u3002"
+  BaseClass: {fileID: 0}
+  ModelPrefab: {fileID: 1996767962855262, guid: e0331453113676149a9c0b2bc03e60de, type: 3}
+  MaleModelPrefab: {fileID: 3021789254948903960, guid: 3227f1866885bff489ffe80acd07a462, type: 3}
+  FemaleModelPrefab: {fileID: 5234456895732634366, guid: a941c0b100fbb4e4f8b57c33af0c82b7, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: b320c1eda692a2649b10f2d8dbb19bb1, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 2e77ecc1bb14aac489b4c4ed4aef0c14, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: 345782ef9f29144428d075ce321ee0cb, type: 2}
+  - {fileID: 11400000, guid: 2f4f7b2544c45e34e868dc56de4a3be3, type: 2}
+  - {fileID: 11400000, guid: c95d1ae3c112bf2449b74647925496e4, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300

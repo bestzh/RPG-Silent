@@ -11,6 +11,7 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
     public Button[] changeButtons;
     public Button[] selectButtons;
     private PlayerWeaponEquipment weapons;
+    [VContainer.Inject] private PlayerProgressService progress;
 
     private void Awake()
     {
@@ -26,6 +27,7 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
     {
         Unbind();
         weapons = source;
+        if (progress != null) progress.Changed += Refresh;
         if (weapons != null)
         {
             weapons.EquipmentChanged += Refresh;
@@ -36,6 +38,7 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
 
     public void Unbind()
     {
+        if (progress != null) progress.Changed -= Refresh;
         if (weapons != null)
         {
             weapons.EquipmentChanged -= Refresh;
@@ -77,6 +80,7 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
         }
     }
 
-    private static string NameOf(WeaponDefinition weapon) => weapon != null ? weapon.DisplayName : "徒手";
+    private string NameOf(WeaponDefinition weapon) => weapon != null ? weapon.DisplayName +
+        (progress != null && progress.GetWeaponLevel(weapon) > 0 ? " +" + progress.GetWeaponLevel(weapon) : "") : "徒手";
     private void OnDestroy() => Unbind();
 }

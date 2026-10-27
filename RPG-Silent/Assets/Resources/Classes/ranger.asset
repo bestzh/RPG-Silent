@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: ranger
+  m_EditorClassIdentifier: 
+  Id: ranger
+  DisplayName: "\u6E38\u4FA0"
+  Description: "\u8FDC\u7A0B\u5F13\u672F\u4E0E\u8FD1\u8EAB\u5E94\u53D8\uFF0C\u4FDD\u6301\u8DDD\u79BB\u5BFB\u627E\u7834\u7EFD\u3002"
+  BaseClass: {fileID: 0}
+  ModelPrefab: {fileID: 1913839456307970, guid: d5a148a3575c47145a45da3ec571473c, type: 3}
+  MaleModelPrefab: {fileID: 5932261508753171745, guid: 3639bd25fb11d7e4c9cb981c9707a47e, type: 3}
+  FemaleModelPrefab: {fileID: 4297331616637526646, guid: 7e0e4584d7381ef4eb3170fd09425231, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: 601ee7f1bd0dfcc45b53cb118d6d3e58, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 7bcd227f316862345a878d735c52a73e, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: 7919a943c73b140488df399390ac13ff, type: 2}
+  - {fileID: 11400000, guid: 7259073466b38154bb2ec225ac5ce7d5, type: 2}
+  - {fileID: 11400000, guid: 15ece4d9413334a46a003d9348951bd4, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300

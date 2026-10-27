@@ -85,8 +85,8 @@ public class SkillSlotUI : MonoBehaviour
             }
             else
             {
-                // 空槽：保留占位图，但明显变淡
-                icon.enabled = true;
+                // 空槽不显示旧技能图标，避免误以为新角色已学会技能。
+                icon.enabled = false;
                 icon.color   = emptyIconColor;
             }
         }

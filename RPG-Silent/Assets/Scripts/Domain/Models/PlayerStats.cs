@@ -117,6 +117,16 @@ namespace RPGSilent.Domain
             MaxEnergy = baseMaxEnergy + (Level - 1) * 5f;
         }
 
+        public bool TrySpendGold(int cost)
+        {
+            if (cost < 0 || Gold < cost) return false;
+            if (cost == 0) return true;
+            Gold -= cost;
+            OnGoldChanged?.Invoke(Gold);
+            OnProgressChanged?.Invoke();
+            return true;
+        }
+
         public bool TrySpendEnergy(float cost)
         {
             if (cost <= 0f) return true;

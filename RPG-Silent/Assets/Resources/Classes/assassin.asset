@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70812b856c71e847a428187e8850486, type: 3}
+  m_Name: assassin
+  m_EditorClassIdentifier: 
+  Id: assassin
+  DisplayName: "\u523A\u5BA2"
+  Description: "\u4EE5\u81F4\u547D\u7A81\u88AD\u548C\u65CB\u5203\u51FB\u7834\u8FD1\u654C\uFF0C\u4F24\u5BB3\u63D0\u9AD8
+    10%\u3002"
+  BaseClass: {fileID: 11400000, guid: f2c1190f39ac97641b082b9f7bccb373, type: 2}
+  ModelPrefab: {fileID: 1074668445682794, guid: 128d74125a472834991824f3f72198b5, type: 3}
+  MaleModelPrefab: {fileID: 5926576407039193698, guid: 7935ab1c430b0474fa4363933547b3b3, type: 3}
+  FemaleModelPrefab: {fileID: 1452176696716776644, guid: 9d1d43c146e88534ab43ca291f6cdc97, type: 3}
+  PreviewIdle: {fileID: 7400000, guid: 601ee7f1bd0dfcc45b53cb118d6d3e58, type: 3}
+  StartingWeapon: {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  Lessons:
+  - {fileID: 11400000, guid: 82dab7a03d73db943ab91e617f70a6bc, type: 2}
+  - {fileID: 11400000, guid: 87e7486c5da37ab4ca2653e17f4833d5, type: 2}
+  RequiredLevel: 10
+  AdvancementCost: 300
