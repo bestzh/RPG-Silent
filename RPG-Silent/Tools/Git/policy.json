@@ -5,14 +5,6 @@
     "RPG-Silent/Assets/Scenes/Dungeon01.unity": {
       "max_mib": 75,
       "reason": "现有 66.97 MiB 副本场景，场景拆分在第二阶段评估。"
-    },
-    "RPG-Silent/Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo.unity": {
-      "max_mib": 75,
-      "reason": "现有第三方演示场景，裁剪前需要核对资源引用。"
-    },
-    "RPG-Silent/Assets/PolygonNatureBiomes/PNB_Enchanted_Forest/Scene/Demo_URP.unity": {
-      "max_mib": 75,
-      "reason": "现有第三方 URP 演示场景，裁剪前需要核对资源引用。"
     }
   }
 }

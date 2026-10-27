@@ -23,12 +23,5 @@
     "com.unity.modules.physics": "1.0.0",
     "com.unity.modules.physics2d": "1.0.0",
     "com.unity.modules.ui": "1.0.0"
-  },
-  "samples": [
-    {
-      "displayName": "Sample",
-      "description": "Sample scenes that show a variety of use cases.",
-      "path": "Samples~"
-    }
-  ]
+  }
 }
