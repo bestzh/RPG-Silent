@@ -115,9 +115,9 @@ git mergetool
 
 `Packages/com.opsive.behaviordesigner/Samples~/` 有 1,293 个跟踪文件，合计 94.73 MiB。其 `package.json` 仍声明此样例入口；直接删除会让样例导入入口失效。裁剪应作为单独的供应商包变更，同时处理样例入口、导入功能及更新方式。
 
-该次评估之后已完成三个文件的当前版本 LFS 转换、示例裁剪及场景拆分，详见 `ResourcePruning.md`、`DungeonSceneSplit.md` 和 `GitMaintenancePlan.md`。远端历史尚未重写；增加忽略规则、删除当前文件或仅从新提交开始使用 LFS，都不会消除旧历史中的完整 blob。
+该次评估之后已完成三个文件的当前版本 LFS 转换、示例裁剪、场景拆分及 main 历史迁移，详见 `ResourcePruning.md`、`DungeonSceneSplit.md` 和 `GitHistoryMigration.md`。历史切换保留当前文件树，旧提交号映射记录在 `GitHistoryCommitMap.csv`。增加忽略规则、删除当前文件或仅从新提交开始使用 LFS，本身不会消除旧历史中的完整 blob。
 
-如果后续决定迁移历史，应按以下步骤执行：
+如将来需要再次迁移历史，应按以下步骤执行：
 
 1. 明确目标分支、标签和文件清单；优先评估上表三个仍在使用的二进制文件，当前版本合计约 179.82 MiB。场景文本保留差异审阅和 Unity 合并能力。
 2. 确认 GitHub LFS 可用额度与其他克隆使用情况，约定暂停推送的时间窗口。
