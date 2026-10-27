@@ -12,6 +12,8 @@ public class MainUI : UIBase
     [Inject] private IGameSettingsService _gameSettings;
     [Inject] private PlayerSkillAccess    _skillAccess;
     [Inject] private PlayerProgressService _progress;
+    [Inject] private PlayerSessionService _session;
+    public WeaponEquipmentUI weaponEquipment;
 
     public Image           avatarImage;
     public Slider          hpBar;
@@ -83,6 +85,8 @@ public class MainUI : UIBase
 
         _stats.Refresh();
         RefreshSaveStatus();
+        if (weaponEquipment != null)
+            weaponEquipment.Bind(_session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerWeaponEquipment>(true) : null);
         ApplyGameSettings(_gameSettings?.CurrentSettings);
 
         Debug.Log("[MainUI] 已打开并绑定玩家数据。");
@@ -102,6 +106,7 @@ public class MainUI : UIBase
 
     private void UnbindSources()
     {
+        weaponEquipment?.Unbind();
         if (_boundStats != null)
         {
             _boundStats.OnHealthChanged -= OnHealthChanged;

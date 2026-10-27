@@ -212,7 +212,8 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
     {
         if (_input != null && !_input.GameplayInputEnabled) return false;
         if (_isCasting) return false;
-        if (_player != null && _player.IsDead) return false;
+        if (_player != null && _player.Weapons != null && _player.Weapons.IsBusy) return false;
+        if (_player != null && (_player.IsDead || !_player.CombatAllowed)) return false;
         if (_player != null && (_player.IsRolling || _player.IsJumping)) return false;
         if (_player != null && _player.StateMachine?.CurrentState is HurtState) return false;
         return true;

@@ -18,7 +18,7 @@ public sealed class ProgressLoadResult
 /// <summary>Single local slot. Writes a flushed temporary file, then atomically replaces it.</summary>
 public sealed class ProgressSaveStore
 {
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
     private const int MaxFileBytes = 64 * 1024;
     private readonly string directory;
     public string PrimaryPath => Path.Combine(directory, "progress.json");
@@ -120,13 +120,20 @@ public sealed class ProgressSaveStore
             if (new FileInfo(path).Length > MaxFileBytes) throw new InvalidDataException();
             var envelope = JsonUtility.FromJson<Envelope>(File.ReadAllText(path, Encoding.UTF8));
             if (envelope == null) throw new InvalidDataException();
-            if (envelope.version != CurrentVersion)
+            if (envelope.version != 1 && envelope.version != CurrentVersion)
                 return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported,
                     Message = "存档版本不兼容，原文件已保留，请使用对应版本的游戏。" };
             if (string.IsNullOrEmpty(envelope.payload) || envelope.checksum != Hash(envelope.payload)) throw new InvalidDataException();
             var data = JsonUtility.FromJson<PlayerProgressData>(envelope.payload);
+            if (data != null && envelope.version == 1)
+            {
+                data.weaponIds = new[] { WeaponDefinition.StarterSwordId, WeaponDefinition.StarterGreatswordId };
+                data.activeWeaponSlot = data.stance == (int)PlayerStance.TwoHandSword ? 1 : 0;
+                if (data.stance == (int)PlayerStance.Unarmed || data.stance == (int)PlayerStance.Relax)
+                    data.weaponIds[0] = string.Empty;
+            }
             Validate(data);
-            return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长和技能装配。" };
+            return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、武器和技能装配。" };
         }
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is UnauthorizedAccessException || ex is ArgumentException)
         {
@@ -143,6 +150,11 @@ public sealed class ProgressSaveStore
             throw new InvalidDataException("存档数据不完整或超出允许范围，原文件已保留。");
         foreach (string id in data.skillIds)
             if (id == null || id.Length > 128) throw new InvalidDataException("存档技能标识无效，原文件已保留。");
+        if (data.weaponIds == null || data.weaponIds.Length != PlayerWeaponEquipment.SlotCount
+            || data.activeWeaponSlot < 0 || data.activeWeaponSlot >= PlayerWeaponEquipment.SlotCount)
+            throw new InvalidDataException("存档武器装备无效，原文件已保留。");
+        foreach (string id in data.weaponIds)
+            if (id == null || id.Length > 128) throw new InvalidDataException("存档武器标识无效，原文件已保留。");
     }
 
     private static string Hash(string payload)

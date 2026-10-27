@@ -20,6 +20,7 @@ public class AttackExecutor : MonoBehaviour
     private IDamageable selfDamageable;
     private bool combatSuspended;
     private bool enemyTargeting;
+    private PlayerController playerOwner;
     internal int CombatGeneration { get; private set; }
 
     // 场景边界/结算使旧弹体和延迟攻击失效，普通连击收招不影响它们。
@@ -35,6 +36,7 @@ public class AttackExecutor : MonoBehaviour
 
     private void Awake()
     {
+        playerOwner = GetComponent<PlayerController>();
         if (attackLoadout == null)   attackLoadout   = GetComponent<PlayerAttackLoadout>();
         if (hitboxController == null) hitboxController = GetComponentInChildren<AttackHitboxController>();
         if (aimCamera == null)        aimCamera        = Camera.main;
@@ -129,7 +131,9 @@ public class AttackExecutor : MonoBehaviour
     }
 
     private bool Owns(AttackContext context) =>
-        !combatSuspended && context != null && context.Owner == this && context.Profile != null
+        !combatSuspended && (playerOwner == null || playerOwner.CombatAllowed
+            && !(playerOwner.Weapons != null && playerOwner.Weapons.IsBusy))
+        && context != null && context.Owner == this && context.Profile != null
         && context.Generation == CombatGeneration;
 
     private void DispatchProfile(AttackContext context)

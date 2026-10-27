@@ -6,13 +6,11 @@ public class IdleState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        player.animator.SetFloat("Horizontal", 0);
-        player.animator.SetFloat("Vertical", 0);
-        player.animator.SetFloat("MoveSpeed", 0);
     }
 
     public override void Update()
     {
+        player.UpdateLocomotionAnimation();
         if (!player.IsGrounded)
         {
             player.StateMachine.ChangeState(new JumpState(player, startFalling: true));
@@ -24,6 +22,8 @@ public class IdleState : PlayerState
             player.StateMachine.ChangeState(new MoveState(player));
         }
     }
+
+    public override void FixedUpdate() => player.Motor.Move(Vector3.zero, Time.fixedDeltaTime);
 
     public override void Exit()
     {

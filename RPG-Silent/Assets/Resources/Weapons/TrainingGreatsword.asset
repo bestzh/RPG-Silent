@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef1bbb05581cd64a9ac9c10648948d9, type: 3}
+  m_Name: TrainingGreatsword
+  m_EditorClassIdentifier: 
+  PersistentId: training-greatsword
+  DisplayName: "\u8BAD\u7EC3\u53CC\u624B\u5251"
+  Stance: 46
+  ComboProfiles:
+  - {fileID: 11400000, guid: 536f1db8a034ee24d9f8ae4629e0b75b, type: 2}
+  - {fileID: 11400000, guid: 7780970d9aa883f4db7752b155237828, type: 2}
+  - {fileID: 11400000, guid: c5cfbd2e7f54cb04aab12423fd7f0a16, type: 2}
+  ModelPrefab: {fileID: 1440115863494796, guid: 892122ee87fc15149bc82d7f9d2cdb9f, type: 3}
+  HandPosition: {x: -0.14, y: 0.015, z: 0}
+  HandRotation: {x: 90, y: 0, z: 0}
+  ModelScale: {x: 1, y: 1, z: 1}
+  SheathBone: 8
+  SheathPosition: {x: -1.106, y: -0.068, z: -0.325}
+  SheathRotation: {x: 79.077, y: 253.938, z: 194.398}
+  DrawFromRelax: {fileID: 7400000, guid: 2af4d4fefae1f51449c80fccbde34cd4, type: 3}
+  DrawFromUnarmed: {fileID: 7400000, guid: f95c96d798bb3b14c8087b88ad5c9f5d, type: 3}
+  SheathToRelax: {fileID: 7400000, guid: fe313e50f716a8b4797477e7c706d2f5, type: 3}
+  SheathToUnarmed: {fileID: 7400000, guid: 4638ca7fe98a28044a1dd9205af58dea, type: 3}

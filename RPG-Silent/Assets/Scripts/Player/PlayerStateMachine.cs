@@ -18,4 +18,6 @@ public class PlayerStateMachine
     {
         currentState?.Update();
     }
+
+    public void FixedUpdate() => currentState?.FixedUpdate();
 }

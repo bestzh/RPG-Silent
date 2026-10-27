@@ -26,6 +26,10 @@ public class PlayerRigSpawner : MonoBehaviour
     [Tooltip("playerRigPrefab 为空时的 Resources 加载路径")]
     [SerializeField] private string resourcePath = "PlayerRig";
 
+    [Header("场景规则")]
+    [Tooltip("主城等安全区关闭：禁止攻击/战斗技能，并使用放松动画；保留玩家选择的战斗姿态。")]
+    [SerializeField] private bool allowCombat = true;
+
     [Header("进入副本时的出生定位")]
     [Tooltip("副本表（留空则自动从 Resources 加载 DungeonDatabase）")]
     [SerializeField] private DungeonDatabase dungeonDatabase;
@@ -40,16 +44,22 @@ public class PlayerRigSpawner : MonoBehaviour
 
     private void Start()
     {
-        if (!DungeonLaunchContext.HasValue) return;
+        var scope = GameLifetimeScope.Instance;
+        if (scope == null || scope.Container == null) return;
+        var session = scope.Container.Resolve<PlayerSessionService>();
+        var player = session.PlayerRig != null ? session.PlayerRig.GetComponentInChildren<PlayerController>(true) : null;
+        if (player == null) return;
+        if (!DungeonLaunchContext.HasValue)
+        {
+            player.SetCombatAllowed(allowCombat);
+            return;
+        }
 
         if (dungeonDatabase == null)
             dungeonDatabase = Resources.Load<DungeonDatabase>("DungeonDatabase");
 
         var entry = dungeonDatabase != null ? dungeonDatabase.GetById(DungeonLaunchContext.DungeonId) : null;
         bool enteringDungeon = entry != null && entry.MatchesScene(gameObject.scene.name);
-        var session = GameLifetimeScope.Instance.Container.Resolve<PlayerSessionService>();
-        var player = session.PlayerRig != null ? session.PlayerRig.GetComponentInChildren<PlayerController>(true) : null;
-        if (player == null) return;
 
         Vector3 pos;
         Quaternion rot;
@@ -70,6 +80,7 @@ public class PlayerRigSpawner : MonoBehaviour
 
         GameLifetimeScope.Instance.Container.Resolve<PlayerStats>().RestoreVitals();
         player.ResetForScene(pos, alignRotation ? rot : player.transform.rotation);
+        player.SetCombatAllowed(allowCombat);
         Debug.Log($"[PlayerRigSpawner] 场景出生已重置：{gameObject.scene.name}，{pos}。");
     }
 

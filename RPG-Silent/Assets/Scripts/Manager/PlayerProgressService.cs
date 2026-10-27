@@ -10,6 +10,8 @@ public sealed class PlayerProgressService : IDisposable
     private readonly PlayerStats stats;
     private readonly ProgressSaveStore store;
     private readonly Dictionary<string, SkillData> catalog = new();
+    private readonly Dictionary<string, WeaponDefinition> weaponCatalog = new();
+    private PlayerWeaponEquipment weapons;
     private PlayerSkillController skills;
     private PlayerStanceController stance;
     private PlayerProgressData pending;
@@ -30,6 +32,12 @@ public sealed class PlayerProgressService : IDisposable
                 throw new InvalidOperationException("技能存档标识缺失或重复：" + skill.name);
             catalog.Add(skill.PersistentId, skill);
         }
+        foreach (var weapon in Resources.LoadAll<WeaponDefinition>("Weapons"))
+        {
+            if (string.IsNullOrEmpty(weapon.PersistentId) || weaponCatalog.ContainsKey(weapon.PersistentId))
+                throw new InvalidOperationException("武器存档标识缺失或重复：" + weapon.name);
+            weaponCatalog.Add(weapon.PersistentId, weapon);
+        }
     }
 
     public ProgressLoadResult InspectSave()
@@ -40,6 +48,10 @@ public sealed class PlayerProgressService : IDisposable
             if (id.Length > 0 && !catalog.ContainsKey(id))
                 return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported,
                     Message = "存档中的技能资源不可用，原文件已保留，请恢复对应游戏内容。" };
+        foreach (string id in result.Data.weaponIds)
+            if (id.Length > 0 && !weaponCatalog.ContainsKey(id))
+                return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported,
+                    Message = "存档中的武器资源不可用，原文件已保留，请恢复对应游戏内容。" };
         return result;
     }
 
@@ -61,7 +73,8 @@ public sealed class PlayerProgressService : IDisposable
         if (!result.CanContinue) return false;
         pending = result.Data;
         profileId = pending.profileId;
-        lastSavedPayload = result.Status == ProgressLoadStatus.Loaded ? JsonUtility.ToJson(pending) : null;
+        // Commit once after restoration, including any version migration or recovery.
+        lastSavedPayload = null;
         newProfile = false;
         HasUnsavedChanges = false;
         StatusMessage = result.Status == ProgressLoadStatus.Recovered ? result.Message : "进度已读取";
@@ -74,7 +87,8 @@ public sealed class PlayerProgressService : IDisposable
         if (attached) return;
         skills = rig.GetComponentInChildren<PlayerSkillController>(true);
         stance = rig.GetComponentInChildren<PlayerStanceController>(true);
-        if (skills == null || stance == null) throw new InvalidOperationException("玩家缺少技能或姿态组件。");
+        weapons = rig.GetComponentInChildren<PlayerWeaponEquipment>(true);
+        if (skills == null || stance == null || weapons == null) throw new InvalidOperationException("玩家缺少技能、姿态或武器组件。");
         applying = true;
         try
         {
@@ -82,13 +96,16 @@ public sealed class PlayerProgressService : IDisposable
             {
                 for (int i = 0; i < PlayerSkillController.MaxSlots; i++)
                     skills.EquipSkill(i, pending.skillIds[i].Length == 0 ? null : catalog[pending.skillIds[i]]);
-                stance.SetStance((PlayerStance)pending.stance, true);
+                var restoredWeapons = new WeaponDefinition[PlayerWeaponEquipment.SlotCount];
+                for (int i = 0; i < restoredWeapons.Length; i++)
+                    restoredWeapons[i] = pending.weaponIds[i].Length == 0 ? null : weaponCatalog[pending.weaponIds[i]];
+                weapons.RestoreEquipment(restoredWeapons, pending.activeWeaponSlot);
                 pending = null;
             }
             attached = true;
             stats.OnProgressChanged += OnProgressChanged;
             skills.OnSlotsChanged += OnProgressChanged;
-            stance.OnStanceChanged += OnStanceChanged;
+            weapons.EquipmentChanged += OnProgressChanged;
         }
         finally { applying = false; }
         Save(); // New games commit only after a real player is created in the loaded scene.
@@ -100,7 +117,16 @@ public sealed class PlayerProgressService : IDisposable
         try
         {
             var data = new PlayerProgressData { profileId = profileId, gold = stats.Gold,
-                totalExp = stats.Exp, stance = (int)stance.CurrentStance, skillIds = new string[PlayerSkillController.MaxSlots] };
+                totalExp = stats.Exp, stance = (int)stance.CurrentStance, skillIds = new string[PlayerSkillController.MaxSlots],
+                weaponIds = new string[PlayerWeaponEquipment.SlotCount], activeWeaponSlot = weapons.ActiveSlot };
+            for (int i = 0; i < data.weaponIds.Length; i++)
+            {
+                var weapon = weapons.GetWeapon(i);
+                if (weapon == null) { data.weaponIds[i] = string.Empty; continue; }
+                if (string.IsNullOrEmpty(weapon.PersistentId) || !weaponCatalog.TryGetValue(weapon.PersistentId, out var known) || known != weapon)
+                    throw new InvalidDataException("武器尚未配置可保存的标识，请恢复有效武器后重试保存。");
+                data.weaponIds[i] = weapon.PersistentId;
+            }
             for (int i = 0; i < data.skillIds.Length; i++)
             {
                 var skill = skills.GetEquippedSkill(i);
@@ -127,7 +153,6 @@ public sealed class PlayerProgressService : IDisposable
     }
 
     private void OnProgressChanged() { if (!applying) Save(); }
-    private void OnStanceChanged(PlayerStance previous, PlayerStance current) => OnProgressChanged();
 
     public void Detach()
     {
@@ -135,9 +160,10 @@ public sealed class PlayerProgressService : IDisposable
         Save();
         stats.OnProgressChanged -= OnProgressChanged;
         if (skills != null) skills.OnSlotsChanged -= OnProgressChanged;
-        if (stance != null) stance.OnStanceChanged -= OnStanceChanged;
+        if (weapons != null) weapons.EquipmentChanged -= OnProgressChanged;
         skills = null;
         stance = null;
+        weapons = null;
         attached = false;
         pending = null;
     }

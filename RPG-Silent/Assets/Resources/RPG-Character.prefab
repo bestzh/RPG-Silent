@@ -247,6 +247,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 989243099915110056}
+    - targetCorrespondingSourceObject: {fileID: 100050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2795307088604129279}
   m_SourcePrefab: {fileID: 100100000, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}
 --- !u!1 &9209024861731085188 stripped
 GameObject:
@@ -277,7 +280,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &7032208370809038174
@@ -287,7 +290,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9209024861731085188}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1f7a3f2c92126e244a45773b85b78398, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -374,6 +377,18 @@ MonoBehaviour:
   SprintSpeed: 8
   mouseSensitivity: 3
   RollForce: 5
+  movement:
+    Acceleration: 35
+    Braking: 50
+    AirAcceleration: 18
+    AirBraking: 6
+    GroundProbeDistance: 0.12
+    MaxSlopeAngle: 55
+    CoyoteTime: 0.1
+    GroundLayers:
+      serializedVersion: 2
+      m_Bits: 4294967291
+  jumpBufferTime: 0.12
 --- !u!114 &4266816619665753452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,6 +468,7 @@ MonoBehaviour:
   defaultProjectileSpawnPoint: {fileID: 0}
   aimCamera: {fileID: 0}
   useDefaultMeleeFallback: 1
+  hitEffectLifetime: 5
 --- !u!114 &989243099915110056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468,6 +484,25 @@ MonoBehaviour:
   hitboxes:
   - {fileID: 2540401780194382713}
   - {fileID: 7050374453677837702}
+--- !u!114 &2795307088604129279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209024861731085188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 586f53df41772fb4398bf7c22d78a936, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableWeapons:
+  - {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  - {fileID: 11400000, guid: ce2f777f305a7b64ebc738e659a5784c, type: 2}
+  equippedWeapons:
+  - {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
+  - {fileID: 11400000, guid: ce2f777f305a7b64ebc738e659a5784c, type: 2}
+  activeSlot: 0
 --- !u!4 &9209024861731506148 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400050, guid: e57e9b8cd5e115f4f8d7736473e5c7fd, type: 3}

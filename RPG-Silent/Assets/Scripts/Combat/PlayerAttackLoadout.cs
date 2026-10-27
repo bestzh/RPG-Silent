@@ -21,9 +21,11 @@ public class PlayerAttackLoadout : MonoBehaviour
     [SerializeField] private PlayerStanceController stanceController;
     [SerializeField] private AttackProfile fallbackProfile;
     [SerializeField] private List<StanceAttackProfileSet> stanceProfiles = new List<StanceAttackProfileSet>();
+    private PlayerWeaponEquipment weapons;
 
     private void Awake()
     {
+        weapons = GetComponent<PlayerWeaponEquipment>();
         if (stanceController == null)
         {
             stanceController = GetComponent<PlayerStanceController>();
@@ -32,6 +34,7 @@ public class PlayerAttackLoadout : MonoBehaviour
 
     public AttackProfile GetProfile(int comboIndex)
     {
+        if (weapons != null && weapons.ActiveWeapon != null) return weapons.ActiveWeapon.GetProfile(comboIndex);
         PlayerStance stance = stanceController != null ? stanceController.CurrentStance : PlayerStance.Relax;
         return GetProfile(stance, comboIndex);
     }

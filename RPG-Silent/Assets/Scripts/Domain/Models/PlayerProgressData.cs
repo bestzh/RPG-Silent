@@ -11,5 +11,7 @@ namespace RPGSilent.Domain
         public int totalExp;
         public int stance;
         public string[] skillIds;
+        public string[] weaponIds;
+        public int activeWeaponSlot;
     }
 }

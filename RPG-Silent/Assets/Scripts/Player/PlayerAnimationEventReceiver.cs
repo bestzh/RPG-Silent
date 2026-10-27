@@ -3,9 +3,11 @@ using UnityEngine;
 public class PlayerAnimationEventReceiver : MonoBehaviour
 {
     private PlayerSkillController  skillController;
+    private PlayerWeaponEquipment weapons;
 
     private void Awake()
     {
+        weapons = GetComponentInParent<PlayerWeaponEquipment>();
         skillController = GetComponent<PlayerSkillController>();
         if (skillController == null)
             skillController = GetComponentInParent<PlayerSkillController>();
@@ -56,8 +58,8 @@ public class PlayerAnimationEventReceiver : MonoBehaviour
         AttackRelease(animationEvent);
     }
 
-    public void WeaponSwitch()
+    public void WeaponSwitch(AnimationEvent animationEvent = null)
     {
-        // Weapon switch animation event.
+        weapons?.NotifyWeaponSwitch(animationEvent);
     }
 }

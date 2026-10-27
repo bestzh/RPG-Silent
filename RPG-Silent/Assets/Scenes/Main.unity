@@ -539757,6 +539757,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigPrefab: {fileID: 2118404959221701388, guid: 9153a0cde26261d438ed1a2d716c84cd, type: 3}
   resourcePath: PlayerRig
+  allowCombat: 0
   playerTag: Player
   dungeonDatabase: {fileID: 0}
   alignRotation: 1
