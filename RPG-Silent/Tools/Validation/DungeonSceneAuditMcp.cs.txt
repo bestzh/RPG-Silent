@@ -1,0 +1,84 @@
+// Read-only Edit Mode snapshot. Set DungeonAudit.label before executing.
+if (UnityEditor.EditorApplication.isPlaying || UnityEditor.EditorApplication.isCompiling) throw new System.Exception("Idle Edit Mode required");
+var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+if (scene.path != "Assets/Scenes/Dungeon01.unity" || scene.isDirty) throw new System.Exception("Saved Dungeon01 required");
+if (System.AppDomain.CurrentDomain.GetData("DungeonAudit.tick") != null) throw new System.Exception("Audit already running");
+var label = System.AppDomain.CurrentDomain.GetData("DungeonAudit.label") as string;
+if (label != "before" && label != "after" && label != "reloaded") throw new System.Exception("Explicit label required");
+var identities = new System.Collections.Generic.Dictionary<int,string>();
+var rootsById = new System.Collections.Generic.Dictionary<int,string>();
+var objects = new System.Collections.Generic.List<UnityEngine.Object>();
+var missing = new System.Collections.Generic.List<string>();
+var roots = scene.GetRootGameObjects();
+foreach (var root in roots) {
+    foreach (var transform in root.GetComponentsInChildren<UnityEngine.Transform>(true)) {
+        var parts = new System.Collections.Generic.List<string>();
+        for (var current = transform; current != null; current = current.parent) parts.Add(current.GetSiblingIndex() + ":" + current.name);
+        parts.Reverse();
+        string path = string.Join("/", parts.ToArray());
+        var go = transform.gameObject;
+        objects.Add(go); identities.Add(go.GetInstanceID(), path + "#GameObject"); rootsById.Add(go.GetInstanceID(), root.name);
+        var components = go.GetComponents<UnityEngine.Component>();
+        for (int index = 0; index < components.Length; index++) {
+            var component = components[index];
+            if (component == null) { missing.Add(path + "#" + index); continue; }
+            objects.Add(component); identities.Add(component.GetInstanceID(), path + "#" + index + ":" + component.GetType().FullName); rootsById.Add(component.GetInstanceID(), root.name);
+        }
+    }
+}
+var hashes = new System.Collections.Generic.SortedDictionary<string,string>(System.StringComparer.Ordinal);
+var external = new System.Collections.Generic.SortedSet<string>(System.StringComparer.Ordinal);
+var unresolved = new System.Collections.Generic.SortedSet<string>(System.StringComparer.Ordinal);
+var references = new System.Collections.Generic.Dictionary<int,string>();
+var sha = System.Security.Cryptography.SHA256.Create();
+var pattern = new System.Text.RegularExpressions.Regex("\\\"instanceID\\\":(-?[0-9]+)");
+int cursor = 0;
+UnityEditor.EditorApplication.CallbackFunction tick = null;
+tick = () => {
+    try {
+        if (UnityEditor.EditorApplication.isPlaying || scene != UnityEngine.SceneManagement.SceneManager.GetActiveScene()) throw new System.Exception("Scene changed during audit");
+        int stop = System.Math.Min(cursor + 700, objects.Count);
+        for (; cursor < stop; cursor++) {
+            var obj = objects[cursor];
+            if (obj == null) throw new System.Exception("Object disappeared");
+            int sourceId = obj.GetInstanceID();
+            string source = identities[sourceId];
+            string json = UnityEditor.EditorJsonUtility.ToJson(obj);
+            string canonical = pattern.Replace(json, match => {
+                int id = int.Parse(match.Groups[1].Value);
+                if (id == 0) return "\"reference\":null";
+                string identity;
+                if (identities.TryGetValue(id, out identity)) {
+                    if (rootsById[sourceId] != rootsById[id]) external.Add(source + " -> " + identity);
+                } else if (!references.TryGetValue(id, out identity)) {
+                    var target = UnityEditor.EditorUtility.InstanceIDToObject(id);
+                    string guid; long localId;
+                    if (target != null && UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(target, out guid, out localId)) identity = "asset:" + guid + ":" + localId;
+                    else { identity = "unresolved:" + id; unresolved.Add(source + " -> " + identity); }
+                    references.Add(id, identity);
+                }
+                return "\"reference\":" + Newtonsoft.Json.JsonConvert.SerializeObject(identity);
+            });
+            var renderer = obj as UnityEngine.Renderer;
+            if (renderer != null) canonical += "|lightmap:" + renderer.lightmapIndex + ":" + renderer.realtimeLightmapIndex + ":" + UnityEngine.JsonUtility.ToJson(renderer.lightmapScaleOffset) + ":" + UnityEngine.JsonUtility.ToJson(renderer.realtimeLightmapScaleOffset);
+            hashes.Add(source, System.BitConverter.ToString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(canonical))).Replace("-", "").ToLowerInvariant());
+        }
+        System.AppDomain.CurrentDomain.SetData("DungeonAudit.result", "Running " + cursor + "/" + objects.Count);
+        if (cursor < objects.Count) return;
+        UnityEditor.EditorApplication.update -= tick;
+        System.AppDomain.CurrentDomain.SetData("DungeonAudit.tick", null);
+        var data = new { label = label, sceneGuid = UnityEditor.AssetDatabase.AssetPathToGUID(scene.path), objectCount = objects.Count, missingScripts = missing, unresolvedReferences = unresolved, crossRootReferences = external, hashes = hashes };
+        System.IO.File.WriteAllText("Logs/GitManagement/dungeon-audit-" + label + ".json", Newtonsoft.Json.JsonConvert.SerializeObject(data));
+        sha.Dispose();
+        System.AppDomain.CurrentDomain.SetData("DungeonAudit.result", "COMPLETE " + objects.Count + " objects; missing=" + missing.Count + "; unresolved=" + unresolved.Count + "; crossRoot=" + external.Count);
+    } catch (System.Exception error) {
+        UnityEditor.EditorApplication.update -= tick;
+        System.AppDomain.CurrentDomain.SetData("DungeonAudit.tick", null);
+        sha.Dispose();
+        System.AppDomain.CurrentDomain.SetData("DungeonAudit.result", "FAILED " + error);
+    }
+};
+System.AppDomain.CurrentDomain.SetData("DungeonAudit.tick", tick);
+System.AppDomain.CurrentDomain.SetData("DungeonAudit.result", "Started " + label);
+UnityEditor.EditorApplication.update += tick;
+return "Started " + label + " audit: " + objects.Count + " objects";
