@@ -34,9 +34,9 @@
 - 迁移副本的 24 项 Git/钩子测试与 5 项发布门禁测试通过；新 main 第一父提交至 main 的两个提交检查为 0 问题。
 - [Repository checks 40440023431](https://github.com/bestzh/RPG-Silent/actions/runs/40440023431) 在新 main 上成功，比较基线为新历史父提交 `b665e855ee0f848543166b896f38992ccf8b1b0a`。
 - 首次 push 事件 [40439403835](https://github.com/bestzh/RPG-Silent/actions/runs/40439403835) 使用旧历史 SHA 作为基线，无公共祖先导致范围检查退出；其两套工具测试成功。保留这次失败记录，没有放宽检查策略。
-- 切换后从 GitHub 建立的完整独立克隆通过 Git/LFS 完整性、当前文件树和三个资源 SHA-256 校验，工作区干净，无 shallow、alternates、promisor 或缺失可达对象。传输时临时复用已验证的迁移前 Git 对象缓存，新历史及缺失对象从 GitHub 获取，随后完整重打包并移除缓存依赖；三个 LFS 对象从 GitHub 下载到空对象库。此证据不是所有未变 Git blob 都重新下载的声明。
+- 切换后不使用本地对象缓存，从 GitHub 完整下载并检出 33,522 个文件及三个 LFS 对象。`git fsck --full --no-dangling`、`git lfs fsck`、当前完整文件树和三个资源 SHA-256 校验通过，工作区干净，无 shallow 或 alternates。该次 GitHub 克隆的 Git pack 为 1,757,217 KiB；服务器打包方式不同于前述本地演练统计。
 
-详细证据在忽略目录 `Logs/GitManagement/`：`final-history-backup.json`、`final-history-rehearsal.json`、`final-history-preflight.json`、`final-history-remote-cached-verification.json`、`final-history-ci.json`、`main-protection-after-history.json` 和 `final-history-local-sync.json`。克隆路径为 `D:/GitBackups/RPG-Silent/20261027-final-history/github-after-cached`。
+详细证据在忽略目录 `Logs/GitManagement/`：`final-history-backup.json`、`final-history-rehearsal.json`、`final-history-preflight.json`、`final-history-remote-verification.json`、`final-history-ci.json`、`main-protection-after-history.json` 和 `final-history-local-sync.json`。完整远端克隆路径为 `D:/GitBackups/RPG-Silent/20261027-final-history/github-after`；另一份使用缓存加速后解除依赖的独立检出也通过完整性验证，其记录另行保留。
 
 ## 其他克隆如何继续
 
