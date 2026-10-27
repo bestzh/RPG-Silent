@@ -13,6 +13,7 @@ public sealed class EnemyMotor
     private float stuckTime;
     private Vector3 lastPosition;
     private readonly NavMeshPath retreatPath = new();
+    private readonly NavMeshPath tacticalPath = new();
     private static readonly float[] retreatAngles = { 0f, 35f, -35f, 70f, -70f, 105f, -105f };
     private Vector3 retreatGoal;
     private float nextRetreatProbe;
@@ -115,12 +116,24 @@ public sealed class EnemyMotor
             body.linearVelocity = new Vector3(0f, body.linearVelocity.y, 0f);
     }
 
+    public bool TryReachablePoint(Vector3 candidate, out Vector3 point)
+    {
+        point = default;
+        if (!CanNavigate) return false;
+        var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+        if (!NavMesh.SamplePosition(candidate, out var hit, 0.8f, filter) ||
+            !NavMesh.CalculatePath(transform.position, hit.position, filter, tacticalPath) ||
+            tacticalPath.status != NavMeshPathStatus.PathComplete) return false;
+        point = hit.position;
+        return true;
+    }
+
     public void Face(Vector3 offset, bool snap = false)
     {
         offset.y = 0f;
         if (offset.sqrMagnitude < 0.001f) return;
         Quaternion rotation = Quaternion.LookRotation(offset);
-        transform.rotation = snap ? rotation : Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * TurnSpeed);
+        transform.rotation = snap ? rotation : Quaternion.RotateTowards(transform.rotation, rotation, Time.deltaTime * TurnSpeed * 60f);
     }
 
     public void FixedTick(bool moving)

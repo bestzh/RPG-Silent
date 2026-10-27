@@ -9,6 +9,7 @@ public sealed class EnemySkillData : ScriptableObject
     [Min(0.1f)] public float Duration = 1.6f;
     [Range(0f, 1f)] public float ReleaseTime = 0.45f;
     [Min(0f)] public float Cooldown = 3f;
+    [Min(0f)] public float RecoveryDuration = 0.35f;
     public float MinRange;
     public float MaxRange = 2.5f;
     [Min(1)] public int RequiredPhase = 1;

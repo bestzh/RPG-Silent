@@ -20,6 +20,9 @@ MonoBehaviour:
   LeashDistance: 60
   PreferredDistance: 3.1
   RetreatDistance: 0
+  AttackFacingAngle: 20
+  ApproachHysteresis: 0.5
+  RecoveryDamageMultiplier: 1.25
   RewardGold: 100
   RewardExp: 200
   StaggerThreshold: 80
@@ -27,5 +30,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 66620e9178390d94bae8e0baca43a8e6, type: 2}
   - {fileID: 11400000, guid: 1c77b1cd29659aa4b95b7b8c4208e0b3, type: 2}
   - {fileID: 11400000, guid: acfcddca93609674daa02aab115b0fe3, type: 2}
+  AttackSequences:
+  - {fileID: 11400000, guid: d2488c303c75d924683f5b14f990a9fc, type: 2}
   HitEffect: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
   DeathEffect: {fileID: 5610560069491694539, guid: 0def5d88622eaa74681191f2c29a1126, type: 3}

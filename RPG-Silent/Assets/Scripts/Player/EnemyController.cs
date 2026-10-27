@@ -1,10 +1,11 @@
 using RPGSilent.Domain;
 using RPGSilent.Enemies;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // 保留旧枚举值，避免已有资产/工具将状态值解释成其他状态。
-public enum EnemyState { Idle, Chase, Attack, Hurt, Return, Dead, Retreat, PhaseTransition }
+public enum EnemyState { Idle, Chase, Attack, Hurt, Return, Dead, Retreat, PhaseTransition, Recover, Reposition }
 
 /// <summary>生命周期与动作状态；感知、导航、选招及命中交给独立能力。</summary>
 public class EnemyController : MonoBehaviour, IDamageable
@@ -24,6 +25,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     public bool ReturningHome { get; private set; }
     public Transform Target => perception?.Target;
     public float DamageMultiplier { get; private set; } = 1f;
+    public EnemyCombatGroup CombatGroup { get; private set; }
+    public bool HasAttackPermit => CombatGroup != null && CombatGroup.Budget.HasPermit(this);
+    public bool HasTacticalPosition { get; private set; }
+    public Vector3 TacticalPosition { get; private set; }
+    public float LeashRadius => leashDistance;
+    public EnemyAttackSequence ActiveSequence { get; private set; }
+    public int SequenceStep => sequenceStep + 1;
+    public bool IsVulnerable => IsBoss && State == EnemyState.Recover && ActiveSequence == null;
+    public string CombatHint => IsVulnerable ? "反击机会" : ActiveSequence != null ?
+        $"连招 {SequenceStep}/{ActiveSequence.Steps.Length}" : string.Empty;
     public event System.Action<EnemyController> Died;
     public event System.Action<EnemyController> Changed;
 
@@ -62,9 +73,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float stateElapsed, nextDecision, nextAttack, lastDamageTime;
     private int staggerDamage;
     private bool initialized, dungeonConfigured, combatLocked;
+    private readonly Dictionary<EnemyAttackSequence, float> sequenceReadyAt = new();
+    private int sequenceStep;
+    private float recoveryDuration;
 
     public bool CanDecide => initialized && isActiveAndEnabled && !IsDead && !combatLocked &&
-        State != EnemyState.Attack && State != EnemyState.Hurt && State != EnemyState.PhaseTransition;
+        State != EnemyState.Attack && State != EnemyState.Hurt && State != EnemyState.PhaseTransition && State != EnemyState.Recover;
     public int DecisionCount { get; private set; }
 
     public bool WantsRetreat => Definition != null && Definition.RetreatDistance > 0f &&
@@ -127,6 +141,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         motor.Initialize();
         perception.Refresh();
         initialized = true;
+        CombatGroup?.Register(this);
         nextAttack = Time.time + 0.8f;
         EnterState(EnemyState.Idle, true);
         StartCoroutine(StartBrain());
@@ -136,6 +151,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (!initialized || IsDead || combatLocked) return;
         executor.ResetCombat();
+        CombatGroup?.Register(this);
+        phases?.RestoreEffects();
         EnterState(EnemyState.Idle, true);
         StartCoroutine(StartBrain());
     }
@@ -157,7 +174,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         StopAllCoroutines();
         if (brain != null && brain.IsActive()) brain.StopBehavior();
-        skills?.Cancel();
+        CancelAction();
+        CombatGroup?.Remove(this);
+        HasTacticalPosition = false;
         motor?.Stop();
         executor?.ResetCombat(true);
         phases?.ClearEffects();
@@ -180,6 +199,20 @@ public class EnemyController : MonoBehaviour, IDamageable
         DamageMultiplier = Mathf.Max(0.1f, tier.EnemyDamageMultiplier);
         rewardGold = Mathf.Max(0, Mathf.RoundToInt(rewardGold * tier.RewardMultiplier));
         rewardExp = Mathf.Max(0, Mathf.RoundToInt(rewardExp * tier.RewardMultiplier));
+    }
+
+    public void BindCombatGroup(EnemyCombatGroup group)
+    {
+        CombatGroup?.Remove(this);
+        CombatGroup = group;
+        CombatGroup?.Register(this);
+    }
+
+    public void AcceptSharedAggro(Transform target)
+    {
+        if (!CanDecide || ReturningHome || HasAggro || !perception.IsAlive || perception.Target != target ||
+            Vector3.Distance(target.position, motor.Home) > leashDistance) return;
+        HasAggro = true;
     }
 
     public void LockForDungeonResult()
@@ -207,18 +240,106 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (HasAggro && (!perception.IsAlive || Vector3.Distance(transform.position, motor.Home) > leashDistance ||
             Vector3.Distance(perception.Target.position, motor.Home) > leashDistance))
         {
-            skills.Cancel();
+            CancelAction();
             executor.ResetCombat();
             HasAggro = false;
             ReturningHome = true;
+            HasTacticalPosition = false;
             EnterState(EnemyState.Idle);
         }
         if (State == EnemyState.Attack && !ReturningHome)
         {
+            var finished = skills.Current;
             if (skills.Tick(Time.deltaTime) && !IsDead && !combatLocked && isActiveAndEnabled)
-            { nextAttack = Time.time + 0.35f; EnterState(EnemyState.Idle); }
+            {
+                if (ActiveSequence != null && sequenceStep + 1 < ActiveSequence.Steps.Length)
+                {
+                    sequenceStep++;
+                    BeginRecovery(ActiveSequence.BetweenAttacks);
+                }
+                else FinishSequence(finished != null ? finished.RecoveryDuration : 0.35f);
+            }
             return;
         }
+        if (State == EnemyState.Recover)
+        {
+            if (ActiveSequence != null)
+            {
+                var next = ActiveSequence.Steps[sequenceStep];
+                if (!InSkillRange(next) || !perception.HasLineOfSight()) { FinishSequence(); return; }
+                motor.Face(perception.Target.position - transform.position);
+                if (stateElapsed < recoveryDuration) return;
+                if (FacingTarget()) BeginSkill(next);
+                else if (stateElapsed >= recoveryDuration + 0.5f) FinishSequence();
+            }
+            else if (stateElapsed >= recoveryDuration)
+            {
+                CombatGroup?.ReleaseAttack(this);
+                EnterState(EnemyState.Idle);
+            }
+            return;
+        }
+        if (State == EnemyState.Idle && HasAggro && perception.IsAlive)
+            motor.Face(perception.Target.position - transform.position);
+    }
+
+    private void BeginSkill(EnemySkillData skill)
+    {
+        skills.Begin(skill, perception.Target, DamageMultiplier);
+        EnterState(EnemyState.Attack, true);
+    }
+
+    private void BeginRecovery(float duration)
+    {
+        recoveryDuration = Mathf.Max(0f, duration);
+        nextAttack = Mathf.Max(nextAttack, Time.time + recoveryDuration);
+        EnterState(EnemyState.Recover, true);
+    }
+
+    private void FinishSequence(float defaultRecovery = 0.35f)
+    {
+        float duration = ActiveSequence != null ? ActiveSequence.RecoveryDuration : defaultRecovery;
+        ActiveSequence = null;
+        sequenceStep = 0;
+        BeginRecovery(duration);
+    }
+
+    private void CancelAction()
+    {
+        skills?.Cancel();
+        CombatGroup?.ReleaseAttack(this);
+        ActiveSequence = null;
+        sequenceStep = 0;
+    }
+
+    private bool FacingTarget()
+    {
+        if (!perception.IsAlive) return false;
+        Vector3 delta = perception.Target.position - transform.position;
+        delta.y = 0f;
+        return delta.sqrMagnitude < 0.001f || Vector3.Angle(transform.forward, delta) <=
+            (Definition != null ? Definition.AttackFacingAngle : 25f);
+    }
+
+    public bool TryBeginSequence()
+    {
+        if (!CanDecide || !HasAggro || ReturningHome || Definition == null || Definition.AttackSequences == null ||
+            Time.time < nextAttack || !FacingTarget() || !perception.HasLineOfSight()) return false;
+        foreach (var sequence in Definition.AttackSequences)
+        {
+            if (sequence == null || sequence.RequiredPhase > Phase || sequence.Steps == null || sequence.Steps.Length == 0 ||
+                (sequenceReadyAt.TryGetValue(sequence, out float readyAt) && Time.time < readyAt)) continue;
+            bool valid = true;
+            foreach (var step in sequence.Steps) if (step == null || step.Attack == null || step.RequiredPhase > Phase) { valid = false; break; }
+            if (!valid || !CanSelect(sequence.Steps[0])) continue;
+            if (CombatGroup != null && !CombatGroup.TryAttack(this)) return false;
+            sequenceReadyAt[sequence] = Time.time + Mathf.Max(sequence.Cooldown, 0.1f);
+            ActiveSequence = sequence;
+            sequenceStep = 0;
+            BeginSkill(sequence.Steps[0]);
+            return true;
+        }
+        return false;
     }
 
     /// <summary>行为树的节拍节点调用；命令执行后重新等待，避免 Repeater 在同一帧空转。</summary>
@@ -227,6 +348,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (!CanDecide || Time.time < nextDecision) return false;
         nextDecision = Time.time + 0.15f;
         if (!HasAggro && !ReturningHome && perception.Distance <= detectionDistance && perception.HasLineOfSight()) HasAggro = true;
+        if (HasAggro && !ReturningHome) CombatGroup?.AlertAllies(this);
         DecisionCount++;
         return true;
     }
@@ -234,14 +356,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     public bool TryChangeBossPhase()
     {
         if (!CanDecide || ReturningHome || phases == null || !phases.TryAdvance((float)CurrentHealth / MaxHealth)) return false;
-        skills.Cancel();
+        CancelAction();
         EnterState(EnemyState.PhaseTransition);
         Changed?.Invoke(this);
         return true;
     }
 
     private void FixedUpdate() => motor?.FixedTick(!IsDead &&
-        (State == EnemyState.Chase || State == EnemyState.Return || State == EnemyState.Retreat));
+        (State == EnemyState.Chase || State == EnemyState.Return || State == EnemyState.Retreat || State == EnemyState.Reposition));
 
     public EnemyActionResult DecideReturn()
     {
@@ -265,7 +387,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public EnemyActionResult DecideAttack()
     {
-        if (!perception.IsAlive || Time.time < nextAttack || !perception.HasLineOfSight()) return EnemyActionResult.Failure;
+        if (!CanDecide || !perception.IsAlive || Time.time < nextAttack || !FacingTarget() || !perception.HasLineOfSight()) return EnemyActionResult.Failure;
+        if (CombatGroup != null && Definition != null && Definition.Behavior == EnemyBehaviorStyle.Ranged && !perception.HasClearShot()) return EnemyActionResult.Failure;
         float total = 0f;
         if (availableSkills == null) return EnemyActionResult.Failure;
         foreach (var skill in availableSkills) if (CanSelect(skill)) total += skill.Weight;
@@ -279,25 +402,50 @@ public class EnemyController : MonoBehaviour, IDamageable
             roll -= skill.Weight;
             if (roll <= 0f) break;
         }
-        motor.Face(perception.Target.position - transform.position, true);
-        skills.Begin(selected, perception.Target, DamageMultiplier);
-        EnterState(EnemyState.Attack, true);
+        if (CombatGroup != null && !CombatGroup.TryAttack(this)) return EnemyActionResult.Failure;
+        BeginSkill(selected);
         return EnemyActionResult.Running;
     }
 
-    private bool CanSelect(EnemySkillData skill) => skills.IsReady(skill) && skill.RequiredPhase <= Phase &&
-        perception.Distance >= skill.MinRange && perception.Distance <= skill.MaxRange;
+    private bool CanSelect(EnemySkillData skill) => skills.IsReady(skill) && InSkillRange(skill);
+
+    private bool InSkillRange(EnemySkillData skill) => skill != null && skill.Attack != null && skill.RequiredPhase <= Phase &&
+        perception.IsAlive && perception.Distance >= skill.MinRange && perception.Distance <= skill.MaxRange;
 
     public EnemyActionResult DecideApproach()
     {
         if (!perception.IsAlive) return DecideIdle();
         float range = Definition != null ? Definition.PreferredDistance : attackDistance;
-        if (perception.Distance > range + 0.15f || !perception.HasLineOfSight())
+        float margin = State == EnemyState.Chase ? 0.1f : (Definition != null ? Definition.ApproachHysteresis : 0.5f);
+        if (perception.Distance > range + margin || !perception.HasLineOfSight())
         {
             EnterState(EnemyState.Chase);
             if (!motor.MoveTo(perception.Target.position, range)) { ReturningHome = true; HasAggro = false; }
         }
         else { EnterState(EnemyState.Idle); motor.Face(perception.Target.position - transform.position); }
+        return EnemyActionResult.Running;
+    }
+
+    public EnemyActionResult DecideGroupPosition()
+    {
+        HasTacticalPosition = false;
+        if (!CanDecide || CombatGroup == null || Definition == null || IsBoss || !perception.IsAlive) return EnemyActionResult.Failure;
+        bool ranged = Definition.Behavior == EnemyBehaviorStyle.Ranged;
+        if (ranged && perception.Distance <= Definition.PreferredDistance + Definition.ApproachHysteresis && perception.HasClearShot())
+            return EnemyActionResult.Failure;
+        if (!CombatGroup.TryGetPosition(this, motor, perception, Definition.PreferredDistance, ranged, out var point))
+            return EnemyActionResult.Failure; // 窄路或缺少完整路径时沿用原追击，仍需申请攻击名额。
+        TacticalPosition = point;
+        HasTacticalPosition = true;
+        Vector3 gap = point - transform.position; gap.y = 0f;
+        if (gap.magnitude <= CombatGroup.PositionTolerance)
+        {
+            EnterState(EnemyState.Idle);
+            motor.Face(perception.Target.position - transform.position);
+            return EnemyActionResult.Failure;
+        }
+        EnterState(EnemyState.Reposition);
+        if (!motor.MoveTo(point, 0.25f)) { HasTacticalPosition = false; return EnemyActionResult.Failure; }
         return EnemyActionResult.Running;
     }
 
@@ -308,18 +456,20 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (State == state && !restart) return;
         State = state;
         stateElapsed = 0f;
-        bool moving = state == EnemyState.Chase || state == EnemyState.Return || state == EnemyState.Retreat;
+        bool moving = state == EnemyState.Chase || state == EnemyState.Return || state == EnemyState.Retreat || state == EnemyState.Reposition;
         if (!moving) motor.Stop();
         string animation = moving ? "Chase" : state == EnemyState.Attack ? skills.Current.AnimationState :
-            state == EnemyState.PhaseTransition ? phases.TransitionAnimation : state.ToString();
+            state == EnemyState.PhaseTransition ? phases.TransitionAnimation : state == EnemyState.Recover ? "Idle" : state.ToString();
         int hash = Animator.StringToHash("Base Layer." + animation);
         if (animator != null && animator.isActiveAndEnabled && animator.runtimeAnimatorController != null && animator.HasState(0, hash))
             animator.CrossFadeInFixedTime(hash, 0.08f, 0, 0f);
+        Changed?.Invoke(this);
     }
 
     public void TakeDamage(int amount)
     {
         if (combatLocked || IsDead || amount <= 0) return;
+        if (IsVulnerable && Definition != null) amount = Mathf.RoundToInt(amount * Definition.RecoveryDamageMultiplier);
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
         EnemySkillRunner.SpawnEffect(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity, effectLifetime);
         if (CurrentHealth == 0) { Die(); return; }
@@ -331,9 +481,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (!armor && staggerDamage >= threshold)
         {
             staggerDamage = 0;
-            skills.Cancel();
+            CancelAction();
             EnterState(EnemyState.Hurt, true);
-            nextAttack = Time.time + 0.6f;
+            nextAttack = Mathf.Max(nextAttack, Time.time + 0.6f);
             if (perception.Target != null) motor.Knockback(perception.Target.position, knockbackDistance);
         }
         Changed?.Invoke(this);
@@ -347,7 +497,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         StopAllCoroutines();
         if (brain != null && brain.IsActive()) brain.StopBehavior();
         HasAggro = false;
-        skills.Cancel();
+        CancelAction();
+        CombatGroup?.Remove(this);
+        HasTacticalPosition = false;
         executor.ResetCombat(true);
         phases?.ClearEffects();
         EnterState(EnemyState.Dead, true);

@@ -24,16 +24,19 @@ public sealed class EnemyPerception
         Rewardable = player != null ? player.GetComponent<IRewardable>() : null;
     }
 
-    public bool HasLineOfSight()
+    public bool HasLineOfSight() => HasLineOfSightFrom(owner.position + Vector3.up);
+    public bool HasClearShot() => HasLineOfSightFrom(owner.position + Vector3.up, true);
+
+    public bool HasLineOfSightFrom(Vector3 origin, bool alliesBlock = false)
     {
         if (!IsAlive) return false;
-        Vector3 origin = owner.position + Vector3.up;
         Vector3 offset = Target.position + Vector3.up - origin;
-        int count = Physics.RaycastNonAlloc(origin, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        int count = alliesBlock ? Physics.SphereCastNonAlloc(origin, 0.2f, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore) :
+            Physics.RaycastNonAlloc(origin, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
             Transform hit = hits[i].transform;
-            if (hit.IsChildOf(owner) || hit.IsChildOf(Target) || hit.GetComponentInParent<IDamageable>() != null) continue;
+            if (hit.IsChildOf(owner) || hit.IsChildOf(Target) || (!alliesBlock && hit.GetComponentInParent<IDamageable>() != null)) continue;
             return false;
         }
         return true;

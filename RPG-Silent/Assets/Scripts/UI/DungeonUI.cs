@@ -49,7 +49,8 @@ public sealed class DungeonUI : UIBase
         if (bossPanel != null) bossPanel.SetActive(boss != null && !boss.IsDead && !boundRun.HasResult);
         if (boss != null)
         {
-            if (bossName != null) bossName.text = $"{boss.DisplayName} · 阶段 {boss.Phase}  {boss.CurrentHealth}/{boss.MaxHealth}";
+            if (bossName != null) bossName.text = $"{boss.DisplayName} · 阶段 {boss.Phase}  {boss.CurrentHealth}/{boss.MaxHealth}" +
+                (string.IsNullOrEmpty(boss.CombatHint) ? "" : $" · <color=#FFD66B>{boss.CombatHint}</color>");
             if (bossHealth != null) bossHealth.value = (float)boss.CurrentHealth / boss.MaxHealth;
         }
         resultPanel.SetActive(boundRun.HasResult);

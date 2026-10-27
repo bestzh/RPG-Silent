@@ -25311,6 +25311,18 @@ MonoBehaviour:
     - Prefab: {fileID: 4691586716535488853, guid: d936367dc7eb085438daffd8baf701c7, type: 3}
       Point: {fileID: 1496346067}
   WaveDelay: 2.5
+  GroupCombat:
+    MaxAttackers: 2
+    MaxMeleeAttackers: 1
+    MaxRangedAttackers: 1
+    AttackStartInterval: 0.8
+    AttacksPerBurst: 2
+    BurstPause: 1.4
+    HandoffDelay: 0.25
+    RequestLifetime: 0.6
+    AllyAlertRadius: 26
+    PositionRefreshInterval: 0.6
+    PositionTolerance: 0.65
 --- !u!4 &641075645
 Transform:
   m_ObjectHideFlags: 0
@@ -78101,6 +78113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigPrefab: {fileID: 2118404959221701388, guid: 9153a0cde26261d438ed1a2d716c84cd, type: 3}
   resourcePath: PlayerRig
+  allowCombat: 1
   dungeonDatabase: {fileID: 0}
   alignRotation: 1
 --- !u!114 &1934438932

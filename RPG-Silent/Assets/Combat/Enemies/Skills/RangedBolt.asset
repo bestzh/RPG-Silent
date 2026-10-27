@@ -18,6 +18,7 @@ MonoBehaviour:
   Duration: 1.7
   ReleaseTime: 0.55
   Cooldown: 2.4
+  RecoveryDuration: 0.55
   MinRange: 0
   MaxRange: 14
   RequiredPhase: 1
