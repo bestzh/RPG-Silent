@@ -27,6 +27,9 @@ MonoBehaviour:
   EnergyCost: 15
   CanBeInterrupted: 1
   AttackProfile: {fileID: 11400000, guid: 12d98f0cd80af464fb5513f66ce89bbc, type: 2}
+  Element: 1
+  SummonPrefab: {fileID: 0}
+  SummonDuration: 20
   TriggerTiming: 2
   ReleaseNormalizedTime: 0.45
   EffectPrefab: {fileID: 98900064558122669, guid: 4aa9f30a28a77224ba84b2a2c334c71b, type: 3}

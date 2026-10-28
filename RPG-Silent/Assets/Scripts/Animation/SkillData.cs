@@ -54,6 +54,9 @@ public class SkillData : ScriptableObject
     [Header("执行")]
     [Tooltip("复用 AttackExecutor 的命中/伤害配置")]
     public AttackProfile AttackProfile;
+    public CombatElement Element;
+    public EnemyController SummonPrefab;
+    [Min(1)] public float SummonDuration = 20f;
     public SkillTriggerTiming TriggerTiming = SkillTriggerTiming.OnAnimationEvent;
     [Range(.05f, .95f)] public float ReleaseNormalizedTime = .45f;
 
