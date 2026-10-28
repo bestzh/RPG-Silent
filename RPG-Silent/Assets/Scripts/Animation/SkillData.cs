@@ -6,7 +6,9 @@ public enum SkillTriggerTiming
     OnAnimationEvent = 0,
 
     /// <summary>释放开始时立刻结算（动画只负责表现）。</summary>
-    OnCastStart = 1
+    OnCastStart = 1,
+    /// <summary>在配置的动作进度结算，不修改共享源动画的事件。</summary>
+    AtAnimationTime = 2
 }
 
 [CreateAssetMenu(fileName = "SkillData", menuName = "Skill/Create New Skill Data")]
@@ -53,6 +55,7 @@ public class SkillData : ScriptableObject
     [Tooltip("复用 AttackExecutor 的命中/伤害配置")]
     public AttackProfile AttackProfile;
     public SkillTriggerTiming TriggerTiming = SkillTriggerTiming.OnAnimationEvent;
+    [Range(.05f, .95f)] public float ReleaseNormalizedTime = .45f;
 
     [Header("技能特效")]
     public GameObject EffectPrefab;

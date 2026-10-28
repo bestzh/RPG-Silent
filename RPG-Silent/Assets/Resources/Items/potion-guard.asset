@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9fbedbdcc05fc4fb6dea7686f5bcd4, type: 3}
+  m_Name: potion-guard
+  m_EditorClassIdentifier: 
+  Id: potion-guard
+  DisplayName: "\u62A4\u4F53\u836F\u5242"
+  Description: "\u526F\u672C\u4E2D\u83B7\u5F97 12 \u79D2\u62A4\u4F53\uFF0C\u989D\u5916\u51CF\u514D
+    20% \u6240\u53D7\u4F24\u5BB3\u3002"
+  Kind: 3
+  Rarity: 0
+  Slot: 0
+  Icon: {fileID: 21300000, guid: 20440c456e08b284c80b99da6921edc9, type: 3}
+  Weapon: {fileID: 0}
+  Appearance: {fileID: 0}
+  Set: {fileID: 0}
+  IsGem: 0
+  UseEffect: 3
+  UseAmount: 0
+  BuyPrice: 40
+  UseStatus: {fileID: 11400000, guid: d7f3de3571eedde45a7de03aec7a0534, type: 2}
+  UseVfx: {fileID: 7155335147208632822, guid: 97c43495f80a3244fad1301dfafbe252, type: 3}
+  RequiredLevel: 1
+  Health: 0
+  Energy: 0
+  AttackPercent: 0
+  DefensePercent: 0
+  SellPrice: 10

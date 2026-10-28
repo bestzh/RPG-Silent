@@ -40,6 +40,18 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
     private AttackContext _attackContext;
 
     public bool IsCasting => _isCasting;
+    public bool CanLink => !_isCasting || (_effectResolved && _castDuration <= 0f && _animationStarted
+        && _animationController != null && _animationController.NormalizedProgress >= .8f);
+    public bool CanQueueSlot(int slot) => IsValidSlot(slot) && equippedSkills[slot] != null
+        && (_progress == null || _progress.GetSkillRank(equippedSkills[slot]) > 0)
+        && _cooldownRemaining[slot] <= CombatActionBuffer.Lifetime
+        && _stats != null && _stats.CurrentEnergy >= equippedSkills[slot].EnergyCost;
+    public bool TryFinishForLink()
+    {
+        if (!CanLink) return false;
+        if (_isCasting) ClearCastingState();
+        return true;
+    }
 
     public int SlotCount => MaxSlots;
 
@@ -151,7 +163,9 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
         if (_progress != null && _progress.GetSkillRank(skill) == 0) return false;
         if (_cooldownRemaining[slotIndex] > 0f) return false;
         if (_stats == null || !_stats.TrySpendEnergy(skill.EnergyCost)) return false;
-
+        TryFinishForLink();
+        if (_player != null && _player.StateMachine.CurrentState is AttackState)
+            _player.StateMachine.ChangeState(new IdleState(_player));
         BeginCast(slotIndex, skill);
         return true;
     }
@@ -209,12 +223,18 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
 
     // ── 内部流程 ───────────────────────────────────────────────────────────────
 
-    private void OnSkillSlotTriggered(int slotIndex) => TryCastSlot(slotIndex);
+    private void OnSkillSlotTriggered(int slotIndex)
+    {
+        if (_player != null) _player.RequestSkill(slotIndex);
+        else TryCastSlot(slotIndex);
+    }
 
     private bool CanCast()
     {
         if (_input != null && !_input.GameplayInputEnabled) return false;
-        if (_isCasting) return false;
+        if (!CanLink) return false;
+        if (_player != null && (!_player.isActiveAndEnabled || !_player.CanReceiveCombatEffects || !_player.IsGrounded)) return false;
+        if (_player != null && _player.StateMachine.CurrentState is AttackState attack && !attack.CanLink) return false;
         if (_player != null && _player.Weapons != null && _player.Weapons.IsBusy) return false;
         if (_player != null && (_player.IsDead || !_player.CombatAllowed)) return false;
         if (_player != null && (_player.IsRolling || _player.IsJumping)) return false;
@@ -254,7 +274,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
 
         _waitingForAnimationEvent = _animationStarted
             && skill.TriggerTiming == SkillTriggerTiming.OnAnimationEvent;
-        if (!_waitingForAnimationEvent)
+        if (!_waitingForAnimationEvent && !(_animationStarted && skill.TriggerTiming == SkillTriggerTiming.AtAnimationTime))
         {
             ResolveSkillEffect();
             if (!_animationStarted) FinishCast();
@@ -274,6 +294,9 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
             StartSkillExecution();
             return;
         }
+
+        if (_animationStarted && _animationController != null && _castingSkill.TriggerTiming == SkillTriggerTiming.AtAnimationTime
+            && _animationController.NormalizedProgress >= _castingSkill.ReleaseNormalizedTime) ResolveSkillEffect();
 
         if (!_animationStarted || _animationController == null || !_animationController.IsPlayingAnimation())
         {

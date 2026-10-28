@@ -19477,6 +19477,7 @@ GameObject:
   - component: {fileID: 3265391464414481605}
   - component: {fileID: 4926735694801910932}
   - component: {fileID: 5409405430284017303}
+  - component: {fileID: 6330508479546462488}
   m_Layer: 0
   m_Name: CrystalWarden
   m_TagString: Untagged
@@ -19677,6 +19678,13 @@ MonoBehaviour:
   TransitionAnimation: Phase
   TransitionEffect: {fileID: 1389068978623401373, guid: fc623da98a94ecd4f8cd0469eff355d3, type: 3}
   EnrageAura: {fileID: 4600449245101698191, guid: 59a1050cbf9879e4c913fd16fa1a388a, type: 3}
+  EnableThirdPhase: 1
+  ThirdPhaseThreshold: 0.25
+  SecondPhaseName: "\u5171\u9E23"
+  ThirdPhaseName: "\u6676\u6838\u8FC7\u8F7D"
+  SecondPhaseHint: "\u907F\u5F00\u788E\u6676\u9886\u57DF \xB7 \u8FDE\u62DB\u7ED3\u675F\u540E\u53CD\u51FB"
+  ThirdPhaseHint: "\u9707\u8361 \u2192 \u9886\u57DF \u2192 \u6676\u523A \xB7 \u8EB2\u5F00\u5730\u9762\u9884\u8B66"
+  ThirdPhaseDamageMultiplier: 1.15
 --- !u!114 &5409405430284017303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19709,6 +19717,21 @@ MonoBehaviour:
   m_EvaluationType: 0
   m_MaxEvaluationCount: 1
   m_Subtree: {fileID: 11400000, guid: 0ca001018cdc8f74995c9f87d9e090b0, type: 2}
+--- !u!114 &6330508479546462488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2610984248486028143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255b7f8466429641bf91a38d0dbb15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}
+  ImpactSound: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+  Mixer: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
 --- !u!1 &2617744876131881987
 GameObject:
   m_ObjectHideFlags: 0

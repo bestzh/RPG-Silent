@@ -55,4 +55,5 @@ public class AttackProfile : ScriptableObject
 
     [Header("Effects")]
     public GameObject HitEffectPrefab;
+    public CombatStatusDefinition StatusOnHit;
 }

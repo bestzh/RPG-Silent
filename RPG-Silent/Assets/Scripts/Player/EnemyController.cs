@@ -21,6 +21,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     public string DisplayName => Definition != null ? Definition.DisplayName : gameObject.name;
     public bool IsBoss => phases != null;
     public int Phase => phases != null ? phases.Phase : 1;
+    public string PhaseName => phases != null ? phases.PhaseName : "";
+    public string PhaseHint => State == EnemyState.PhaseTransition ? "正在转阶段 · 拉开距离" :
+        IsVulnerable ? "破绽出现 · 现在反击" : CurrentSkill != null ? CurrentSkill.DisplayName : phases != null ? phases.Hint : "";
     public EnemySkillData CurrentSkill => skills?.Current;
     public bool ReturningHome { get; private set; }
     public Transform Target => perception?.Target;
@@ -33,10 +36,11 @@ public class EnemyController : MonoBehaviour, IDamageable
     public EnemyAttackSequence ActiveSequence { get; private set; }
     public int SequenceStep => sequenceStep + 1;
     public bool IsVulnerable => IsBoss && State == EnemyState.Recover && ActiveSequence == null;
-    public string CombatHint => IsVulnerable ? "反击机会" : ActiveSequence != null ?
+    public string CombatHint => State == EnemyState.PhaseTransition ? "阶段变化" : IsVulnerable ? "反击机会" : ActiveSequence != null ?
         $"连招 {SequenceStep}/{ActiveSequence.Steps.Length}" : string.Empty;
     public event System.Action<EnemyController> Died;
     public event System.Action<EnemyController> Changed;
+    public event System.Action<EnemyHit> Damaged;
 
     [Header("旧预制体默认战斗配置")]
     public float moveSpeed = 3f;
@@ -73,6 +77,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     private float stateElapsed, nextDecision, nextAttack, lastDamageTime;
     private int staggerDamage;
     private bool initialized, dungeonConfigured, combatLocked;
+    public bool CombatLocked => combatLocked;
+    public CombatStatusController Statuses { get; private set; }
     private readonly Dictionary<EnemyAttackSequence, float> sequenceReadyAt = new();
     private int sequenceStep;
     private float recoveryDuration;
@@ -87,6 +93,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        Statuses = GetComponent<CombatStatusController>() ?? gameObject.AddComponent<CombatStatusController>();
         if (Definition != null)
         {
             MaxHealth = Definition.Health;
@@ -217,6 +224,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void LockForDungeonResult()
     {
+        Statuses?.State.Clear();
         combatLocked = true;
         enabled = false;
     }
@@ -285,7 +293,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void BeginSkill(EnemySkillData skill)
     {
-        skills.Begin(skill, perception.Target, DamageMultiplier);
+        skills.Begin(skill, perception.Target, DamageMultiplier * (phases != null ? phases.DamageMultiplier : 1f));
         EnterState(EnemyState.Attack, true);
     }
 
@@ -357,6 +365,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (!CanDecide || ReturningHome || phases == null || !phases.TryAdvance((float)CurrentHealth / MaxHealth)) return false;
         CancelAction();
+        executor.ResetCombat(); // Old phase projectiles and persistent areas cannot survive the transition.
         EnterState(EnemyState.PhaseTransition);
         Changed?.Invoke(this);
         return true;
@@ -369,6 +378,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (Vector3.Distance(transform.position, motor.Home) <= homeTolerance + 0.1f)
         {
+            if (ReturningHome && phases != null)
+            {
+                phases.ResetEncounter(); CurrentHealth = MaxHealth; staggerDamage = 0;
+                Statuses?.State.Clear(); skills.ResetCooldowns(); sequenceReadyAt.Clear(); executor.ResetCombat();
+                Changed?.Invoke(this);
+            }
             ReturningHome = false;
             EnterState(EnemyState.Idle);
             return EnemyActionResult.Success;
@@ -466,32 +481,41 @@ public class EnemyController : MonoBehaviour, IDamageable
         Changed?.Invoke(this);
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount) => ReceiveDamage(amount, perception != null && perception.Target != null ? perception.Target.position : transform.position - transform.forward, false);
+    public void TakePeriodicDamage(int amount) => ReceiveDamage(amount, transform.position, true);
+    public void ReceiveHit(int amount, Vector3 source) => ReceiveDamage(amount, source, false);
+
+    void ReceiveDamage(int amount, Vector3 source, bool periodic)
     {
         if (combatLocked || IsDead || amount <= 0) return;
-        if (IsVulnerable && Definition != null) amount = Mathf.RoundToInt(amount * Definition.RecoveryDamageMultiplier);
+        bool vulnerable = IsVulnerable;
+        if (vulnerable && Definition != null) amount = Mathf.RoundToInt(amount * Definition.RecoveryDamageMultiplier);
+        amount = Mathf.Min(CurrentHealth, amount);
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
-        EnemySkillRunner.SpawnEffect(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity, effectLifetime);
-        if (CurrentHealth == 0) { Die(); return; }
+        if (!periodic) EnemySkillRunner.SpawnEffect(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity, effectLifetime);
+        if (CurrentHealth == 0) { Die(); Damaged?.Invoke(new EnemyHit(amount, false, false, vulnerable, true, periodic)); return; }
         HasAggro = perception.IsAlive;
         lastDamageTime = Time.time;
-        staggerDamage += amount;
+        if (!periodic) staggerDamage += amount;
         bool armor = State == EnemyState.PhaseTransition || (skills.Current != null && skills.Current.SuperArmor);
         int threshold = Definition != null ? Definition.StaggerThreshold : 0;
-        if (!armor && staggerDamage >= threshold)
+        bool staggered = !periodic && !armor && staggerDamage >= threshold;
+        if (staggered)
         {
             staggerDamage = 0;
             CancelAction();
             EnterState(EnemyState.Hurt, true);
             nextAttack = Mathf.Max(nextAttack, Time.time + 0.6f);
-            if (perception.Target != null) motor.Knockback(perception.Target.position, knockbackDistance);
+            motor.Knockback(source, knockbackDistance);
         }
+        Damaged?.Invoke(new EnemyHit(amount, staggered, armor, vulnerable, false, periodic));
         Changed?.Invoke(this);
     }
 
     public void Die()
     {
         if (combatLocked || IsDead) return;
+        Statuses?.State.Clear();
         CurrentHealth = 0;
         IsDead = true;
         StopAllCoroutines();
