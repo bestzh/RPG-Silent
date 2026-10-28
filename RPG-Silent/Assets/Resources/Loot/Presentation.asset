@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0c2b72f92e60c748b570553c072bc9c, type: 3}
+  m_Name: Presentation
+  m_EditorClassIdentifier: 
+  CurrencyModel: {fileID: 1857210066081004, guid: 0441eac5e332cb0458385fc6d722f5b0, type: 3}
+  ItemModel: {fileID: 1624953783224470, guid: 45879a9296a948147b133a12268a8240, type: 3}
+  GlowPrefab: {fileID: 5475257323992577593, guid: 7d49ff9c462b4ce4c81dc2ec27803c47, type: 3}
+  GlowMaterial: {fileID: 2100000, guid: 1efd8a34d5e73184d825c784a8bf58fa, type: 2}
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}

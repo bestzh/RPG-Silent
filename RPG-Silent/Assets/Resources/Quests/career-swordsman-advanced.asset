@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: career-swordsman-advanced
+  m_EditorClassIdentifier: 
+  Id: career-swordsman-advanced
+  Title: "\u8FDB\u9636\u8BD5\u70BC \xB7 \u5251\u58EB"
+  Description: "\u8FBE\u5230 10 \u7EA7\u5E76\u5B8C\u6210\u521D\u8BD5\u540E\uFF0C\u5411\u5BFC\u5E08\u9009\u62E9\u81EA\u5DF1\u7684\u8F6C\u804C\u5206\u652F\u3002\u4EE5\u8FDB\u9636\u804C\u4E1A\u5B8C\u6210\u6C34\u6676\u6D1E\u7A9F\u7684\u6311\u6218\uFF0C\u518D\u56DE\u5230\u5BFC\u5E08\u5904\u9886\u53D6\u8BD5\u70BC\u5956\u52B1\u3002\u5DF2\u7ECF\u8F6C\u804C\u7684\u89D2\u8272\u4E5F\u53EF\u63A5\u53D6\u3002"
+  Category: 2
+  Giver: 0
+  FamilyId: swordsman
+  PrerequisiteId: career-swordsman
+  RequiredLevel: 10
+  Order: 60
+  Objectives:
+  - Kind: 5
+    Label: "\u5B8C\u6210\u4EFB\u4E00\u804C\u4E1A\u8F6C\u804C"
+    DungeonId: 0
+    ItemId: 
+    Required: 1
+  - Kind: 1
+    Label: "\u901A\u5173\u6C34\u6676\u6D1E\u7A9F"
+    DungeonId: 1002
+    ItemId: 
+    Required: 1
+  RewardGold: 800
+  RewardExp: 1200
+  Rewards:
+  - itemId: gem-fury
+    count: 1
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

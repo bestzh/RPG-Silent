@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public enum DungeonRunState { Inactive, Running, Succeeded, Failed, Leaving }
 
-/// <summary>场景作用域内的一次副本；敌人先记账，通关时一次结算，卸载即释放。</summary>
+/// <summary>Owns encounter outcome and scene-local drops; rewards commit only on manual pickup.</summary>
 public sealed class DungeonRunService : IDisposable
 {
     public const string UiKey = "UI/DungeonUI";
@@ -16,11 +17,18 @@ public sealed class DungeonRunService : IDisposable
     private readonly IUIService ui;
     private readonly ISceneLoader loader;
     private readonly PlayerSessionService session;
+    private readonly PlayerProgressService progress;
+    private readonly List<WorldLootPickup> drops = new();
+    private readonly System.Random random = new();
+    private DungeonLootTable lootTable;
+    private LootPresentation lootPresentation;
+    public bool ResultVisible { get; private set; }
+    public int RemainingDrops => drops.Count(x => x != null && !x.IsCollected);
+    public int CollectedItems { get; private set; }
     private readonly HashSet<EnemyController> remaining = new();
     private readonly List<EnemyController> enemies = new();
     private PlayerController player;
     private bool disposed;
-    private int pendingGold, pendingExp;
     private DungeonRunState settledState;
     private DungeonEncounter encounter;
     private DungeonDatabase.DifficultyTier difficultyTier;
@@ -35,15 +43,17 @@ public sealed class DungeonRunService : IDisposable
     public int AwardedGold { get; private set; }
     public int AwardedExp { get; private set; }
     public string FailureReason { get; private set; }
+    public string TravelError { get; private set; }
     public bool HasResult => settledState == DungeonRunState.Succeeded || settledState == DungeonRunState.Failed;
     public bool Succeeded => settledState == DungeonRunState.Succeeded;
     public event Action Changed;
 
     public DungeonRunService(PlayerStats stats, IPlayerInputActions input, ICursorService cursor,
-        IUIService ui, ISceneLoader loader, PlayerSessionService session)
+        IUIService ui, ISceneLoader loader, PlayerSessionService session, PlayerProgressService progress)
     {
         this.stats = stats; this.input = input; this.cursor = cursor;
         this.ui = ui; this.loader = loader; this.session = session;
+        this.progress = progress;
     }
 
     public void Initialize(Scene scene)
@@ -53,12 +63,14 @@ public sealed class DungeonRunService : IDisposable
         Dungeon = database != null ? database.GetById(DungeonLaunchContext.DungeonId) : null;
         if (Dungeon == null || !Dungeon.MatchesScene(scene.name)) return;
         Difficulty = DungeonLaunchContext.Difficulty;
+        lootTable = Resources.Load<DungeonLootTable>("Loot/Dungeon" + Dungeon.Id);
+        lootPresentation = Resources.Load<LootPresentation>("Loot/Presentation");
         var tier = Dungeon.GetDifficultyTier(Difficulty);
         difficultyTier = tier;
         player = session.PlayerRig != null ? session.PlayerRig.GetComponentInChildren<PlayerController>(true) : null;
         State = DungeonRunState.Running;
         ui.OpenUI(UiKey);
-        if (!Dungeon.IsEnabled || tier == null || player == null)
+        if (!Dungeon.IsEnabled || tier == null || player == null || lootTable == null || lootPresentation == null)
         {
             Finish(false, "副本配置不可用，请返回主城。");
             return;
@@ -124,8 +136,8 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Running || !remaining.Remove(enemy)) return;
         enemy.Died -= OnEnemyDied;
         ++DefeatedEnemies;
-        pendingGold += enemy.RewardGold;
-        pendingExp += enemy.RewardExp;
+        progress.RecordQuestDungeonEvent(Dungeon.Id, false);
+        SpawnDrops(enemy);
         if (stats.IsDead) Finish(false, "角色已倒下。");
         else if (encounter == null && remaining.Count == 0) Finish(true);
         else Changed?.Invoke();
@@ -140,24 +152,62 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed || State != DungeonRunState.Running) return;
         State = settledState = success ? DungeonRunState.Succeeded : DungeonRunState.Failed;
+        if (success) progress.RecordQuestDungeonEvent(Dungeon.Id, true);
+        player?.Statuses?.State.Clear();
         FailureReason = reason;
         encounter?.Stop();
         stats.OnHealthChanged -= OnHealthChanged;
         input.SetGameplayInputBlocked(this, true);
         cursor.EnterUICursor();
-        player?.LockForDungeonResult();
+        ResultVisible = true;
+        if (!success) player?.LockForDungeonResult();
         foreach (var enemy in enemies)
             if (enemy != null) enemy.LockForDungeonResult();
-        if (success)
-        {
-            AwardedGold = pendingGold;
-            AwardedExp = pendingExp;
-            stats.AddReward(AwardedGold, AwardedExp);
-        }
         ui.SetRaycastEnabled("UI/MainUI", false);
         Changed?.Invoke();
     }
 
+    private void SpawnDrops(EnemyController enemy)
+    {
+        var items = lootTable.RollEnemy(Difficulty, enemy.IsBoss, random);
+        for (int i = 0; i <= items.Length; i++)
+        {
+            var go = new GameObject("World loot"); SceneManager.MoveGameObjectToScene(go, enemy.gameObject.scene);
+            Vector3 position = enemy.transform.position;
+            Vector3 candidate = position + Quaternion.Euler(0, i * 137.5f, 0) * Vector3.forward * (i == 0 ? .25f : .9f);
+            var agent = enemy.GetComponent<UnityEngine.AI.NavMeshAgent>(); UnityEngine.AI.NavMeshHit nav;
+            if (agent != null && UnityEngine.AI.NavMesh.SamplePosition(candidate, out nav, 1f,
+                new UnityEngine.AI.NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = UnityEngine.AI.NavMesh.AllAreas }))
+                position = nav.position;
+            var ground = Physics.RaycastAll(position + Vector3.up * 1.5f, Vector3.down, 4f, ~0, QueryTriggerInteraction.Ignore)
+                .Where(h => h.normal.y > .6f && h.collider.GetComponentInParent<EnemyController>() == null && h.collider.GetComponentInParent<PlayerController>() == null)
+                .OrderBy(h => h.distance).ToArray();
+            if (ground.Length > 0) position = ground[0].point;
+            go.transform.position = position + Vector3.up * .03f;
+            var drop = go.AddComponent<WorldLootPickup>();
+            drop.InitializeRolled(i == 0 ? null : progress.FindItem(items[i - 1].itemId), i == 0 ? null : items[i - 1],
+                i == 0 ? enemy.RewardGold : 0, i == 0 ? enemy.RewardExp : 0, lootPresentation);
+            drop.Collected += OnDropCollected; drops.Add(drop);
+        }
+    }
+    void OnDropCollected(WorldLootPickup pickup)
+    {
+        AwardedGold += pickup.Gold; AwardedExp += pickup.Experience;
+        if (pickup.Item != null) CollectedItems += pickup.Count;
+        pickup.Collected -= OnDropCollected; Changed?.Invoke();
+    }
+    public void ContinueLooting()
+    {
+        if (!Succeeded || disposed || State == DungeonRunState.Leaving || stats.IsDead) return;
+        ResultVisible = false; input.SetGameplayInputBlocked(this, false); ui.SetRaycastEnabled("UI/MainUI", true);
+        if (input.GameplayInputEnabled) cursor.EnterGameplayCursor(); Changed?.Invoke();
+    }
+    public void ShowResult()
+    {
+        if (!HasResult || disposed || State == DungeonRunState.Leaving) return;
+        ResultVisible = true; input.SetGameplayInputBlocked(this, true); cursor.EnterUICursor();
+        ui.SetRaycastEnabled("UI/MainUI", false); Changed?.Invoke();
+    }
     public void Retry() => Leave(Dungeon?.SceneKey);
     public void ReturnToMain() => Leave("Scenes/Main");
 
@@ -165,7 +215,11 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed || !HasResult || State == DungeonRunState.Leaving || loader.IsLoading ||
             ui.IsUIOpen("UI/LoadingUI") || string.IsNullOrEmpty(sceneKey)) return;
+        if (!progress.Save()) { TravelError = "进度尚未保存，无法离开。请检查存储后再次点击重试或返回。"; Changed?.Invoke(); return; }
+        TravelError = string.Empty;
         State = DungeonRunState.Leaving;
+        ResultVisible = true;
+        input.SetGameplayInputBlocked(this, true); cursor.EnterUICursor();
         Changed?.Invoke();
         // 直到目的场景激活，才由出生器复活/清上下文；失败保留本次结果与奖励。
         ui.OpenUI("UI/LoadingUI", sceneKey, "UI/MainUI", (Action)(() =>
@@ -194,6 +248,8 @@ public sealed class DungeonRunService : IDisposable
             if (enemy != null) { enemy.Died -= OnEnemyDied; enemy.Changed -= OnBossChanged; }
         remaining.Clear();
         enemies.Clear();
+        foreach (var pickup in drops) if (pickup != null) pickup.Collected -= OnDropCollected;
+        drops.Clear();
         Changed = null;
         input.SetGameplayInputBlocked(this, false);
     }

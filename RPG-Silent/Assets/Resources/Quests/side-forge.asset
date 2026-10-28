@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: side-forge
+  m_EditorClassIdentifier: 
+  Id: side-forge
+  Title: "\u94C1\u5320\u7684\u5907\u6599"
+  Description: "\u94C1\u5320\u9700\u8981\u953B\u9020\u788E\u7247\u4FEE\u8865\u57CE\u9632\u88C5\u5907\u3002\u526F\u672C\u4E2D\u62FE\u53D6\u6750\u6599\uFF0C\u6216\u5206\u89E3\u4E0D\u7528\u7684\u9632\u5177\uFF0C\u5E26\u56DE
+    5 \u679A\u788E\u7247\u3002\u4EA4\u4ED8\u4F1A\u6D88\u8017\u8FD9\u4E9B\u6750\u6599\uFF0C\u5F85\u9886\u53D6\u9875\u4E2D\u7684\u6750\u6599\u987B\u5148\u79FB\u5165\u80CC\u5305\u3002"
+  Category: 1
+  Giver: 1
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 30
+  Objectives:
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u953B\u9020\u788E\u7247\uFF08\u63D0\u4EA4\u65F6\u6D88\u8017\uFF09"
+    DungeonId: 0
+    ItemId: forge-shard
+    Required: 5
+  RewardGold: 250
+  RewardExp: 200
+  Rewards:
+  - itemId: gem-guard
+    count: 1
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0
