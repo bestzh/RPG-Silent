@@ -23,7 +23,8 @@ public sealed class DungeonRunService : IDisposable
     private DungeonLootTable lootTable;
     private LootPresentation lootPresentation;
     public bool ResultVisible { get; private set; }
-    public int RemainingDrops => drops.Count(x => x != null && !x.IsCollected);
+    public int RemainingDrops => WorldLootPickup.Active.Count(x => x != null && !x.IsCollected && x.gameObject.scene == runScene);
+    Scene runScene;
     public int CollectedItems { get; private set; }
     private readonly HashSet<EnemyController> remaining = new();
     private readonly List<EnemyController> enemies = new();
@@ -91,6 +92,7 @@ public sealed class DungeonRunService : IDisposable
         var database = Resources.Load<DungeonDatabase>("DungeonDatabase");
         Dungeon = database != null ? database.GetById(DungeonLaunchContext.DungeonId) : null;
         if (Dungeon == null || !Dungeon.MatchesScene(scene.name) || Dungeon.IsTraining) return;
+        runScene = scene;
         Challenge = DungeonLaunchContext.Challenge; startedAt = Time.time;
         Difficulty = DungeonLaunchContext.Difficulty;
         lootTable = Resources.Load<DungeonLootTable>("Loot/Dungeon" + Dungeon.Id);

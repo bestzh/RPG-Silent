@@ -46,6 +46,7 @@ public sealed partial class InventoryUI
     }
     void ResetManagement()
     {
+        CloseDiscard();
         draft = null; batchMode = false; batchKeys.Clear(); batchQuote = presetConfirmation = null;
         if (presetShade != null) presetShade.gameObject.SetActive(false);
     }
