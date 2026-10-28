@@ -11,7 +11,8 @@ public class PlayerMovementSettings
     [Range(0.02f, 0.3f)] public float GroundProbeDistance = 0.12f;
     [Range(0f, 80f)] public float MaxSlopeAngle = 55f;
     [Range(0f, 0.3f)] public float CoyoteTime = 0.1f;
-    public LayerMask GroundLayers = Physics.DefaultRaycastLayers;
+    // Forest moss collides with the character on Ignore Raycast; it still supports feet.
+    public LayerMask GroundLayers = Physics.AllLayers;
 }
 
 /// <summary>
@@ -94,6 +95,18 @@ public sealed class PlayerMotor
     {
         if (!body.isKinematic)
             body.linearVelocity = new Vector3(velocity.x, body.linearVelocity.y, velocity.z);
+    }
+
+    // Sweep the existing rigidbody capsule before an impulse so walls still stop knockback/lunges.
+    public void MoveImpulse(Vector3 velocity, float deltaTime)
+    {
+        if (body.isKinematic) return;
+        velocity.y = 0;
+        float speed = velocity.magnitude;
+        if (speed > .001f && deltaTime > 0 && body.SweepTest(velocity / speed, out var hit,
+            speed * deltaTime + .03f, QueryTriggerInteraction.Ignore))
+            velocity *= Mathf.Clamp01(Mathf.Max(0, hit.distance - .03f) / (speed * deltaTime));
+        SetHorizontalVelocity(velocity);
     }
 
     public void Jump(float impulse, float now)

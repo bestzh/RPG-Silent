@@ -32,6 +32,12 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public event Action WalkStarted;
     public event Action WalkEnded;
     public event Action AttackTriggered;
+    public event Action<bool> AttackReleased;
+    private bool suppressAttackRelease;
+    public event Action LockTargetTriggered;
+    public event Action GuardStarted;
+    public event Action GuardEnded;
+    public event Action<int> TargetCycleTriggered;
     public event Action StanceToggleTriggered;
     public event Action PauseTriggered;
     public event Action InteractTriggered;
@@ -53,6 +59,12 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public InputAction Walk         { get; private set; }
     public InputAction Attack       { get; private set; }
     public InputAction Look         { get; private set; }
+    public InputAction LockTarget { get; private set; }
+    public InputAction Guard { get; private set; }
+    public InputAction NextTarget { get; private set; }
+    public InputAction PreviousTarget { get; private set; }
+    InputAction targetScroll;
+    float nextScrollAt;
     private InputAction CursorToggle { get; set; }
     public InputAction StanceToggle { get; private set; }
     public InputAction Pause        { get; private set; }
@@ -110,6 +122,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
 
     private void OnDestroy()
     {
+        suppressAttackRelease = true;
         _currentRebind?.Cancel();
         _currentRebind?.Dispose();
         UnsubscribeHandlers();
@@ -128,6 +141,8 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         CancelCurrentRebind();
         string savedJson = SaveBindingsToJson();
 
+        suppressAttackRelease = true;
+        AttackReleased?.Invoke(false);
         _map.Disable();
         UnsubscribeGameplayHandlers();
         _map.Dispose();
@@ -137,6 +152,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         LoadBindingsFromJson(savedJson);
 
         ApplyGameplayInputState();
+        suppressAttackRelease = false;
     }
 
     public void StartRebind(InputAction action, int bindingIndex,
@@ -145,7 +161,10 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         _currentRebind?.Cancel();
         _currentRebind?.Dispose();
 
+        suppressAttackRelease = true;
+        if (action == Attack) AttackReleased?.Invoke(false);
         action.Disable();
+        suppressAttackRelease = false;
 
         _currentRebind = action
             .PerformInteractiveRebinding(bindingIndex)
@@ -280,6 +299,11 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
 
         Look = _map.AddAction("Look", InputActionType.Value);
         Look.AddBinding("<Mouse>/delta");
+        LockTarget = _map.AddAction("LockTarget", InputActionType.Button, "<Mouse>/middleButton");
+        Guard = _map.AddAction("Guard", InputActionType.Button, "<Mouse>/rightButton");
+        NextTarget = _map.AddAction("NextTarget", InputActionType.Button, "<Keyboard>/rightBracket");
+        PreviousTarget = _map.AddAction("PreviousTarget", InputActionType.Button, "<Keyboard>/leftBracket");
+        targetScroll = _map.AddAction("TargetScroll", InputActionType.Value, "<Mouse>/scroll/y");
 
         CursorToggle = _map.AddAction("CursorToggle", InputActionType.Button);
         CursorToggle.AddBinding("<Keyboard>/leftCtrl");
@@ -340,6 +364,13 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         Walk.performed        += OnWalkPerformed;
         Walk.canceled         += OnWalkCanceled;
         Attack.performed      += OnAttackPerformed;
+        Attack.canceled       += OnAttackCanceled;
+        LockTarget.performed += OnLockTarget;
+        Guard.performed += OnGuardStarted;
+        Guard.canceled += OnGuardEnded;
+        NextTarget.performed += OnNextTarget;
+        PreviousTarget.performed += OnPreviousTarget;
+        targetScroll.performed += OnTargetScroll;
         CursorToggle.performed += OnCursorTogglePerformed;
         StanceToggle.performed += OnStanceTogglePerformed;
         Interact.performed += OnInteractPerformed;
@@ -363,10 +394,16 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         if (Roll         != null)   Roll.performed         -= OnRollPerformed;
         if (Jump         != null)   Jump.performed         -= OnJumpPerformed;
         if (Walk         != null) { Walk.performed         -= OnWalkPerformed;        Walk.canceled   -= OnWalkCanceled; }
-        if (Attack       != null)   Attack.performed       -= OnAttackPerformed;
+        if (Attack != null) { Attack.performed -= OnAttackPerformed; Attack.canceled -= OnAttackCanceled; }
         if (CursorToggle != null)   CursorToggle.performed -= OnCursorTogglePerformed;
         if (StanceToggle != null)   StanceToggle.performed -= OnStanceTogglePerformed;
         if (Interact != null) Interact.performed -= OnInteractPerformed;
+
+        if (LockTarget != null) LockTarget.performed -= OnLockTarget;
+        if (Guard != null) { Guard.performed -= OnGuardStarted; Guard.canceled -= OnGuardEnded; }
+        if (NextTarget != null) NextTarget.performed -= OnNextTarget;
+        if (PreviousTarget != null) PreviousTarget.performed -= OnPreviousTarget;
+        if (targetScroll != null) targetScroll.performed -= OnTargetScroll;
 
         // SkillSlots 在 RebuildMap 时整表 Dispose，旧回调随 Action 一起丢弃
     }
@@ -391,12 +428,26 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     private void OnWalkPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(WalkStarted);
     private void OnWalkCanceled(InputAction.CallbackContext _)         => WalkEnded?.Invoke();
     private void OnAttackPerformed(InputAction.CallbackContext _)      => RaiseGameplayAction(AttackTriggered);
+    private void OnAttackCanceled(InputAction.CallbackContext _) => AttackReleased?.Invoke(GameplayInputEnabled && !suppressAttackRelease);
     private void OnStanceTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(StanceToggleTriggered);
     private void OnCursorTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(CursorToggleTriggered);
     private void OnPausePerformed(InputAction.CallbackContext _)       => PauseTriggered?.Invoke();
     private void OnInventoryPerformed(InputAction.CallbackContext _) => InventoryTriggered?.Invoke();
     private void OnJournalPerformed(InputAction.CallbackContext _) => JournalTriggered?.Invoke();
     private void OnInteractPerformed(InputAction.CallbackContext _) => RaiseGameplayAction(InteractTriggered);
+
+    void OnLockTarget(InputAction.CallbackContext _) => RaiseGameplayAction(LockTargetTriggered);
+    void OnGuardStarted(InputAction.CallbackContext _) => RaiseGameplayAction(GuardStarted);
+    void OnGuardEnded(InputAction.CallbackContext _) => GuardEnded?.Invoke();
+    void OnNextTarget(InputAction.CallbackContext _) { if (GameplayInputEnabled) TargetCycleTriggered?.Invoke(1); }
+    void OnPreviousTarget(InputAction.CallbackContext _) { if (GameplayInputEnabled) TargetCycleTriggered?.Invoke(-1); }
+    void OnTargetScroll(InputAction.CallbackContext context)
+    {
+        float value = context.ReadValue<float>();
+        if (!GameplayInputEnabled || Mathf.Abs(value) < .01f || Time.unscaledTime < nextScrollAt) return;
+        nextScrollAt = Time.unscaledTime + .16f;
+        TargetCycleTriggered?.Invoke(value > 0 ? 1 : -1);
+    }
 
     public string GetSkillSlotDisplay(int slotIndex)
     {

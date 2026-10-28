@@ -10,6 +10,10 @@ public enum EnemyState { Idle, Chase, Attack, Hurt, Return, Dead, Retreat, Phase
 /// <summary>生命周期与动作状态；感知、导航、选招及命中交给独立能力。</summary>
 public class EnemyController : MonoBehaviour, IDamageable
 {
+    static readonly HashSet<EnemyController> activeEnemies = new();
+    public static IEnumerable<EnemyController> ActiveEnemies => activeEnemies;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetActiveEnemies() => activeEnemies.Clear();
     public EnemyDefinition Definition;
     public int MaxHealth = 60;
     public int CurrentHealth { get; private set; }
@@ -18,7 +22,13 @@ public class EnemyController : MonoBehaviour, IDamageable
     public bool HasAggro { get; private set; }
     public int RewardGold => rewardGold;
     public int RewardExp => rewardExp;
-    public string DisplayName => Definition != null ? Definition.DisplayName : gameObject.name;
+    public string DisplayName => (IsCompanion ? "兽灵 · " : IsElite ? "精英 · " : "") + (Definition != null ? Definition.DisplayName : gameObject.name);
+    public PlayerController CompanionOwner { get; private set; }
+    public bool IsCompanion { get; private set; }
+    public bool IsElite { get; private set; }
+    public bool IsTrainingTarget { get; private set; }
+    public bool TrainingAttacks { get; private set; }
+    float companionExpires;
     public bool IsBoss => phases != null;
     public int Phase => phases != null ? phases.Phase : 1;
     public string PhaseName => phases != null ? phases.PhaseName : "";
@@ -83,7 +93,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     private int sequenceStep;
     private float recoveryDuration;
 
-    public bool CanDecide => initialized && isActiveAndEnabled && !IsDead && !combatLocked &&
+    // Following owns locomotion while there is no usable combat target; the enemy tree must not reset its path to idle.
+    bool ShouldFollowOwner => IsCompanion && CompanionOwner != null &&
+        (!perception.IsAlive || Vector3.Distance(transform.position, CompanionOwner.transform.position) > 18f);
+    public bool CanDecide => !ShouldFollowOwner && (!IsTrainingTarget || TrainingAttacks) && initialized && isActiveAndEnabled && !IsDead && !combatLocked &&
         State != EnemyState.Attack && State != EnemyState.Hurt && State != EnemyState.PhaseTransition && State != EnemyState.Recover;
     public int DecisionCount { get; private set; }
 
@@ -145,6 +158,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Start()
     {
+        if (IsCompanion || IsElite) gameObject.AddComponent<EnemyAllegianceLabel>();
         motor.Initialize();
         perception.Refresh();
         initialized = true;
@@ -156,6 +170,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void OnEnable()
     {
+        activeEnemies.Add(this);
         if (!initialized || IsDead || combatLocked) return;
         executor.ResetCombat();
         CombatGroup?.Register(this);
@@ -179,6 +194,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        activeEnemies.Remove(this);
         StopAllCoroutines();
         if (brain != null && brain.IsActive()) brain.StopBehavior();
         CancelAction();
@@ -193,6 +209,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void OnDestroy()
     {
+        activeEnemies.Remove(this);
         if (fallbackSkill != null) Destroy(fallbackSkill);
         if (fallbackProfile != null) Destroy(fallbackProfile);
     }
@@ -206,6 +223,29 @@ public class EnemyController : MonoBehaviour, IDamageable
         DamageMultiplier = Mathf.Max(0.1f, tier.EnemyDamageMultiplier);
         rewardGold = Mathf.Max(0, Mathf.RoundToInt(rewardGold * tier.RewardMultiplier));
         rewardExp = Mathf.Max(0, Mathf.RoundToInt(rewardExp * tier.RewardMultiplier));
+    }
+
+    public void ConfigureCompanion(PlayerController owner, float duration, float multiplier)
+    {
+        IsCompanion = true; CompanionOwner = owner; companionExpires = Time.time + duration;
+        dungeonConfigured = true; rewardGold = rewardExp = 0;
+        DamageMultiplier = Mathf.Max(.1f, multiplier); MaxHealth *= 2; CurrentHealth = MaxHealth;
+        GetComponent<CombatFaction>().Team = CombatTeam.Player;
+        executor.ConfigureCompanionTargeting(); perception.ConfigureCompanion(owner);
+        BindCombatGroup(null);
+    }
+    public void ConfigureElite()
+    {
+        if (IsElite) return;
+        IsElite = true; MaxHealth *= 2; CurrentHealth = MaxHealth;
+        DamageMultiplier *= 1.25f; rewardGold *= 2; rewardExp *= 2;
+        transform.localScale *= 1.15f;
+    }
+    public void ConfigureTraining(bool attacks)
+    {
+        IsTrainingTarget = true; TrainingAttacks = attacks; dungeonConfigured = true;
+        rewardGold = rewardExp = 0; MaxHealth = CurrentHealth = 1000000;
+        DamageMultiplier = .25f;
     }
 
     public void BindCombatGroup(EnemyCombatGroup group)
@@ -233,7 +273,20 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (IsDead || combatLocked) return;
         stateElapsed += Time.deltaTime;
+        if (IsCompanion)
+        {
+            if (CompanionOwner == null || !CompanionOwner.CanReceiveCombatEffects || Time.time >= companionExpires)
+            { Destroy(gameObject); return; }
+            motor.SetHome(CompanionOwner.transform.position);
+        }
         perception.Refresh();
+        if (ShouldFollowOwner)
+        {
+            CancelAction(); HasAggro = false; ReturningHome = false;
+            if (Vector3.Distance(transform.position, motor.Home) > 2.5f) { EnterState(EnemyState.Chase); motor.MoveTo(motor.Home, 2); }
+            else EnterState(EnemyState.Idle);
+            return;
+        }
         if (Time.time - lastDamageTime > 3f) staggerDamage = 0;
         if (State == EnemyState.PhaseTransition)
         {
@@ -484,19 +537,20 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void TakeDamage(int amount) => ReceiveDamage(amount, perception != null && perception.Target != null ? perception.Target.position : transform.position - transform.forward, false);
     public void TakePeriodicDamage(int amount) => ReceiveDamage(amount, transform.position, true);
     public void ReceiveHit(int amount, Vector3 source) => ReceiveDamage(amount, source, false);
+    public void ReceiveHit(int amount, Vector3 source, float staggerMultiplier) => ReceiveDamage(amount, source, false, staggerMultiplier);
 
-    void ReceiveDamage(int amount, Vector3 source, bool periodic)
+    void ReceiveDamage(int amount, Vector3 source, bool periodic, float staggerMultiplier = 1f)
     {
         if (combatLocked || IsDead || amount <= 0) return;
         bool vulnerable = IsVulnerable;
         if (vulnerable && Definition != null) amount = Mathf.RoundToInt(amount * Definition.RecoveryDamageMultiplier);
         amount = Mathf.Min(CurrentHealth, amount);
-        CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
+        CurrentHealth = Mathf.Max(IsTrainingTarget ? 1 : 0, CurrentHealth - amount);
         if (!periodic) EnemySkillRunner.SpawnEffect(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity, effectLifetime);
         if (CurrentHealth == 0) { Die(); Damaged?.Invoke(new EnemyHit(amount, false, false, vulnerable, true, periodic)); return; }
         HasAggro = perception.IsAlive;
         lastDamageTime = Time.time;
-        if (!periodic) staggerDamage += amount;
+        if (!periodic) staggerDamage += Mathf.RoundToInt(amount * Mathf.Max(0, staggerMultiplier));
         bool armor = State == EnemyState.PhaseTransition || (skills.Current != null && skills.Current.SuperArmor);
         int threshold = Definition != null ? Definition.StaggerThreshold : 0;
         bool staggered = !periodic && !armor && staggerDamage >= threshold;
@@ -512,9 +566,19 @@ public class EnemyController : MonoBehaviour, IDamageable
         Changed?.Invoke(this);
     }
 
+    // Parry disrupts ordinary melee attackers, preserving boss phases and armored skills.
+    public bool ReceiveParry()
+    {
+        if (combatLocked || IsDead || IsBoss || State == EnemyState.PhaseTransition || skills.Current != null && skills.Current.SuperArmor) return false;
+        CancelAction(); staggerDamage = 0;
+        EnterState(EnemyState.Hurt, true);
+        nextAttack = Mathf.Max(nextAttack, Time.time + .6f);
+        Changed?.Invoke(this); return true;
+    }
+
     public void Die()
     {
-        if (combatLocked || IsDead) return;
+        if (combatLocked || IsDead || IsTrainingTarget) return;
         Statuses?.State.Clear();
         CurrentHealth = 0;
         IsDead = true;
