@@ -23,7 +23,8 @@ public sealed class DungeonRunService : IDisposable
     private DungeonLootTable lootTable;
     private LootPresentation lootPresentation;
     public bool ResultVisible { get; private set; }
-    public int RemainingDrops => drops.Count(x => x != null && !x.IsCollected);
+    public int RemainingDrops => WorldLootPickup.Active.Count(x => x != null && !x.IsCollected && x.gameObject.scene == runScene);
+    Scene runScene;
     public int CollectedItems { get; private set; }
     private readonly HashSet<EnemyController> remaining = new();
     private readonly List<EnemyController> enemies = new();
@@ -48,6 +49,7 @@ public sealed class DungeonRunService : IDisposable
     public string ChallengeSummary => DungeonChallengeRules.Label(Challenge) + " · " + DungeonChallengeRules.Duration(Elapsed) +
         (Challenge == DungeonChallenge.Timed ? " / " + DungeonChallengeRules.Duration(TimeLimit) + (Elapsed > TimeLimit ? " · 已超时，仍可完成清理" : "") : "");
     public void RecordExploration() { ExplorationCount++; Changed?.Invoke(); }
+    public void RecordExplorationDiscovery(ExplorationNode node) { if (Dungeon != null && !Dungeon.IsTraining) progress.RecordExplorationDiscovery(node); }
     public void RecordExplorationObjective(ExplorationKind kind)
     {
         if (Dungeon == null || Dungeon.IsTraining) return;
@@ -90,6 +92,7 @@ public sealed class DungeonRunService : IDisposable
         var database = Resources.Load<DungeonDatabase>("DungeonDatabase");
         Dungeon = database != null ? database.GetById(DungeonLaunchContext.DungeonId) : null;
         if (Dungeon == null || !Dungeon.MatchesScene(scene.name) || Dungeon.IsTraining) return;
+        runScene = scene;
         Challenge = DungeonLaunchContext.Challenge; startedAt = Time.time;
         Difficulty = DungeonLaunchContext.Difficulty;
         lootTable = Resources.Load<DungeonLootTable>("Loot/Dungeon" + Dungeon.Id);
@@ -170,6 +173,7 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Running || !remaining.Remove(enemy)) return;
         enemy.Died -= OnEnemyDied;
         ++DefeatedEnemies;
+        progress.RecordEnemyDiscovery(enemy);
         progress.RecordQuestDungeonEvent(Dungeon.Id, false);
         if (enemy.IsElite && !enemy.IsBoss) progress.RecordQuestActivity(QuestObjectiveKind.DefeatElite, Dungeon.Id);
         SpawnDrops(enemy);
@@ -191,7 +195,7 @@ public sealed class DungeonRunService : IDisposable
         ChallengeGold = DungeonChallengeRules.BonusGold(Challenge, ChallengeCompleted, difficultyTier?.RewardMultiplier ?? 1);
         ChallengeRewardPending = ChallengeGold > 0;
         if (ChallengeRewardPending) ClaimChallengeReward();
-        if (success) progress.RecordQuestDungeonEvent(Dungeon.Id, true);
+        if (success) { progress.RecordQuestDungeonEvent(Dungeon.Id, true); progress.RecordCompletedRun(Dungeon.Id); }
         if (success && ChallengeCompleted && Challenge != DungeonChallenge.Exploration)
             progress.RecordQuestActivity(Challenge == DungeonChallenge.Timed ? QuestObjectiveKind.CompleteTimed : QuestObjectiveKind.CompleteBossTrial, Dungeon.Id);
         player?.Statuses?.State.Clear();

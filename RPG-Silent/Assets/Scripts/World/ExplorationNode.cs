@@ -12,6 +12,7 @@ public sealed class ExplorationNode : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetActive() => active.Clear();
     public ExplorationKind Kind;
     public string DisplayName;
+    public string PersistentId;
     public bool Hidden;
     public Transform MovingGate;
     public Transform ChestLid;
@@ -83,6 +84,7 @@ public sealed class ExplorationNode : MonoBehaviour
         }
         run.RecordExploration();
         run.RecordExplorationObjective(Kind);
+        run.RecordExplorationDiscovery(this);
         return true;
     }
     void EliteDied(EnemyController enemy)

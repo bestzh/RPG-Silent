@@ -22,6 +22,7 @@ namespace RPGSilent.Domain
         public InventoryData inventory;
         public QuestJournalData quests = new();
         public ConsumableLoadoutData consumables = new();
+        public WorldProgressData world = new();
     }
 
     [Serializable]

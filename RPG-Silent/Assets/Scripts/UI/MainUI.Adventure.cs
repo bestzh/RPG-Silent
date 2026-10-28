@@ -82,6 +82,7 @@ public partial class MainUI
         if(mapOverlay==null || combatPlayer==null) return;
         playerMapArrow.localRotation=Quaternion.Euler(0,0,-combatPlayer.transform.eulerAngles.y);
         int index=0;
+        AddTrackedMapMarker(ref index);
         foreach(var node in ExplorationNode.Active)
         { node.Discover(combatPlayer.transform.position); if(node.VisibleOnMap) AddMapMarker(ref index,node.transform.position,node.Symbol,new Color(1,.83f,.3f)); }
         foreach(var enemy in EnemyController.ActiveEnemies)

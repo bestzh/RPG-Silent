@@ -19,10 +19,11 @@ public sealed class ProgressLoadResult
 /// <summary>Selected local character. Writes a flushed temporary file, then atomically replaces it.</summary>
 public sealed partial class ProgressSaveStore
 {
-    public const int CurrentVersion = 10;
+    public const int CurrentVersion = 11;
     private const int MaxFileBytes = 512 * 1024;
     private readonly string rootDirectory;
     private string directory;
+    public string LastFailureDiagnostic { get; private set; }
     public string PrimaryPath => Path.Combine(directory, "progress.json");
     public string BackupPath => Path.Combine(directory, "progress.backup.json");
     public bool HasFiles => File.Exists(PrimaryPath) || File.Exists(BackupPath);
@@ -60,6 +61,7 @@ public sealed partial class ProgressSaveStore
     public bool TrySave(PlayerProgressData data, bool newProfile, out string error)
     {
         error = null;
+        LastFailureDiagnostic = null;
         try
         {
             Validate(data);
@@ -73,6 +75,8 @@ public sealed partial class ProgressSaveStore
             var existing = Read(PrimaryPath);
             if (!newProfile && existing.Status == ProgressLoadStatus.Unsupported)
                 throw new InvalidDataException(existing.Message);
+            if (!newProfile && existing.Status == ProgressLoadStatus.Unavailable)
+                throw new IOException(existing.Message);
             if (newProfile)
             {
                 // Explicit new-game confirmation permits replacing the slot. Preserve old
@@ -91,6 +95,7 @@ public sealed partial class ProgressSaveStore
         }
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is UnauthorizedAccessException || ex is ArgumentException)
         {
+            LastFailureDiagnostic = ex.GetType().Name + " (0x" + ex.HResult.ToString("X8") + "): " + ex.Message + "\n" + ex.StackTrace;
             error = "进度未保存，请检查磁盘空间或目录权限后重试。";
             if (ex is InvalidDataException) error = ex.Message;
             return false;
@@ -115,7 +120,10 @@ public sealed partial class ProgressSaveStore
             stream.Write(bytes, 0, bytes.Length);
             stream.Flush(true);
         }
-        if (File.Exists(destination)) File.Replace(temporary, destination, backup);
+        // Windows can fail with ERROR_UNABLE_TO_REMOVE_REPLACED (1175) when the
+        // backup argument is null. Keep the displaced file at a separate, bounded
+        // path: a corrupt primary must never replace the good recovery backup.
+        if (File.Exists(destination)) File.Replace(temporary, destination, backup ?? destination + ".replaced");
         else File.Move(temporary, destination);
     }
 
@@ -161,6 +169,7 @@ public sealed partial class ProgressSaveStore
             }
             if (data != null && envelope.version < 9) data.quests = new QuestJournalData();
             if (data != null && envelope.version < 10) data.consumables = new ConsumableLoadoutData();
+            if (data != null && envelope.version < 11) data.world = new WorldProgressData();
             Validate(data);
             return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、装备、技能与任务。" };
         }
@@ -202,6 +211,7 @@ public sealed partial class ProgressSaveStore
         InventoryData.Validate(data.inventory);
         QuestJournalData.Validate(data.quests);
         ConsumableLoadoutData.Validate(data.consumables);
+        WorldProgressData.Validate(data.world);
         if (data.equipmentVersion < 0 || data.equipmentVersion > 1) throw new InvalidDataException("装备存档版本无效。");
         if (data.equipmentVersion == 0 && (data.inventory.loadouts.Length > 0 || data.inventory.bag.Concat(data.inventory.overflow).Any(x => x.IsInstance)))
             throw new InvalidDataException("装备格式标记与实例记录不一致。");

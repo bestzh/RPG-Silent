@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: commission-explore
+  m_EditorClassIdentifier: 
+  Id: commission-explore
+  Title: "\u65E7\u8DEF\u63A2\u7D22\u59D4\u6258"
+  Description: "\u7C73\u62C9\u9700\u8981\u6301\u7EED\u66F4\u65B0\u8865\u7ED9\u70B9\u7684\u4FE1\u606F\u3002\u518D\u6B21\u8FDB\u5165\u68EE\u6797\u5F00\u542F\u5B9D\u7BB1\u540E\u8FD4\u56DE\u62A5\u544A\u3002"
+  Category: 4
+  Giver: 3
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 400
+  Repeatable: 1
+  RequiredStoryId: 
+  RequiredChoiceId: 
+  Objectives:
+  - Kind: 11
+    Label: "\u6253\u5F00\u68EE\u6797\u5B9D\u7BB1"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 2
+  RewardGold: 160
+  RewardExp: 240
+  Rewards:
+  - itemId: forge-shard
+    count: 3
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

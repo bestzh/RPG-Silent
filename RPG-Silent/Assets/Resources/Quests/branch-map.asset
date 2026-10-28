@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: branch-map
+  m_EditorClassIdentifier: 
+  Id: branch-map
+  Title: "\u5931\u843D\u5730\u56FE"
+  Description: "\u4E0E\u7C73\u62C9\u5206\u4EAB\u68EE\u6797\u548C\u6676\u7A9F\u4E24\u5904\u9690\u85CF\u652F\u8DEF\u7684\u7EBF\u7D22\uFF0C\u5B8C\u6210\u65E7\u9053\u8DEF\u7684\u5730\u56FE\u3002"
+  Category: 3
+  Giver: 3
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 300
+  Repeatable: 0
+  RequiredStoryId: ruin-secret
+  RequiredChoiceId: share
+  Objectives:
+  - Kind: 7
+    Label: "\u53D1\u73B0\u68EE\u6797\u9690\u85CF\u652F\u8DEF"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 1
+  - Kind: 7
+    Label: "\u53D1\u73B0\u6676\u7A9F\u9690\u85CF\u652F\u8DEF"
+    DungeonId: 1002
+    ItemId: 
+    NpcRole: 0
+    Required: 1
+  RewardGold: 220
+  RewardExp: 500
+  Rewards:
+  - itemId: crystal-shard
+    count: 4
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

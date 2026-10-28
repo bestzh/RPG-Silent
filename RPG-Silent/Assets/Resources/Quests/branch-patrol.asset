@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: branch-patrol
+  m_EditorClassIdentifier: 
+  Id: branch-patrol
+  Title: "\u5DE1\u9632\u5148\u950B"
+  Description: "\u6309\u4F60\u4E0E\u963F\u767B\u7684\u7EA6\u5B9A\uFF0C\u51FB\u8D25\u4E24\u540D\u68EE\u6797\u7CBE\u82F1\uFF0C\u4FDD\u969C\u57CE\u5916\u9053\u8DEF\u3002"
+  Category: 1
+  Giver: 2
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 300
+  Repeatable: 0
+  RequiredStoryId: town-duty
+  RequiredChoiceId: protect
+  Objectives:
+  - Kind: 8
+    Label: "\u51FB\u8D25\u68EE\u6797\u7CBE\u82F1"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 2
+  RewardGold: 280
+  RewardExp: 200
+  Rewards:
+  - itemId: forge-shard
+    count: 5
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

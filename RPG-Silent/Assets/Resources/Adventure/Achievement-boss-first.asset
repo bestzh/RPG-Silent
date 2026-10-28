@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 114beebbeaad87941ba02c7f9dc9659e, type: 3}
+  m_Name: Achievement-boss-first
+  m_EditorClassIdentifier: 
+  Id: boss-first
+  Title: "\u9996\u9886\u514B\u661F"
+  Description: "\u51FB\u8D25\u4EFB\u610F\u4E00\u540D\u526F\u672C\u9996\u9886\u3002"
+  Kind: 1
+  Distinct: 0
+  Required: 1
+  Gold: 160
+  Experience: 200
+  ForgeShards: 3

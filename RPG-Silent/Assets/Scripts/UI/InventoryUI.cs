@@ -92,6 +92,7 @@ public sealed partial class InventoryUI : UIBase
         setText = W.Text(panel, Font, "SetBonus", "", 1200, 720, 452, 112, 18);
         status = W.Text(panel, Font, "Status", "点击背包中的装备试穿，确认后才会正式装备。", 28, 840, 1624, 42, 21);
         BuildManagement();
+        BuildDiscard();
     }
     public override void OnOpen(params object[] args)
     {
@@ -198,6 +199,7 @@ public sealed partial class InventoryUI : UIBase
         RefreshDetails(data);
         RefreshPreview();
         RefreshManagement();
+        RefreshDiscard();
     }
     void RefreshPreview()
     {

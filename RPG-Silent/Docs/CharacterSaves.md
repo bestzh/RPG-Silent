@@ -2,6 +2,8 @@
 
 更新：2026-10-28。使用现有职业、男女模型、装备外观、预览控件和字体，不需要下载资源。
 
+最新：存档现为 v11，新增独立角色的剧情、好感、图鉴、成就、重复委托与主城时间；旧数据继续保留。本文曾记录的损坏恢复后保存偶发失败已定位到 Windows `File.Replace(..., null)` 的错误 1175，修复为保留被替换文件且不覆盖有效恢复备份，500 次完整循环没有复现失败。最新 390 项 EditMode、运行验证与 4 份旧 v10 档读取证据见 [LivingWorldAndProgression.md](LivingWorldAndProgression.md)。下文 v10、未定位问题和 Windows 包验收均为此前阶段记录；本轮尚未重新打包。
+
 后续最终集成回归、第三轮 257 项全量测试、Windows64 构建及独立启动均已通过，详见 [FinalLocalValidation.md](FinalLocalValidation.md)。下文验证条目保留本阶段的原始范围与历史问题。
 
 ## 操作
