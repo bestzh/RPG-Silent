@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: commission-material
+  m_EditorClassIdentifier: 
+  Id: commission-material
+  Title: "\u5E02\u96C6\u8865\u8D27\u59D4\u6258"
+  Description: "\u628A\u591A\u4F59\u7684\u953B\u9020\u788E\u7247\u4EA4\u7ED9\u7F57\u838E\uFF0C\u6362\u53D6\u91D1\u5E01\u548C\u6676\u6838\u3002\u6BCF\u6B21\u4EA4\u4ED8\u540E\u9700\u518D\u901A\u5173\u526F\u672C\u5237\u65B0\u3002"
+  Category: 4
+  Giver: 4
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 400
+  Repeatable: 1
+  RequiredStoryId: 
+  RequiredChoiceId: 
+  Objectives:
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u953B\u9020\u788E\u7247"
+    DungeonId: 0
+    ItemId: forge-shard
+    NpcRole: 0
+    Required: 5
+  RewardGold: 140
+  RewardExp: 100
+  Rewards:
+  - itemId: crystal-shard
+    count: 1
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

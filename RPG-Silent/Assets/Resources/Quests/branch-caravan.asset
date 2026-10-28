@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: branch-caravan
+  m_EditorClassIdentifier: 
+  Id: branch-caravan
+  Title: "\u5546\u8DEF\u5B88\u671B"
+  Description: "\u7F57\u838E\u5C06\u91D1\u5E01\u4EA4\u7ED9\u4F60\uFF0C\u4F5C\u4E3A\u6E05\u7406\u6797\u95F4\u5546\u8DEF\u7684\u62A5\u916C\u3002"
+  Category: 1
+  Giver: 4
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 300
+  Repeatable: 0
+  RequiredStoryId: market-aid
+  RequiredChoiceId: escort
+  Objectives:
+  - Kind: 0
+    Label: "\u51FB\u8D25\u68EE\u6797\u654C\u4EBA"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 6
+  RewardGold: 360
+  RewardExp: 180
+  Rewards:
+  - itemId: forge-shard
+    count: 2
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

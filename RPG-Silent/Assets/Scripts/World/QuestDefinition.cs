@@ -3,7 +3,7 @@ using RPGSilent.Domain;
 using UnityEngine;
 
 // Append values: existing assets and saved objective arrays retain their meaning.
-public enum QuestCategory { Main, Side, Profession, Special }
+public enum QuestCategory { Main, Side, Profession, Special, Commission }
 public enum QuestObjectiveKind { DefeatEnemies, ClearDungeon, DeliverMaterial, LearnSkills, ReachLevel, AdvanceClass,
     TalkToNpc, DiscoverSecret, DefeatElite, CompleteTimed, CompleteBossTrial, OpenChest }
 public enum QuestStatus { Locked, Available, Active, Ready, Rewarded }
@@ -35,9 +35,12 @@ public sealed class QuestDefinition : ScriptableObject
     public string PrerequisiteId = string.Empty;
     [Range(1, 50)] public int RequiredLevel = 1;
     public int Order;
+    public bool Repeatable;
+    public string RequiredStoryId = string.Empty;
+    public string RequiredChoiceId = string.Empty;
     public QuestObjective[] Objectives = Array.Empty<QuestObjective>();
     [Min(0)] public int RewardGold;
     [Min(0)] public int RewardExp;
     public ItemStackData[] Rewards = Array.Empty<ItemStackData>();
-    public string CategoryLabel => Category switch { QuestCategory.Main => "主线", QuestCategory.Side => "支线", QuestCategory.Special => "特殊", _ => "职业" };
+    public string CategoryLabel => Category switch { QuestCategory.Main => "主线", QuestCategory.Side => "支线", QuestCategory.Special => "特殊", QuestCategory.Commission => "委托", _ => "职业" };
 }

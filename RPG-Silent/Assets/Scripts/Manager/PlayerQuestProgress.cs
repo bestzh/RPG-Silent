@@ -56,7 +56,8 @@ public sealed partial class PlayerProgressService
         return data.entries.All(e => questCatalog.TryGetValue(e.questId, out var q) &&
             (q.FamilyId.Length == 0 || q.FamilyId == classes[savedClass].FamilyId) && e.counts.Length == q.Objectives.Length &&
             e.counts.Select((value, i) => q.Objectives[i].IsCounter ? value <= q.Objectives[i].Required : value == 0).All(x => x) &&
-            (q.PrerequisiteId.Length == 0 || data.entries.Any(p => p.questId == q.PrerequisiteId && p.rewarded)) &&
+            (q.PrerequisiteId.Length == 0 || data.entries.Any(p => p.questId == q.PrerequisiteId && (p.rewarded || p.completedCount > 0))) &&
+            (q.Repeatable || e.completedCount <= 1) &&
             (!e.rewarded || q.Objectives.Select((o, i) => !o.IsCounter || e.counts[i] == o.Required).All(x => x)));
     }
     public QuestStatus GetQuestStatus(string id)
@@ -64,8 +65,9 @@ public sealed partial class PlayerProgressService
         var q = FindQuest(id);
         if (q == null || (q.FamilyId.Length > 0 && q.FamilyId != CurrentClass?.FamilyId)) return QuestStatus.Locked;
         var e = journal.entries.FirstOrDefault(x => x.questId == id);
-        if (e != null) return e.rewarded ? QuestStatus.Rewarded : q.Objectives.Select((o, i) => ObjectiveCount(q, e, i) >= o.Required).All(x => x) ? QuestStatus.Ready : QuestStatus.Active;
-        return stats.Level >= q.RequiredLevel && (q.PrerequisiteId.Length == 0 || journal.entries.Any(x => x.questId == q.PrerequisiteId && x.rewarded)) ? QuestStatus.Available : QuestStatus.Locked;
+        if (e != null) return e.rewarded ? q.Repeatable && world.completedRuns > e.lastTurnInRun ? QuestStatus.Available : QuestStatus.Rewarded : q.Objectives.Select((o, i) => ObjectiveCount(q, e, i) >= o.Required).All(x => x) ? QuestStatus.Ready : QuestStatus.Active;
+        return stats.Level >= q.RequiredLevel && (q.PrerequisiteId.Length == 0 || QuestWasCompleted(q.PrerequisiteId)) &&
+            (q.RequiredStoryId.Length == 0 || world.Choice(q.RequiredStoryId) == q.RequiredChoiceId) ? QuestStatus.Available : QuestStatus.Locked;
     }
     int ObjectiveCount(QuestDefinition q, QuestProgressData e, int i)
     {
@@ -94,7 +96,9 @@ public sealed partial class PlayerProgressService
     public string QuestRequirementText(string id)
     {
         var q = FindQuest(id); if (q == null) return "任务资源不可用。";
-        return $"接取等级 Lv.{q.RequiredLevel}" + (q.PrerequisiteId.Length == 0 ? "" : " · 先提交「" + FindQuest(q.PrerequisiteId)?.Title + "」");
+        return $"接取等级 Lv.{q.RequiredLevel}" + (q.PrerequisiteId.Length == 0 ? "" : " · 先提交「" + FindQuest(q.PrerequisiteId)?.Title + "」") +
+            (q.RequiredStoryId.Length == 0 ? "" : " · 剧情选择：" + (stories.TryGetValue(q.RequiredStoryId, out var s) ? s.Choices.FirstOrDefault(x => x.Id == q.RequiredChoiceId)?.Label : "")) +
+            (q.Repeatable ? "\n可重复 · 每次交付后再通关一趟副本刷新" : "");
     }
     public string QuestGiverText(string id) => FindQuest(id)?.Giver switch
     {
@@ -134,9 +138,13 @@ public sealed partial class PlayerProgressService
         if (!CanTalkQuest(id, npc, out message)) return false;
         if (GetQuestStatus(id) != QuestStatus.Available) { message = "任务已接取，或尚未满足前置条件。"; return false; }
         var data = Capture(); var q = FindQuest(id);
-        data.quests.entries = data.quests.entries.Append(new QuestProgressData { questId = id, counts = new int[q.Objectives.Length] }).ToArray();
+        var prior = data.quests.entries.FirstOrDefault(x => x.questId == id);
+        if (prior != null) { prior.rewarded = false; prior.counts = new int[q.Objectives.Length]; }
+        else data.quests.entries = data.quests.entries.Append(new QuestProgressData { questId = id, counts = new int[q.Objectives.Length] }).ToArray();
+        observedObjectives.Remove(id); observedReady.Remove(id);
         data.quests.trackedId = id;
-        return CommitQuest(data, 0, 0, "已接取并追踪「" + q.Title + "」。", out message);
+        bool ok = CommitQuest(data, 0, 0, "已接取并追踪「" + q.Title + "」。", out message);
+        if (ok) Notify(message); return ok;
     }
     public bool TryTrackQuest(string id, out string message)
     {
@@ -153,18 +161,23 @@ public sealed partial class PlayerProgressService
         foreach (var o in q.Objectives.Where(x => x.Kind == QuestObjectiveKind.DeliverMaterial))
             if (!data.inventory.TrySpendMaterial(o.ItemId, o.Required)) { message = "交付材料不足，请先从待领取移入背包。"; return false; }
         if (!data.inventory.AddRewards(q.Rewards)) { message = "背包和待领取空间不足，请整理后再提交；材料尚未消耗。"; return false; }
-        data.quests.entries.First(x => x.questId == id).rewarded = true;
+        var completed = data.quests.entries.First(x => x.questId == id);
+        completed.rewarded = true; completed.completedCount = Math.Min(1000000, completed.completedCount + 1); completed.lastTurnInRun = world.completedRuns;
+        data.world.AddAffinity((int)q.Giver, q.Repeatable ? 2 : 5);
+        if (q.Repeatable) data.world.Record(CollectionKind.Commission, id);
         if (data.quests.trackedId == id) data.quests.trackedId = data.quests.entries.FirstOrDefault(x => !x.rewarded)?.questId ?? "";
-        return CommitQuest(data, q.RewardGold, q.RewardExp, "已完成「" + q.Title + "」，奖励已保存。满包物品可在背包待领取页领取。", out message);
+        bool ok = CommitQuest(data, q.RewardGold, q.RewardExp, "已完成「" + q.Title + "」，奖励已保存。满包物品可在背包待领取页领取。", out message);
+        if (ok) Notify("任务奖励 · " + q.Title + "\n" + QuestRewardText(id)); return ok;
     }
     bool CommitQuest(PlayerProgressData data, int gold, int exp, string success, out string message)
     {
         data.gold = (int)Math.Min(int.MaxValue, (long)stats.Gold + gold); data.totalExp = (int)Math.Min(int.MaxValue, (long)stats.Exp + exp);
+        CollectInventoryDiscoveries(data);
         if (!store.TrySave(data, newProfile, out message)) { StatusMessage = message; HasUnsavedChanges = true; Changed?.Invoke(); return false; }
         applying = true;
         try
         {
-            journal = data.quests.Copy(); inventory = data.inventory.Copy(); stats.AddReward(gold, exp);
+            journal = data.quests.Copy(); inventory = data.inventory.Copy(); world = data.world.Copy(); stats.AddReward(gold, exp);
             newProfile = false; lastSavedPayload = JsonUtility.ToJson(data); HasUnsavedChanges = false; StatusMessage = message = success;
         }
         finally { applying = false; }
