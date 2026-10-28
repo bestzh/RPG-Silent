@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
-public class MainUI : UIBase
+public partial class MainUI : UIBase
 {
     // 通过 VContainer 注入，不再 FindWithTag
     [Inject] private IPlayerStatsReader   _stats;
@@ -28,10 +28,13 @@ public class MainUI : UIBase
     public TMP_Text npcPromptText;
     public TMP_Text classNameText;
     private PlayerNpcInteraction npcInteraction;
+    private Button inventoryButton;
+    private PlayerLootInteraction lootInteraction;
 
     private void Update()
     {
-        if (npcPromptText != null) npcPromptText.text = npcInteraction != null ? npcInteraction.Prompt : string.Empty;
+        RefreshCombatHud();
+        if (npcPromptText != null) npcPromptText.text = !string.IsNullOrEmpty(lootInteraction?.Prompt) ? lootInteraction.Prompt : npcInteraction != null ? npcInteraction.Prompt : string.Empty;
         if (classNameText != null) classNameText.text = _progress?.CurrentClass?.DisplayName ?? string.Empty;
     }
 
@@ -93,8 +96,17 @@ public class MainUI : UIBase
             Debug.LogWarning("[MainUI] skillSlots 列表为空，请在 Inspector 拖入 10 个 SkillSlotUI。");
 
         _stats.Refresh();
+        if (inventoryButton == null)
+        {
+            inventoryButton = ProgressionUIWidgets.Button(transform.Find("TopLeftPanel"), classNameText.font, "InventoryButton", "背包 [B]", 0, 0, 156, 44,
+                () => _session?.PlayerRig?.GetComponentInChildren<PlayerInventoryInteraction>(true)?.Toggle());
+            var r = inventoryButton.GetComponent<RectTransform>(); r.anchorMin = r.anchorMax = r.pivot = new Vector2(1, 1); r.anchoredPosition = new Vector2(-24, -330);
+        }
         npcInteraction = _session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerNpcInteraction>(true) : null;
+        lootInteraction = _session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerLootInteraction>(true) : null;
         RefreshSaveStatus();
+        BuildQuestHud();
+        BuildCombatHud();
         if (weaponEquipment != null)
             weaponEquipment.Bind(_session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerWeaponEquipment>(true) : null);
         ApplyGameSettings(_gameSettings?.CurrentSettings);
@@ -211,6 +223,7 @@ public class MainUI : UIBase
 
     private void RefreshSaveStatus()
     {
+        RefreshQuestHud();
         if (saveStatusText != null) saveStatusText.text = _progress != null && _progress.HasUnsavedChanges
             ? _progress.StatusMessage + "\n可在菜单中重试保存。" : string.Empty;
     }
@@ -237,6 +250,9 @@ public class MainUI : UIBase
         SetActiveIfNotNull(skillBarRoot,            showHud);
         SetActiveIfNotNull(levelText?.gameObject, showHud);
         SetActiveIfNotNull(expBar?.gameObject, showHud);
+        SetActiveIfNotNull(questTracker?.gameObject, showHud);
+        SetActiveIfNotNull(consumableBar?.gameObject, showHud);
+        SetActiveIfNotNull(statusBar?.gameObject, showHud);
     }
 
     private static void SetActiveIfNotNull(GameObject target, bool active)

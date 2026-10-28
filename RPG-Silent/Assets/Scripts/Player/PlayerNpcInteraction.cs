@@ -22,7 +22,7 @@ public sealed class PlayerNpcInteraction : MonoBehaviour
     void OnEnable() { if (input != null) input.InteractTriggered += Interact; SceneManager.activeSceneChanged += OnSceneChanged; }
     void OnDisable() { if (input != null) input.InteractTriggered -= Interact; SceneManager.activeSceneChanged -= OnSceneChanged; Close(); }
     void OnSceneChanged(Scene before, Scene after) => Close();
-    bool OtherModal => ui.IsUIOpen("UI/LoadingUI") || ui.IsUIOpen("UI/PortalUI") || ui.IsUIOpen("UI/PauseUI") || ui.IsUIOpen("UI/SettingsUI");
+    bool OtherModal => ui.IsUIOpen("UI/LoadingUI") || ui.IsUIOpen("UI/PortalUI") || ui.IsUIOpen("UI/PauseUI") || ui.IsUIOpen("UI/SettingsUI") || ui.IsUIOpen(PlayerInventoryInteraction.UiKey) || ui.IsUIOpen(PlayerQuestInteraction.UiKey);
     void Update()
     {
         if (player == null || input == null || ui == null) return;

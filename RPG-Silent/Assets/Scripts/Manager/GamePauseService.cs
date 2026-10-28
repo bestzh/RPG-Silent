@@ -111,7 +111,10 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     private void OnPauseTriggered()
     {
+        if (_uiService.IsUIOpen(PlayerQuestInteraction.UiKey)) { _uiService.CloseUI(PlayerQuestInteraction.UiKey); return; }
+        if (_uiService.IsUIOpen(PlayerInventoryInteraction.UiKey)) { _uiService.CloseUI(PlayerInventoryInteraction.UiKey); return; }
         if (_uiService.IsUIOpen("UI/TownNpcUI")) { _uiService.CloseUI("UI/TownNpcUI"); return; }
+        if (_dungeonRun.Succeeded && !_dungeonRun.ResultVisible) { _dungeonRun.ShowResult(); return; }
         if (_dungeonRun.HasResult) return;
         if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_uiService.IsUIOpen(SettingsUiKey))

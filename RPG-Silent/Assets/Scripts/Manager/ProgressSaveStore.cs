@@ -16,12 +16,13 @@ public sealed class ProgressLoadResult
     public bool CanContinue => Status == ProgressLoadStatus.Loaded || Status == ProgressLoadStatus.Recovered;
 }
 
-/// <summary>Single local slot. Writes a flushed temporary file, then atomically replaces it.</summary>
-public sealed class ProgressSaveStore
+/// <summary>Selected local character. Writes a flushed temporary file, then atomically replaces it.</summary>
+public sealed partial class ProgressSaveStore
 {
-    public const int CurrentVersion = 4;
-    private const int MaxFileBytes = 64 * 1024;
-    private readonly string directory;
+    public const int CurrentVersion = 10;
+    private const int MaxFileBytes = 512 * 1024;
+    private readonly string rootDirectory;
+    private string directory;
     public string PrimaryPath => Path.Combine(directory, "progress.json");
     public string BackupPath => Path.Combine(directory, "progress.backup.json");
     public bool HasFiles => File.Exists(PrimaryPath) || File.Exists(BackupPath);
@@ -37,16 +38,18 @@ public sealed class ProgressSaveStore
 
     public ProgressSaveStore(string directory)
     {
-        this.directory = Path.GetFullPath(directory ?? throw new ArgumentNullException(nameof(directory)));
+        rootDirectory = this.directory = Path.GetFullPath(directory ?? throw new ArgumentNullException(nameof(directory)));
     }
 
-    public ProgressLoadResult Load()
+    public ProgressLoadResult Load() => ReadCharacter(CurrentCharacterKey);
+
+    private static ProgressLoadResult LoadDirectory(string folder)
     {
-        var primary = Read(PrimaryPath);
+        var primary = Read(Path.Combine(folder, "progress.json"));
         // Never silently downgrade a save written by a newer/different format.
         if (primary.CanContinue || primary.Status == ProgressLoadStatus.Unsupported ||
             primary.Status == ProgressLoadStatus.Unavailable) return primary;
-        var backup = Read(BackupPath);
+        var backup = Read(Path.Combine(folder, "progress.backup.json"));
         if (backup.CanContinue)
             return new ProgressLoadResult { Status = ProgressLoadStatus.Recovered, Data = backup.Data,
                 Message = "主存档不可用，将从上一次备份恢复。" };
@@ -60,10 +63,13 @@ public sealed class ProgressSaveStore
         try
         {
             Validate(data);
+            if (directory != rootDirectory && !string.Equals(data.profileId, Path.GetFileName(directory), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("角色标识与存档目录不一致，原文件已保留。");
             Directory.CreateDirectory(directory);
             string payload = JsonUtility.ToJson(data);
             string text = JsonUtility.ToJson(new Envelope { version = CurrentVersion,
                 savedUtc = DateTime.UtcNow.ToString("O"), payload = payload, checksum = Hash(payload) }, true);
+            if (Encoding.UTF8.GetByteCount(text) > MaxFileBytes) throw new InvalidDataException("存档容量已满，原文件已保留。");
             var existing = Read(PrimaryPath);
             if (!newProfile && existing.Status == ProgressLoadStatus.Unsupported)
                 throw new InvalidDataException(existing.Message);
@@ -141,8 +147,22 @@ public sealed class ProgressSaveStore
                 data.weaponUpgrades = new WeaponUpgradeData[0];
             }
             if (data != null && envelope.version < 4) data.gender = (int)PlayerGender.Legacy;
+            if (data != null && envelope.version < 5)
+                data.inventory = InventoryData.FromLegacyWeapons((data.weaponIds ?? Array.Empty<string>())
+                    .Concat((data.weaponUpgrades ?? Array.Empty<WeaponUpgradeData>()).Where(e => e != null).Select(e => e.weaponId)));
+            if (data?.inventory != null && envelope.version < 7)
+                foreach (var item in (data.inventory.bag ?? Array.Empty<ItemStackData>()).Concat(data.inventory.overflow ?? Array.Empty<ItemStackData>()))
+                    if (item != null) item.gemId = string.Empty;
+            if (data?.inventory != null && envelope.version < 8)
+            {
+                data.inventory.loadouts = Array.Empty<EquipmentLoadoutData>();
+                foreach (var item in (data.inventory.bag ?? Array.Empty<ItemStackData>()).Concat(data.inventory.overflow ?? Array.Empty<ItemStackData>()))
+                    if (item != null) item.isLocked = false;
+            }
+            if (data != null && envelope.version < 9) data.quests = new QuestJournalData();
+            if (data != null && envelope.version < 10) data.consumables = new ConsumableLoadoutData();
             Validate(data);
-            return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、武器和技能装配。" };
+            return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、装备、技能与任务。" };
         }
         catch (Exception ex) when (ex is IOException || ex is InvalidDataException || ex is UnauthorizedAccessException || ex is ArgumentException)
         {
@@ -179,6 +199,28 @@ public sealed class ProgressSaveStore
         foreach (var entry in data.weaponUpgrades)
             if (entry == null || string.IsNullOrEmpty(entry.weaponId) || entry.weaponId.Length > 128 || entry.level < 1 || entry.level > 5 || !weaponSet.Add(entry.weaponId))
                 throw new InvalidDataException("存档武器强化等级无效，原文件已保留。");
+        InventoryData.Validate(data.inventory);
+        QuestJournalData.Validate(data.quests);
+        ConsumableLoadoutData.Validate(data.consumables);
+        if (data.equipmentVersion < 0 || data.equipmentVersion > 1) throw new InvalidDataException("装备存档版本无效。");
+        if (data.equipmentVersion == 0 && (data.inventory.loadouts.Length > 0 || data.inventory.bag.Concat(data.inventory.overflow).Any(x => x.IsInstance)))
+            throw new InvalidDataException("装备格式标记与实例记录不一致。");
+        if (data.equipmentVersion == 1)
+        {
+            if (data.weaponInstanceIds == null || data.weaponInstanceIds.Length != PlayerWeaponEquipment.SlotCount || data.weaponUpgrades.Length != 0)
+                throw new InvalidDataException("武器实例记录不完整。");
+            for (int i = 0; i < data.weaponIds.Length; i++)
+            {
+                string key = data.weaponInstanceIds[i];
+                var instance = data.inventory.Find(key);
+                if (key == null || (data.weaponIds[i].Length == 0 ? key.Length != 0 :
+                    instance == null || !instance.IsInstance || instance.legacyReserve || instance.itemId != data.weaponIds[i]))
+                    throw new InvalidDataException("装备了未持有的武器实例。");
+            }
+        }
+        foreach (string id in data.weaponIds)
+            if (id.Length > 0 && data.inventory.Count(id) == 0)
+                throw new InvalidDataException("装备了未持有的武器，原文件已保留。");
     }
 
     private static string Hash(string payload)

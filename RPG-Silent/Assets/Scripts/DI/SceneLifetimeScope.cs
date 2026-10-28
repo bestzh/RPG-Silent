@@ -63,9 +63,11 @@ public class SceneLifetimeScope : LifetimeScope
 
     private void OnDungeonChanged()
     {
-        if (!_dungeonRun.HasResult) return;
+        if (!_dungeonRun.HasResult || !_dungeonRun.ResultVisible) return;
         Container.Resolve<IGamePauseService>().Resume();
         Container.Resolve<IPortalService>().ClosePortal();
+        _uiManager.CloseUI(PlayerInventoryInteraction.UiKey);
+        _uiManager.CloseUI(PlayerQuestInteraction.UiKey);
         _uiManager.SetRaycastEnabled("UI/MainUI", false);
     }
 
@@ -79,6 +81,8 @@ public class SceneLifetimeScope : LifetimeScope
             _uiManager.ReleaseUI(DungeonRunService.UiKey);
             _uiManager.CloseUI("UI/PortalUI");
             _uiManager.CloseUI("UI/TownNpcUI");
+            _uiManager.CloseUI(PlayerInventoryInteraction.UiKey);
+            _uiManager.CloseUI(PlayerQuestInteraction.UiKey);
             _uiManager.SetRaycastEnabled("UI/MainUI", true);
             _uiManager.SetSceneResolver(null);
         }

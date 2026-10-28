@@ -32,6 +32,10 @@ namespace RPGSilent.Domain
         event Action StanceToggleTriggered;
         event Action PauseTriggered;
         event Action InteractTriggered;
+        event Action InventoryTriggered;
+        event Action JournalTriggered;
+        event Action<int> ConsumableTriggered;
+        string GetConsumableSlotDisplay(int slotIndex);
         event Action CursorToggleTriggered;
 
         /// <summary>技能槽触发，参数为槽位索引 0..9（对应按键 1..9,0）。</summary>
