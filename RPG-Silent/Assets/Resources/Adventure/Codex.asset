@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90cada6ef530ea449b441f6c9806a79, type: 3}
+  m_Name: Codex
+  m_EditorClassIdentifier: 
+  Enemies:
+  - {fileID: 11400000, guid: 7d2bcba31cdd4d84ebe310f795c35531, type: 2}
+  - {fileID: 11400000, guid: 6cc81c6fdbf2a084e94b2988c270aeea, type: 2}
+  - {fileID: 11400000, guid: b016574dd8878ba4c9682e0c704d30fc, type: 2}
+  - {fileID: 11400000, guid: 203b9ea5b4ffaa047861b54967be256b, type: 2}
+  - {fileID: 11400000, guid: ad5b79042e80b344188d57e9dd298030, type: 2}
+  - {fileID: 11400000, guid: 6a7d6307aa450614a87e19db42b16423, type: 2}
+  Secrets:
+  - Id: forest-hidden
+    Label: "\u5E7D\u5F71\u68EE\u6797 \xB7 \u77F3\u7891\u540E\u7684\u65E7\u8DEF"
+  - Id: cavern-hidden
+    Label: "\u6C34\u6676\u6D1E\u7A9F \xB7 \u6676\u58C1\u540E\u7684\u652F\u8DEF"

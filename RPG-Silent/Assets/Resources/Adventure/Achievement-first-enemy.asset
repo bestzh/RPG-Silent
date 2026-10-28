@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 114beebbeaad87941ba02c7f9dc9659e, type: 3}
+  m_Name: Achievement-first-enemy
+  m_EditorClassIdentifier: 
+  Id: first-enemy
+  Title: "\u521D\u6218\u544A\u6377"
+  Description: "\u5728\u526F\u672C\u4E2D\u51FB\u8D25\u7B2C\u4E00\u540D\u666E\u901A\u654C\u4EBA\u3002"
+  Kind: 0
+  Distinct: 0
+  Required: 1
+  Gold: 60
+  Experience: 60
+  ForgeShards: 1
