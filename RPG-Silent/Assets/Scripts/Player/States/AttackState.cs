@@ -17,11 +17,13 @@ public class AttackState : PlayerState
     private bool attackEnded;
     private float progress;
     private float enteredAt;
+    float charge;
+    bool dodgeFollowup;
     public int ComboIndex => comboIndex;
     // Never skip the current profile's hit window, even if an input arrives early.
     public bool CanLink => attackAnimationSeen && attackEnded && !player.animator.IsInTransition(0);
 
-    public AttackState(PlayerController player) : base(player) { }
+    public AttackState(PlayerController player, float charge = 0f) : base(player) { this.charge = Mathf.Clamp01(charge); }
 
     public override void Enter()
     {
@@ -29,11 +31,18 @@ public class AttackState : PlayerState
         maxCombo = player.StanceController != null ? player.StanceController.MaxCombo : 1;
         attackAnimationSeen = false;
         attackExecutor = player.GetComponent<AttackExecutor>();
+        dodgeFollowup = player.ConsumeDodgeFollowup();
+        if (charge > 0) maxCombo = 1;
 
         PlayCurrentAttack();
     }
 
-    public override void FixedUpdate() => player.Motor.Move(Vector3.zero, Time.fixedDeltaTime);
+    public override void FixedUpdate()
+    {
+        if (dodgeFollowup && Time.time - enteredAt < .18f && player.GameplayInputEnabled)
+            player.Motor.MoveImpulse(player.transform.forward * 3f, Time.fixedDeltaTime);
+        else player.Motor.Move(Vector3.zero, Time.fixedDeltaTime);
+    }
 
     /// <summary>首段与续段均由同一个 Attack InputAction 转发；下一次状态更新消费一次。</summary>
     public void RequestCombo() => player.RequestBasicAttack();
@@ -69,6 +78,8 @@ public class AttackState : PlayerState
         if (!CanLink || !player.CanAttack) return false;
         // Finishers (and single-shot stances) retain a recovery before starting a new chain.
         if (comboIndex >= maxCombo && progress < .9f) return false;
+        charge = 0; dodgeFollowup = false;
+        maxCombo = player.StanceController != null ? player.StanceController.MaxCombo : 1;
         comboIndex = comboIndex >= maxCombo ? 1 : comboIndex + 1;
         PlayCurrentAttack();
         return true;
@@ -77,8 +88,17 @@ public class AttackState : PlayerState
     private void PlayCurrentAttack()
     {
         attackExecutor?.AttackEnd();
-        attackExecutor?.SetCurrentComboIndex(comboIndex);
-        expectedAnimationHash = Animator.StringToHash($"Attack_{comboIndex}");
+        PlayerStance stance = player.CurrentStance;
+        float damage = charge > 0 ? WeaponCombatRules.ChargeDamage(stance, charge) : 1f;
+        if (dodgeFollowup) damage *= 1.3f;
+        bool staffFinisher = stance == PlayerStance.TwoHandStaff && comboIndex == 3;
+        if (staffFinisher) damage *= 1.4f;
+        float stagger = stance == PlayerStance.TwoHandSword ? Mathf.Lerp(1.25f, 3f, charge)
+            : stance == PlayerStance.OneHandSword && comboIndex == 3 ? 1.8f : 1f;
+        float projectileSpeed = stance == PlayerStance.TwoHandBow ? Mathf.Lerp(1f, 1.7f, charge) : 1f;
+        attackExecutor?.SetNormalAttack(comboIndex, damage, stagger, projectileSpeed, staffFinisher ? 6f : 0f);
+        string motion = dodgeFollowup ? "SwordDodgeAttack" : charge > 0 ? stance == PlayerStance.TwoHandBow ? "BowChargeShot" : "HeavyChargeStrike" : $"Attack_{comboIndex}";
+        expectedAnimationHash = Animator.StringToHash(motion);
         currentProfile = attackExecutor != null ? attackExecutor.GetCurrentAttackProfile() : null;
         attackStarted = false;
         attackReleased = false;
@@ -88,7 +108,8 @@ public class AttackState : PlayerState
         progress = 0f;
         player.animator.SetInteger(ComboIndexParameter, comboIndex);
         player.animator.ResetTrigger(AttackTrigger);
-        player.animator.CrossFadeInFixedTime($"Attack_{comboIndex}", .06f, 0, 0f);
+        player.animator.SetFloat("BasicAttackSpeed", WeaponCombatRules.AttackSpeed(stance, comboIndex));
+        player.animator.CrossFadeInFixedTime(motion, .06f, 0, 0f);
     }
 
     private void UpdateAttackTiming(float normalizedTime)
@@ -128,6 +149,8 @@ public class AttackState : PlayerState
     public override void Exit()
     {
         player.animator.ResetTrigger(AttackTrigger);
+        player.animator.SetFloat("BasicAttackSpeed", 1f);
         attackExecutor?.AttackEnd();
+        if (dodgeFollowup) player.Motor.SetHorizontalVelocity(Vector3.zero);
     }
 }

@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PersistentId: training-staff
   DisplayName: "\u8BAD\u7EC3\u6CD5\u6756"
+  DamageMultiplier: 1
+  MountTemplate: {fileID: 0}
   Stance: 45
   ComboProfiles:
+  - {fileID: 11400000, guid: f43c9b1dde88c3e4684536d131988d66, type: 2}
+  - {fileID: 11400000, guid: f43c9b1dde88c3e4684536d131988d66, type: 2}
   - {fileID: 11400000, guid: f43c9b1dde88c3e4684536d131988d66, type: 2}
   ModelPrefab: {fileID: 1367188017501208, guid: 7618bf1eceed7fd4786bae1d1976ef37, type: 3}
   HandBone: 18

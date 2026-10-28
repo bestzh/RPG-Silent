@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeliveryType: 4
   Damage: 22
+  Impact: 1
   TargetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -39,3 +40,4 @@ MonoBehaviour:
   AreaDuration: 5
   TickInterval: 1
   HitEffectPrefab: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
+  StatusOnHit: {fileID: 0}
