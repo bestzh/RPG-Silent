@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: special-elite-watch
+  m_EditorClassIdentifier: 
+  Id: special-elite-watch
+  Title: "\u7CBE\u82F1\u730E\u624B"
+  Description: "\u8C03\u67E5\u4E24\u5904\u9057\u8FF9\u7684\u7CBE\u82F1\u6D3B\u52A8\u3002\u5F00\u542F\u68EE\u6797\u4E0E\u6676\u7A9F\u4E2D\u7684\u7CBE\u82F1\u4F0F\u51FB\u4E8B\u4EF6\uFF0C\u5206\u522B\u51FB\u8D25\u4E24\u540D\u7CBE\u82F1\u3002"
+  Category: 3
+  Giver: 3
+  FamilyId: 
+  PrerequisiteId: main-forest
+  RequiredLevel: 3
+  Order: 204
+  Objectives:
+  - Kind: 8
+    Label: "\u51FB\u8D25\u68EE\u6797\u7CBE\u82F1"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 2
+  - Kind: 8
+    Label: "\u51FB\u8D25\u6676\u7A9F\u7CBE\u82F1"
+    DungeonId: 1002
+    ItemId: 
+    NpcRole: 0
+    Required: 2
+  RewardGold: 400
+  RewardExp: 500
+  Rewards:
+  - itemId: forge-shard
+    count: 6
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

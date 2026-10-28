@@ -58,6 +58,7 @@ public sealed class PlayerNpcInteraction : MonoBehaviour
     {
         if (holdingInput || !input.GameplayInputEnabled || !player.CanChangeEquipment || OtherModal || !InRange(target)) return;
         conversation = target; holdingInput = true; openedAt = Time.unscaledTime;
+        progress.RecordQuestConversation(conversation);
         input.SetGameplayInputBlocked(this, true); cursor.EnterUICursor();
         ui.SetRaycastEnabled("UI/MainUI", false); ui.OpenUI("UI/TownNpcUI", this);
     }

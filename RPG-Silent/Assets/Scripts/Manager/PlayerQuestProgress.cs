@@ -30,7 +30,8 @@ public sealed partial class PlayerProgressService
                 throw new InvalidOperationException("任务配置无效：" + q.name);
             foreach (var o in q.Objectives)
                 if (o == null || !Enum.IsDefined(typeof(QuestObjectiveKind), o.Kind) || string.IsNullOrEmpty(o.Label) || o.Required < 1 || o.Required > 9999 ||
-                    (o.IsCounter && (database == null || database.GetById(o.DungeonId) == null)) ||
+                    (o.IsDungeonCounter && (database == null || database.GetById(o.DungeonId) == null || database.GetById(o.DungeonId).IsTraining)) ||
+                    (o.Kind == QuestObjectiveKind.TalkToNpc && (!Enum.IsDefined(typeof(TownNpcRole), o.NpcRole) || o.Required != 1)) ||
                     (o.Kind == QuestObjectiveKind.DeliverMaterial && FindItem(o.ItemId)?.Kind != ItemKind.Material) ||
                     (o.Kind == QuestObjectiveKind.ReachLevel && o.Required > PlayerStats.LevelCap) ||
                     (o.Kind == QuestObjectiveKind.AdvanceClass && o.Required != 1))
@@ -95,7 +96,26 @@ public sealed partial class PlayerProgressService
         var q = FindQuest(id); if (q == null) return "任务资源不可用。";
         return $"接取等级 Lv.{q.RequiredLevel}" + (q.PrerequisiteId.Length == 0 ? "" : " · 先提交「" + FindQuest(q.PrerequisiteId)?.Title + "」");
     }
-    public string QuestGiverText(string id) => FindQuest(id)?.Giver == TownNpcRole.Blacksmith ? "主城铁匠" : $"主城{(CurrentClass?.BaseClass ?? CurrentClass)?.DisplayName}导师";
+    public string QuestGiverText(string id) => FindQuest(id)?.Giver switch
+    {
+        TownNpcRole.Blacksmith => "主城铁匠",
+        TownNpcRole.Steward => "广场执事 · 阿登",
+        TownNpcRole.Scout => "探险家 · 米拉",
+        TownNpcRole.Resident => "商人 · 罗莎",
+        _ => $"主城{(CurrentClass?.BaseClass ?? CurrentClass)?.DisplayName}导师"
+    };
+    public string QuestMarkerFor(TownNpc npc)
+    {
+        bool available = false;
+        foreach (var q in Quests)
+        {
+            if (!QuestMatchesNpc(q.Id, npc)) continue;
+            var state = GetQuestStatus(q.Id);
+            if (state == QuestStatus.Ready) return "?";
+            if (state == QuestStatus.Available) available = true;
+        }
+        return available ? "!" : "";
+    }
     public bool QuestMatchesNpc(string id, TownNpc npc)
     {
         var q = FindQuest(id);
@@ -154,14 +174,27 @@ public sealed partial class PlayerProgressService
     // Gameplay events remain in memory if saving fails, so retrying Save never loses or doubles them.
     public void RecordQuestDungeonEvent(int dungeonId, bool cleared)
     {
+        RecordQuestActivity(cleared ? QuestObjectiveKind.ClearDungeon : QuestObjectiveKind.DefeatEnemies, dungeonId);
+    }
+    public void RecordQuestConversation(TownNpc npc)
+    {
+        var player = weapons != null ? weapons.GetComponent<PlayerController>() : null;
+        if (player == null || player.IsDead || player.CombatAllowed || npc == null || !npc.isActiveAndEnabled ||
+            npc.gameObject.scene != SceneManager.GetActiveScene() || Vector3.Distance(player.transform.position, npc.transform.position) > npc.InteractionRadius ||
+            npc.Role == TownNpcRole.Mentor && npc.Profession?.Id != CurrentClass?.FamilyId) return;
+        RecordQuestActivity(QuestObjectiveKind.TalkToNpc, 0, npc.Role);
+    }
+    // Callers own event de-duplication: successful interaction, registered enemy death, settled challenge.
+    public void RecordQuestActivity(QuestObjectiveKind kind, int dungeonId, TownNpcRole npcRole = TownNpcRole.Mentor)
+    {
         if (!attached) return;
-        bool changed = false; var kind = cleared ? QuestObjectiveKind.ClearDungeon : QuestObjectiveKind.DefeatEnemies;
+        bool changed = false;
         foreach (var e in journal.entries.Where(x => !x.rewarded))
         {
             var q = FindQuest(e.questId);
-            if (cleared && q.Objectives.Any(o => o.Kind == QuestObjectiveKind.AdvanceClass) && CurrentClass?.IsAdvanced != true) continue;
+            if (kind == QuestObjectiveKind.ClearDungeon && q.Objectives.Any(o => o.Kind == QuestObjectiveKind.AdvanceClass) && CurrentClass?.IsAdvanced != true) continue;
             for (int i = 0; i < q.Objectives.Length; i++)
-                if (q.Objectives[i].Kind == kind && q.Objectives[i].DungeonId == dungeonId && e.counts[i] < q.Objectives[i].Required)
+                if (q.Objectives[i].MatchesEvent(kind, dungeonId, npcRole) && e.counts[i] < q.Objectives[i].Required)
                 { e.counts[i]++; changed = true; }
         }
         if (changed) Save();

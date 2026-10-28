@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: side-neighbors
+  m_EditorClassIdentifier: 
+  Id: side-neighbors
+  Title: "\u8857\u574A\u7684\u53E3\u4FE1"
+  Description: "\u5546\u4EBA\u7F57\u838E\u60F3\u786E\u8BA4\u5DE1\u9632\u4E0E\u63A2\u9669\u961F\u7684\u8FD1\u51B5\u3002\u4E0E\u6267\u4E8B\u548C\u63A2\u9669\u5BB6\u4EA4\u8C08\u540E\uFF0C\u56DE\u6765\u544A\u8BC9\u5979\u6D88\u606F\u3002"
+  Category: 1
+  Giver: 4
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 101
+  Objectives:
+  - Kind: 6
+    Label: "\u5411\u5E7F\u573A\u6267\u4E8B\u95EE\u5019"
+    DungeonId: 0
+    ItemId: 
+    NpcRole: 2
+    Required: 1
+  - Kind: 6
+    Label: "\u5411\u63A2\u9669\u5BB6\u8BE2\u95EE\u8FD1\u51B5"
+    DungeonId: 0
+    ItemId: 
+    NpcRole: 3
+    Required: 1
+  RewardGold: 60
+  RewardExp: 80
+  Rewards: []

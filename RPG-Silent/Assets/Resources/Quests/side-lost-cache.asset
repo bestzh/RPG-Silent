@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: side-lost-cache
+  m_EditorClassIdentifier: 
+  Id: side-lost-cache
+  Title: "\u6797\u4E2D\u7684\u65E7\u8865\u7ED9"
+  Description: "\u63A2\u9669\u961F\u5728\u68EE\u6797\u7559\u6709\u65E7\u8865\u7ED9\u3002\u63A5\u53D6\u540E\u5F00\u542F\u4E24\u4E2A\u68EE\u6797\u5B9D\u7BB1\uFF0C\u518D\u56DE\u57CE\u62A5\u544A\u3002\u5B9D\u7BB1\u4E2D\u7684\u88C5\u5907\u4ECD\u9700\u81EA\u884C\u62FE\u53D6\u3002"
+  Category: 1
+  Giver: 3
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 103
+  Objectives:
+  - Kind: 11
+    Label: "\u5F00\u542F\u68EE\u6797\u5B9D\u7BB1"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 2
+  RewardGold: 180
+  RewardExp: 180
+  Rewards:
+  - itemId: forge-shard
+    count: 2
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

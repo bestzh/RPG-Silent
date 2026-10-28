@@ -48,6 +48,12 @@ public sealed class DungeonRunService : IDisposable
     public string ChallengeSummary => DungeonChallengeRules.Label(Challenge) + " · " + DungeonChallengeRules.Duration(Elapsed) +
         (Challenge == DungeonChallenge.Timed ? " / " + DungeonChallengeRules.Duration(TimeLimit) + (Elapsed > TimeLimit ? " · 已超时，仍可完成清理" : "") : "");
     public void RecordExploration() { ExplorationCount++; Changed?.Invoke(); }
+    public void RecordExplorationObjective(ExplorationKind kind)
+    {
+        if (Dungeon == null || Dungeon.IsTraining) return;
+        if (kind == ExplorationKind.Chest) progress.RecordQuestActivity(QuestObjectiveKind.OpenChest, Dungeon.Id);
+        if (kind == ExplorationKind.HiddenPassage) progress.RecordQuestActivity(QuestObjectiveKind.DiscoverSecret, Dungeon.Id);
+    }
     public void RegisterOptionalEnemy(EnemyController enemy) { if (State != DungeonRunState.Running) return; TotalEnemies++; RegisterEnemy(enemy); }
     public bool ClaimChallengeReward()
     {
@@ -165,6 +171,7 @@ public sealed class DungeonRunService : IDisposable
         enemy.Died -= OnEnemyDied;
         ++DefeatedEnemies;
         progress.RecordQuestDungeonEvent(Dungeon.Id, false);
+        if (enemy.IsElite && !enemy.IsBoss) progress.RecordQuestActivity(QuestObjectiveKind.DefeatElite, Dungeon.Id);
         SpawnDrops(enemy);
         if (stats.IsDead) Finish(false, "角色已倒下。");
         else if ((encounter == null || encounter.IsComplete) && remaining.Count == 0) Finish(true);
@@ -185,6 +192,8 @@ public sealed class DungeonRunService : IDisposable
         ChallengeRewardPending = ChallengeGold > 0;
         if (ChallengeRewardPending) ClaimChallengeReward();
         if (success) progress.RecordQuestDungeonEvent(Dungeon.Id, true);
+        if (success && ChallengeCompleted && Challenge != DungeonChallenge.Exploration)
+            progress.RecordQuestActivity(Challenge == DungeonChallenge.Timed ? QuestObjectiveKind.CompleteTimed : QuestObjectiveKind.CompleteBossTrial, Dungeon.Id);
         player?.Statuses?.State.Clear();
         FailureReason = reason;
         encounter?.Stop();
