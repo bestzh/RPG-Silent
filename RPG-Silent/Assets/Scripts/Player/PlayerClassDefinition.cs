@@ -13,6 +13,7 @@ public sealed class PlayerClassDefinition : ScriptableObject
     public GameObject ModelPrefab;
     public GameObject MaleModelPrefab;
     public GameObject FemaleModelPrefab;
+    public PlayerGender LegacyArmorGender = PlayerGender.Male;
     public AnimationClip PreviewIdle;
     public WeaponDefinition StartingWeapon;
     public SkillData[] Lessons = new SkillData[0];
@@ -21,6 +22,8 @@ public sealed class PlayerClassDefinition : ScriptableObject
     public bool IsAdvanced => BaseClass != null;
     public string FamilyId => IsAdvanced ? BaseClass.Id : Id;
     public float DamageMultiplier => IsAdvanced ? 1.1f : 1f;
+    public PlayerGender GetVisualGender(PlayerGender gender, bool wearingArmor)
+        => gender == PlayerGender.Legacy && wearingArmor ? LegacyArmorGender : gender;
     public GameObject GetModel(PlayerGender gender) => gender switch
     {
         PlayerGender.Male => MaleModelPrefab,

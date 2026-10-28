@@ -19,6 +19,7 @@ MonoBehaviour:
   ModelPrefab: {fileID: 1741276027538082, guid: 767b276e5b6e4b14bbcd51b5a6e78ca8, type: 3}
   MaleModelPrefab: {fileID: 519750892739493410, guid: 74b8c4ac485475a47b8ffb263a89ce77, type: 3}
   FemaleModelPrefab: {fileID: 3894136194294577985, guid: 9b8ee309eacd3de4293872a0ac2ba844, type: 3}
+  LegacyArmorGender: 1
   PreviewIdle: {fileID: 7400000, guid: 5c0b1be3522a16f4c8519b02a90a980d, type: 3}
   StartingWeapon: {fileID: 11400000, guid: 3f44b07cb54742143bcb76bbe8442de1, type: 2}
   Lessons:

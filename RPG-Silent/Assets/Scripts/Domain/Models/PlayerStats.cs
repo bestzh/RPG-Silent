@@ -10,6 +10,8 @@ namespace RPGSilent.Domain
         public const int LevelCap = 50;
         private readonly int baseMaxHealth;
         private readonly float baseMaxEnergy;
+        private int equipmentHealth, equipmentEnergy;
+        public int DefensePercent { get; private set; }
         public int Level { get; private set; } = 1;
         public int ExpInLevel => Level >= LevelCap ? 0 : Exp - ExpAtLevel(Level);
         public int ExpToNextLevel => Level >= LevelCap ? 0 : Level * 100;
@@ -45,6 +47,7 @@ namespace RPGSilent.Domain
 
         public void ResetForNewGame()
         {
+            equipmentHealth = equipmentEnergy = DefensePercent = 0;
             Level = 1;
             MaxHealth = baseMaxHealth;
             MaxEnergy = baseMaxEnergy;
@@ -58,7 +61,8 @@ namespace RPGSilent.Domain
         public void TakeDamage(int damage)
         {
             if (IsDead || damage <= 0) return;
-            CurrentHealth = System.Math.Max(0, CurrentHealth - damage);
+            int mitigated = Math.Max(1, (int)Math.Ceiling(damage * (100d - DefensePercent) / 100d));
+            CurrentHealth = System.Math.Max(0, CurrentHealth - mitigated);
             OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
         }
 
@@ -113,8 +117,19 @@ namespace RPGSilent.Domain
         {
             Level = 1;
             while (Level < LevelCap && Exp >= ExpAtLevel(Level + 1)) ++Level;
-            MaxHealth = baseMaxHealth + (Level - 1) * 10;
-            MaxEnergy = baseMaxEnergy + (Level - 1) * 5f;
+            MaxHealth = baseMaxHealth + (Level - 1) * 10 + equipmentHealth;
+            MaxEnergy = baseMaxEnergy + (Level - 1) * 5f + equipmentEnergy;
+        }
+
+        // Changing gear never heals or revives; otherwise repeated swaps could refill HP.
+        public void SetEquipmentBonuses(int health, int energy, int defensePercent)
+        {
+            if (health < 0 || health > 10000 || energy < 0 || energy > 10000 || defensePercent < 0 || defensePercent > 50)
+                throw new ArgumentOutOfRangeException(nameof(health));
+            equipmentHealth = health; equipmentEnergy = energy; DefensePercent = defensePercent;
+            RecalculateLevel();
+            CurrentHealth = Math.Min(CurrentHealth, MaxHealth); CurrentEnergy = Math.Min(CurrentEnergy, MaxEnergy);
+            OnHealthChanged?.Invoke(CurrentHealth, MaxHealth); OnEnergyChanged?.Invoke(CurrentEnergy, MaxEnergy);
         }
 
         public bool TrySpendGold(int cost)

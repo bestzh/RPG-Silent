@@ -9,6 +9,9 @@ public sealed class WeaponDefinition : ScriptableObject
 
     public string PersistentId;
     public string DisplayName;
+    [Min(1f)] public float DamageMultiplier = 1f;
+    [Tooltip("品质变体复用原武器的模型挂点校准。")]
+    public WeaponDefinition MountTemplate;
     public PlayerStance Stance = PlayerStance.OneHandSword;
     public AttackProfile[] ComboProfiles;
     public GameObject ModelPrefab;

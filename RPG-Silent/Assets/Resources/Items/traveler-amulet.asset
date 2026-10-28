@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9fbedbdcc05fc4fb6dea7686f5bcd4, type: 3}
+  m_Name: traveler-amulet
+  m_EditorClassIdentifier: 
+  Id: traveler-amulet
+  DisplayName: "\u65C5\u4EBA\u62A4\u7B26"
+  Description: "\u7531\u5192\u9669\u8005\u4E0E\u68EE\u6797\u5B88\u536B\u4F7F\u7528\u7684\u5B9E\u7528\u88C5\u5907\u3002"
+  Kind: 0
+  Rarity: 0
+  Slot: 4
+  Icon: {fileID: 21300000, guid: ae478d0ec651f45f6ac962b9647d2091, type: 3}
+  Weapon: {fileID: 0}
+  Appearance: {fileID: 0}
+  Set: {fileID: 11400000, guid: dd4f31b3f217df648a5dbd8a6ab452f3, type: 2}
+  IsGem: 0
+  RequiredLevel: 1
+  Health: 4
+  Energy: 8
+  AttackPercent: 2
+  DefensePercent: 0
+  SellPrice: 20

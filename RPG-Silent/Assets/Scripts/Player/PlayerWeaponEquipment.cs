@@ -22,6 +22,7 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
     [SerializeField, Range(0.02f, 0.2f)] private float attachmentBlend = 0.09f;
 
     private PlayerController player;
+    [VContainer.Inject] private PlayerProgressService progress;
     private PlayerStanceController stance;
     private Animator animator;
     private AttackExecutor attacks;
@@ -35,6 +36,8 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
     private bool pendingSelection;
     private int requestedSlot;
     private WeaponDefinition requestedWeapon;
+    private string requestedInstanceId;
+    private readonly string[] equippedInstanceIds = { "", "" };
     private AnimatorOverrideController transitionController;
     private RuntimeAnimatorController settledController;
     private int settledFrame;
@@ -115,46 +118,66 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
     }
 
     public WeaponDefinition GetWeapon(int slot) => slot >= 0 && slot < SlotCount ? equippedWeapons[slot] : null;
+    public string GetInstanceId(int slot) => slot >= 0 && slot < SlotCount ? equippedInstanceIds[slot] : string.Empty;
+    public void RestoreInstanceIds(string[] ids)
+    {
+        if (ids == null || ids.Length != SlotCount) throw new ArgumentException("武器实例记录无效。");
+        Array.Copy(ids, equippedInstanceIds, SlotCount);
+    }
     public WeaponDefinition GetAvailableWeapon(int index) => index >= 0 && index < availableWeapons.Length ? availableWeapons[index] : null;
-    public bool IsAvailable(WeaponDefinition weapon) => weapon == null || Array.IndexOf(availableWeapons, weapon) >= 0;
+    public bool IsAvailable(WeaponDefinition weapon) => weapon == null ||
+        (Array.IndexOf(availableWeapons, weapon) >= 0 && (progress == null || progress.CanEquipWeapon(weapon)));
 
     public bool TryEquip(int slot, WeaponDefinition weapon)
     {
         if (slot < 0 || slot >= SlotCount || !IsAvailable(weapon) || !CanChangeEquipment) return false;
-        if (equippedWeapons[slot] == weapon) return true;
+        return TryEquipSelection(slot, weapon, progress?.ResolveWeaponKey(weapon) ?? string.Empty);
+    }
+    public bool TryEquipInstance(int slot, string key)
+    {
+        if (progress == null || slot < 0 || slot >= SlotCount || !CanChangeEquipment || !progress.CanEquipWeaponInstance(key)) return false;
+        var definition = progress.FindItem(key)?.Weapon;
+        if (!IsAvailable(definition)) return false;
+        return TryEquipSelection(slot, definition, key ?? string.Empty);
+    }
+    bool TryEquipSelection(int slot, WeaponDefinition weapon, string key)
+    {
+        if (equippedWeapons[slot] == weapon && equippedInstanceIds[slot] == key) return true;
         if (slot != activeSlot)
         {
+            if (progress != null && !progress.CommitWeaponSelection(slot, key, activeSlot)) return false;
             equippedWeapons[slot] = weapon;
+            equippedInstanceIds[slot] = key;
             EquipmentChanged?.Invoke();
             return true;
         }
-        RequestSelection(slot, weapon);
-        return true;
+        return RequestSelection(slot, weapon, key);
     }
 
     public bool TrySelectSlot(int slot)
     {
         if (slot < 0 || slot >= SlotCount || !CanChangeEquipment) return false;
         if (activeSlot == slot) return true;
-        RequestSelection(slot, equippedWeapons[slot]);
-        return true;
+        return RequestSelection(slot, equippedWeapons[slot], equippedInstanceIds[slot]);
     }
 
     public bool TrySwitchNext() => TrySelectSlot((activeSlot + 1) % SlotCount);
 
-    private void RequestSelection(int slot, WeaponDefinition weapon)
+    private bool RequestSelection(int slot, WeaponDefinition weapon, string key)
     {
         requestedSlot = slot;
         requestedWeapon = weapon;
+        requestedInstanceId = key;
         pendingSelection = true;
         if (!combatAllowed || weapon == ActiveWeapon)
         {
-            CommitSelection();
+            bool committed = CommitSelection();
             ApplyStablePresentation();
             PresentationChanged?.Invoke();
-            return;
+            return committed;
         }
         BeginSequence();
+        return true;
     }
 
     // Validate the entire restored selection before touching live equipment.
@@ -167,6 +190,10 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
         CancelTransition();
         ReleaseTransitionController();
         Array.Copy(weapons, equippedWeapons, SlotCount);
+        if (progress != null)
+            for (int i = 0; i < SlotCount; i++)
+                if (progress.FindItem(equippedInstanceIds[i])?.Weapon != weapons[i] || (weapons[i] == null && equippedInstanceIds[i].Length > 0))
+                    equippedInstanceIds[i] = progress.ResolveWeaponKey(weapons[i]) ?? string.Empty;
         activeSlot = selectedSlot;
         attacks?.ResetCombat();
         ApplyStablePresentation();
@@ -255,16 +282,21 @@ public sealed class PlayerWeaponEquipment : MonoBehaviour
             FinishSequence();
     }
 
-    private void CommitSelection()
+    private bool CommitSelection()
     {
-        if (!pendingSelection) return;
+        if (!pendingSelection) return true;
+        if (progress != null && !progress.CommitWeaponSelection(requestedSlot, requestedInstanceId, requestedSlot))
+        { pendingSelection = false; requestedWeapon = null; requestedInstanceId = null; return false; }
         equippedWeapons[requestedSlot] = requestedWeapon;
+        equippedInstanceIds[requestedSlot] = requestedInstanceId;
         activeSlot = requestedSlot;
         pendingSelection = false;
         requestedWeapon = null;
+        requestedInstanceId = null;
         // The atomic handoff commits progress; presentation callbacks cannot change inventory.
         stance.SetStancePresentation(ActiveWeapon != null ? ActiveWeapon.Stance : PlayerStance.Unarmed, true, applyAnimator: false);
         EquipmentChanged?.Invoke();
+        return true;
     }
 
     public void TickTransition()
