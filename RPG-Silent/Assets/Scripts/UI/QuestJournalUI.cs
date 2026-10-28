@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using VContainer;
 using W = ProgressionUIWidgets;
 
-public sealed class QuestJournalUI : UIBase
+public sealed partial class QuestJournalUI : UIBase
 {
     [Inject] PlayerProgressService progress;
     public TMP_FontAsset Font;
@@ -14,7 +14,7 @@ public sealed class QuestJournalUI : UIBase
     TMP_Text heading, description, objectives, rewards, destination, status;
     Button track;
     readonly Button[] tabs = new Button[3];
-    readonly Button[] categoryTabs = new Button[5];
+    readonly Button[] categoryTabs = new Button[6];
     string selected;
     int filter, category;
     protected override void OnInit()
@@ -25,8 +25,8 @@ public sealed class QuestJournalUI : UIBase
         W.Button(panel, Font, "Close", "关闭 [J]", 1040, 26, 148, 42, () => interaction?.Close());
         string[] labels = { "全部任务", "进行中", "已提交" };
         for (int i = 0; i < 3; i++) { int index = i; tabs[i] = W.Button(panel, Font, "Filter:" + i, labels[i], 32 + i * 132, 100, 122, 42, () => { filter = index; rows.anchoredPosition = Vector2.zero; Refresh(); }); }
-        string[] categories = { "全部", "主线", "支线", "职业", "特殊" };
-        for (int i = 0; i < categories.Length; i++) { int index = i; categoryTabs[i] = W.Button(panel, Font, "Category:" + i, categories[i], 32 + i * 78, 154, 74, 40, () => { category = index; rows.anchoredPosition = Vector2.zero; Refresh(); }); }
+        string[] categories = { "全部", "主线", "支线", "职业", "特殊", "委托" };
+        for (int i = 0; i < categories.Length; i++) { int index = i; categoryTabs[i] = W.Button(panel, Font, "Category:" + i, categories[i], 32 + i * 65, 154, 61, 40, () => { category = index; rows.anchoredPosition = Vector2.zero; Refresh(); }); }
         var viewport = W.Rect(panel, "Viewport", 32, 208, 386, 502);
         viewport.gameObject.AddComponent<Image>().color = W.Card; viewport.gameObject.AddComponent<RectMask2D>();
         rows = W.Rect(viewport, "Rows", 0, 0, 386, 502);
@@ -39,11 +39,12 @@ public sealed class QuestJournalUI : UIBase
         destination = W.Text(panel, Font, "Destination", "", 452, 560, 736, 90, 22);
         track = W.Button(panel, Font, "Track", "追踪任务", 452, 666, 280, 44, Track);
         status = W.Text(panel, Font, "Status", "", 32, 736, 1156, 44, 20);
+        BuildCollectionTabs();
     }
     public override void OnOpen(params object[] args)
     {
         progress.Changed -= Refresh; interaction = args.Length > 0 ? args[0] as PlayerQuestInteraction : null;
-        filter = category = 0; selected = progress.TrackedQuest?.Id; status.text = "先接取，再探索或挑战；头顶 ! 可接，? 可交。完成后回对应 NPC 提交并领取奖励。";
+        filter = category = journalPage = 0; selected = progress.TrackedQuest?.Id; status.text = "任务追踪显示方向与距离；成就可手动领奖，图鉴记录每个角色的冒险。";
         progress.Changed += Refresh; Refresh();
     }
     public override void OnClose() { progress.Changed -= Refresh; var previous = interaction; interaction = null; previous?.OnUiClosed(); }
@@ -58,6 +59,8 @@ public sealed class QuestJournalUI : UIBase
     {
         if (panel == null) return;
         foreach (Transform child in rows) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
+        RefreshCollectionTabs();
+        if (journalPage != 0) { RefreshCollectionRows(); return; }
         for (int i = 0; i < tabs.Length; i++) tabs[i].image.color = filter == i ? W.Accent : W.Card;
         for (int i = 0; i < categoryTabs.Length; i++) categoryTabs[i].image.color = category == i ? W.Accent : W.Card;
         var quests = progress.Quests.Where(q => (category == 0 || (int)q.Category == category - 1) &&

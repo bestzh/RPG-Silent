@@ -46,6 +46,8 @@ public sealed partial class PlayerProgressService : IDisposable
                 throw new InvalidOperationException("职业标识缺失或重复：" + c.name);
         LoadItemCatalog();
         LoadQuestCatalog();
+        LoadWorldCatalog();
+        Changed += ObserveWorldFeedback;
     }
     public ProgressLoadResult InspectSave() => ValidateLoadedCharacter(store.Load());
     ProgressLoadResult ValidateLoadedCharacter(ProgressLoadResult result)
@@ -62,6 +64,9 @@ public sealed partial class PlayerProgressService : IDisposable
             if (!ValidInventoryContent(d.inventory)) throw new InvalidDataException();
             if (!ValidQuestContent(d.quests, d.classId)) throw new InvalidDataException();
             if (!ValidConsumableContent(d.consumables)) throw new InvalidDataException();
+            if (!ValidWorldContent(d.world)) throw new InvalidDataException();
+            if (d.quests.entries.Any(e => e.lastTurnInRun > d.world.completedRuns ||
+                FindQuest(e.questId).RequiredStoryId.Length > 0 && d.world.Choice(FindQuest(e.questId).RequiredStoryId) != FindQuest(e.questId).RequiredChoiceId)) throw new InvalidDataException();
         }
         catch (InvalidDataException) { return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported, Message = "装备、任务、药品记录或对应资源不可用，原文件已保留。" }; }
         return result;
@@ -90,6 +95,7 @@ public sealed partial class PlayerProgressService : IDisposable
         lastSavedPayload = null; newProfile = false; HasUnsavedChanges = false;
         StatusMessage = result.Status == ProgressLoadStatus.Recovered ? result.Message : "进度已读取";
         stats.RestoreProgress(pending.gold, pending.totalExp);
+        SeedWorldFeedback();
     }
     public void Attach(GameObject rig)
     {
@@ -190,6 +196,7 @@ public sealed partial class PlayerProgressService : IDisposable
         if (!attached || skills.GetComponent<PlayerController>().CombatAllowed || stats.IsDead || cost < 0) return false;
         if (stats.Gold < cost) { message = $"金币不足，需要 {cost} 金币。"; return false; }
         d.gold = stats.Gold - cost;
+        CollectInventoryDiscoveries(d);
         if (!store.TrySave(d, newProfile, out message)) { StatusMessage = message; HasUnsavedChanges = true; Changed?.Invoke(); return false; }
         applying = true;
         try
@@ -216,6 +223,7 @@ public sealed partial class PlayerProgressService : IDisposable
         inventory = d.inventory.Copy();
         journal = d.quests.Copy();
         consumables = d.consumables.Copy();
+        world = d.world.Copy();
         ApplyEquipmentBonuses();
     }
     PlayerProgressData Capture()
@@ -224,7 +232,7 @@ public sealed partial class PlayerProgressService : IDisposable
             stance = (int)stance.CurrentStance, classId = classId, gender = (int)CurrentGender, activeWeaponSlot = weapons.ActiveSlot,
             skillIds = new string[PlayerSkillController.MaxSlots], weaponIds = new string[PlayerWeaponEquipment.SlotCount],
             learnedSkills = learned.OrderBy(p => p.Key).Select(p => new SkillProgressData { skillId = p.Key, rank = p.Value }).ToArray(),
-            weaponUpgrades = Array.Empty<WeaponUpgradeData>(), equipmentVersion = 1, quests = journal.Copy(), consumables = consumables.Copy(),
+            weaponUpgrades = Array.Empty<WeaponUpgradeData>(), equipmentVersion = 1, quests = journal.Copy(), consumables = consumables.Copy(), world = world.Copy(),
             weaponInstanceIds = Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetInstanceId).ToArray(), inventory = inventory.Copy() };
         for (int i = 0; i < d.weaponIds.Length; i++)
         {
@@ -236,6 +244,7 @@ public sealed partial class PlayerProgressService : IDisposable
             var s = skills.GetEquippedSkill(i); d.skillIds[i] = s?.PersistentId ?? string.Empty;
             if (s != null && (!catalog.TryGetValue(d.skillIds[i], out var known) || known != s || GetSkillRank(s) == 0)) throw new InvalidDataException("技能尚未学会或资源无效，请恢复有效技能后重试保存。");
         }
+        CollectInventoryDiscoveries(d);
         return d;
     }
     public bool Save()
@@ -246,6 +255,7 @@ public sealed partial class PlayerProgressService : IDisposable
             var d = Capture(); string payload = JsonUtility.ToJson(d);
             if (payload == lastSavedPayload && !HasUnsavedChanges) { Changed?.Invoke(); return true; }
             if (!store.TrySave(d, newProfile, out string error)) throw new InvalidDataException(error);
+            world = d.world.Copy();
             newProfile = false; lastSavedPayload = payload; HasUnsavedChanges = false; StatusMessage = "进度已保存";
         }
         catch (InvalidDataException ex) { HasUnsavedChanges = true; StatusMessage = ex.Message; }

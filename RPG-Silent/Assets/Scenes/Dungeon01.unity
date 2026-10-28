@@ -17105,6 +17105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 0
   DisplayName: "\u8865\u7ED9\u5B9D\u7BB1"
+  PersistentId: Dungeon01-Chest-1
   Hidden: 0
   MovingGate: {fileID: 0}
   ChestLid: {fileID: 1543397809}
@@ -17944,6 +17945,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 1
   DisplayName: "\u542F\u52A8\u5C01\u95E8\u673A\u5173"
+  PersistentId: Dungeon01-Mechanism-3
   Hidden: 0
   MovingGate: {fileID: 1369000866}
   ChestLid: {fileID: 0}
@@ -54682,6 +54684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 3
   DisplayName: "\u89E6\u78B0\u8BD5\u70BC\u6676\u77F3 \xB7 \u7CBE\u82F1\u4F0F\u51FB"
+  PersistentId: Dungeon01-EliteEvent-0
   Hidden: 0
   MovingGate: {fileID: 0}
   ChestLid: {fileID: 0}
@@ -69801,6 +69804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 2
   DisplayName: "\u68C0\u67E5\u9690\u853D\u77F3\u7891"
+  PersistentId: forest-hidden
   Hidden: 1
   MovingGate: {fileID: 1437846005}
   ChestLid: {fileID: 0}
@@ -78913,6 +78917,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 0
   DisplayName: "\u79D8\u85CF\u5B9D\u7BB1"
+  PersistentId: Dungeon01-Chest-4
   Hidden: 0
   MovingGate: {fileID: 0}
   ChestLid: {fileID: 1007055466}
@@ -82337,6 +82342,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Kind: 0
   DisplayName: "\u5C01\u95E8\u540E\u7684\u5B9D\u7BB1"
+  PersistentId: Dungeon01-Chest-2
   Hidden: 0
   MovingGate: {fileID: 0}
   ChestLid: {fileID: 125558753}

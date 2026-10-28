@@ -42,6 +42,7 @@ public sealed partial class TownNpcUI : UIBase
         scroll.horizontal = false; scroll.movementType = ScrollRect.MovementType.Clamped; scroll.scrollSensitivity = 35;
         status = W.Text(panel, Font, "Status", "新技能自动装入第一个空槽。转职后可继续学习基础职业技能。", 32, 646, 996, 72, 21);
         BuildQuestTabs();
+        BuildWorldTabs();
     }
     public override void OnOpen(params object[] args)
     {
@@ -51,6 +52,7 @@ public sealed partial class TownNpcUI : UIBase
         questPage = interaction?.Conversation != null && interaction.Conversation.Role >= TownNpcRole.Steward;
         questCategory = 0;
         supplyPage = false;
+        ResetWorldPages();
         status.text = interaction != null && interaction.Conversation != null && interaction.Conversation.Role == TownNpcRole.Blacksmith
             ? "强化必定成功。武器需先装入武器槽；防具饰品可直接选择背包中的装备。"
             : "新技能自动装入第一个空槽。转职后可继续学习基础职业技能。";
@@ -72,22 +74,25 @@ public sealed partial class TownNpcUI : UIBase
         var npc = interaction.Conversation;
         bool mentor = npc.Role == TownNpcRole.Mentor;
         bool smith = npc.Role == TownNpcRole.Blacksmith;
-        foreach (string name in new[] { "Slot", "PreviousSlot", "NextSlot", "ClearSlot" }) panel.Find(name).gameObject.SetActive(mentor && !questPage && !supplyPage);
-        weaponTab.gameObject.SetActive(smith && !questPage && !supplyPage); armorTab.gameObject.SetActive(smith && !questPage && !supplyPage); gemTab.gameObject.SetActive(smith && !questPage && !supplyPage); materialBalance.gameObject.SetActive(smith && !questPage && !supplyPage);
+        foreach (string name in new[] { "Slot", "PreviousSlot", "NextSlot", "ClearSlot" }) panel.Find(name).gameObject.SetActive(mentor && !questPage && !supplyPage && !ExtraNpcPage);
+        weaponTab.gameObject.SetActive(smith && !questPage && !supplyPage && !ExtraNpcPage); armorTab.gameObject.SetActive(smith && !questPage && !supplyPage && !ExtraNpcPage); gemTab.gameObject.SetActive(smith && !questPage && !supplyPage && !ExtraNpcPage); materialBalance.gameObject.SetActive(smith && !questPage && !supplyPage && !ExtraNpcPage);
         weaponTab.image.color = !armorForge && !gemForge ? W.Accent : W.Card; armorTab.image.color = armorForge && !gemForge ? W.Accent : W.Card;
         gemTab.image.color = gemForge ? W.Accent : W.Card;
         materialBalance.text = $"锻造碎片 {progress.ArmorUpgradeMaterials} · 晶核碎片 {progress.Inventory.Count(PlayerProgressService.GemCraftMaterialId)}";
         var viewport = rows.parent.GetComponent<RectTransform>();
-        viewport.anchoredPosition = new Vector2(32, questPage || supplyPage ? -192 : -246);
-        viewport.sizeDelta = new Vector2(996, questPage || supplyPage ? 430 : 376);
+        viewport.anchoredPosition = new Vector2(32, storyPage || supplyPage ? -192 : -246);
+        viewport.sizeDelta = new Vector2(996, storyPage || supplyPage ? 430 : 376);
         title.text = npc.DisplayName;
         details.text = $"{progress.CurrentClass.DisplayName}  ·  Lv.{progress.Level}  ·  金币 {progress.Gold}\n" +
             (smith ? gemForge ? "每件防具饰品可镶嵌 1 颗宝石。镶嵌、替换、拆卸均为 50 金币；旧宝石完整返还。" : armorForge ? "防具基础属性每级 +10%，最高 +5；随机词条保持不变。强化仅作用于所选装备。" :
             "武器每级增加 10% 普攻伤害，最高 +5。只强化所选槽位中的这一件武器。" : "基础职业技能最高 3 级；转职后最高 5 级。滚动查看全部技能与转职分支。");
         slotLabel.text = $"装配目标：槽 {(selectedSlot + 1) % 10}";
         RefreshQuestTabs();
+        RefreshWorldTabs();
         float y = 10;
-        if (questPage) y = AddQuestRows(y);
+        if (storyPage) y = AddStoryRows(y);
+        else if (craftingPage) y = AddCraftingRows(y);
+        else if (questPage) y = AddQuestRows(y);
         else if (supplyPage) y = AddSupplyRows(y);
         else if (smith && gemForge) y = AddGemRows(y);
         else if (smith && armorForge) y = AddArmorRows(y);

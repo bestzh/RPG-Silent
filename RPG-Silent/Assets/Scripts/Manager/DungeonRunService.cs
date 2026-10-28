@@ -48,6 +48,7 @@ public sealed class DungeonRunService : IDisposable
     public string ChallengeSummary => DungeonChallengeRules.Label(Challenge) + " · " + DungeonChallengeRules.Duration(Elapsed) +
         (Challenge == DungeonChallenge.Timed ? " / " + DungeonChallengeRules.Duration(TimeLimit) + (Elapsed > TimeLimit ? " · 已超时，仍可完成清理" : "") : "");
     public void RecordExploration() { ExplorationCount++; Changed?.Invoke(); }
+    public void RecordExplorationDiscovery(ExplorationNode node) { if (Dungeon != null && !Dungeon.IsTraining) progress.RecordExplorationDiscovery(node); }
     public void RecordExplorationObjective(ExplorationKind kind)
     {
         if (Dungeon == null || Dungeon.IsTraining) return;
@@ -170,6 +171,7 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Running || !remaining.Remove(enemy)) return;
         enemy.Died -= OnEnemyDied;
         ++DefeatedEnemies;
+        progress.RecordEnemyDiscovery(enemy);
         progress.RecordQuestDungeonEvent(Dungeon.Id, false);
         if (enemy.IsElite && !enemy.IsBoss) progress.RecordQuestActivity(QuestObjectiveKind.DefeatElite, Dungeon.Id);
         SpawnDrops(enemy);
@@ -191,7 +193,7 @@ public sealed class DungeonRunService : IDisposable
         ChallengeGold = DungeonChallengeRules.BonusGold(Challenge, ChallengeCompleted, difficultyTier?.RewardMultiplier ?? 1);
         ChallengeRewardPending = ChallengeGold > 0;
         if (ChallengeRewardPending) ClaimChallengeReward();
-        if (success) progress.RecordQuestDungeonEvent(Dungeon.Id, true);
+        if (success) { progress.RecordQuestDungeonEvent(Dungeon.Id, true); progress.RecordCompletedRun(Dungeon.Id); }
         if (success && ChallengeCompleted && Challenge != DungeonChallenge.Exploration)
             progress.RecordQuestActivity(Challenge == DungeonChallenge.Timed ? QuestObjectiveKind.CompleteTimed : QuestObjectiveKind.CompleteBossTrial, Dungeon.Id);
         player?.Statuses?.State.Clear();

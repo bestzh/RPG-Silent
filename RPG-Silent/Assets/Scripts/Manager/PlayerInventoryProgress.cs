@@ -185,13 +185,14 @@ public sealed partial class PlayerProgressService
     bool CommitInventory(InventoryData next, int gold, int exp, string success, out string message)
     {
         var data = Capture(); data.inventory = next;
+        CollectInventoryDiscoveries(data);
         data.gold = (int)Math.Min(int.MaxValue, (long)stats.Gold + gold);
         data.totalExp = (int)Math.Min(int.MaxValue, (long)stats.Exp + exp);
         if (!store.TrySave(data, newProfile, out message)) { StatusMessage = message; HasUnsavedChanges = true; Changed?.Invoke(); return false; }
         applying = true;
         try
         {
-            inventory = next.Copy(); ApplyEquipmentBonuses(); stats.AddReward(gold, exp);
+            inventory = next.Copy(); world = data.world.Copy(); ApplyEquipmentBonuses(); stats.AddReward(gold, exp);
             if (appearance != null && appearance.ApplyLoadout(CurrentClass, CurrentGender, EquippedItems))
                 weapons.RestoreEquipment(Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetWeapon).ToArray(), weapons.ActiveSlot);
             newProfile = false; lastSavedPayload = JsonUtility.ToJson(data); HasUnsavedChanges = false; StatusMessage = message = success;
