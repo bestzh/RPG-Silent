@@ -1,6 +1,12 @@
 # 主城职业导师与武器强化
 
-最新选角与外观：职业页已加入男女模型预览，基础职业及转职共 18 套外观，存档更新到 v4；旧模型继续用于兼容旧存档。详见 [CharacterCreation.md](CharacterCreation.md)。下文记录本次成长系统最初接入时的 v3 方案。
+2026-10-28 更新：21 个职业技能已接入项目现有动画、定时释放和普攻 / 技能衔接；当前存档为 v10，技能标识保持兼容，详见 [CombatFlow.md](CombatFlow.md)。
+
+最新状态：职业页包含男女模型预览，基础职业及转职共 18 套外观；当前 v6 存档逐件保存装备与词条，铁匠仅强化指定实例，同名武器不再共享等级。详见 [CharacterCreation.md](CharacterCreation.md) 和 [EquipmentInstances.md](EquipmentInstances.md)。下文记录成长系统最初接入时的 v3 方案。
+
+铁匠现在还有“防具饰品强化”页，可强化已穿戴及背包内的五槽装备，消耗金币和现有锻造碎片，详见 [ArmorUpgrades.md](ArmorUpgrades.md)。
+
+铁匠“宝石工坊”可制作四种宝石并镶嵌到具体防具，替换和拆卸返还旧宝石；现有六套防具激活 2/4/5 件效果，详见 [EquipmentGrowth.md](EquipmentGrowth.md)。
 
 更新日期：2026-10-27。所有模型、动画、字体、图标、箭矢与法术特效均复用项目已有资源；没有下载或生成外部美术资源。
 
