@@ -20,6 +20,7 @@ public sealed class EnemyMotor
     private Vector3 retreatGoal;
     private float nextRetreatProbe;
     public Vector3 Home { get; private set; }
+    public void SetHome(Vector3 position) => Home = position;
     public float Speed { get; set; }
     public float TurnSpeed { get; set; }
     public bool CanNavigate => useAgent && agent != null && agent.enabled && agent.isOnNavMesh;

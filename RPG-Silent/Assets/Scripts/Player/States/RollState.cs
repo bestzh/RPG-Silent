@@ -20,13 +20,14 @@ public class RollState : PlayerState
             player.ReturnToLocomotion();
             return;
         }
+        if (player.Defense != null && !player.Defense.BeginRoll()) { player.ReturnToLocomotion(); return; }
         player.SetIsRolling(true);
         velocity = player.FacingRotation * new Vector3(input.x, 0f, input.y) * player.RollForce;
     }
 
     public override void Update()
     {
-        if (!player.AnimationController.IsPlayingAnimation()) player.ReturnToLocomotion();
+        if (!player.AnimationController.IsPlayingAnimation()) { player.CompleteDodge(); player.ReturnToLocomotion(); }
     }
 
     public override void FixedUpdate() => player.Motor.SetHorizontalVelocity(
@@ -34,6 +35,7 @@ public class RollState : PlayerState
 
     public override void Exit()
     {
+        player.Defense?.EndRoll();
         player.SetIsRolling(false);
         player.animator.SetBool("IsRolling", false);
         if (player.AnimationController.CurrentAnimationName() == RollAnimationName)

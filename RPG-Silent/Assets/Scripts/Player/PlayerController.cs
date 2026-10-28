@@ -14,6 +14,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     [Inject] private IPlayerInputActions        _playerInputActions;
     [Inject] private IControllerSettingsService _controllerSettings;
     [Inject] private IGameSettingsService       _gameSettings;
+    [Inject] private PlayerStats combatStats;
+    public PlayerStats CombatStats => combatStats;
+    [Inject] private PlayerProgressService progress;
+    public PlayerProgressService Progress => progress;
+    public PlayerClassCombat ClassCombat { get; private set; }
+    public PlayerCombatRecord CombatRecord { get; } = new();
+    public TrainingGround Training { get; set; }
+    public PlayerExplorationInteraction Exploration { get; private set; }
 
     // ── FSM ────────────────────────────────────────────────────────────────────
     public PlayerStateMachine StateMachine { get; private set; }
@@ -40,7 +48,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public bool CanRoll => GameplayInputEnabled && !IsDead && IsGrounded && !IsJumping && !IsRolling
         && !(Weapons != null && Weapons.IsBusy)
         && !(StateMachine.CurrentState is HurtState)
-        && (StanceController == null || StanceController.CanRoll);
+        && (StanceController == null || StanceController.CanRoll) && (Defense == null || Defense.CanAffordRoll);
 
     public bool CanDiveRoll => CanRoll && InputDir.magnitude > 0.1f;
 
@@ -56,8 +64,11 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public float SprintSpeed = 8f;
     public float CurrentMoveSpeed => (IsSprinting ? SprintSpeed : IsWalking ? WalkSpeed : MoveSpeed) * (Statuses?.State.MovementMultiplier ?? 1f);
     public CombatStatusController Statuses { get; private set; }
-    public bool CanReceiveCombatEffects => CombatAllowed && !combatLocked && !IsDead;
-    public bool CanUseConsumables => isActiveAndEnabled && GameplayInputEnabled && !combatLocked && !IsDead && !(Weapons != null && Weapons.IsBusy);
+    public PlayerTargetLock TargetLock { get; private set; }
+    public PlayerDefense Defense { get; private set; }
+    public PlayerHitFeedback HitFeedback { get; private set; }
+    public bool CanReceiveCombatEffects => isActiveAndEnabled && CombatAllowed && !combatLocked && !IsDead;
+    public bool CanUseConsumables => Training == null && isActiveAndEnabled && GameplayInputEnabled && !combatLocked && !IsDead && !(Weapons != null && Weapons.IsBusy);
 
     public bool IsGrounded => Motor != null && Motor.IsGrounded;
     public PlayerMotor Motor { get; private set; }
@@ -110,6 +121,11 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         StanceController    = GetComponent<PlayerStanceController>();
         Weapons             = GetComponent<PlayerWeaponEquipment>();
         Statuses = GetComponent<CombatStatusController>() ?? gameObject.AddComponent<CombatStatusController>();
+        TargetLock = GetComponent<PlayerTargetLock>() ?? gameObject.AddComponent<PlayerTargetLock>();
+        Defense = GetComponent<PlayerDefense>() ?? gameObject.AddComponent<PlayerDefense>();
+        HitFeedback = GetComponent<PlayerHitFeedback>() ?? gameObject.AddComponent<PlayerHitFeedback>();
+        ClassCombat = GetComponent<PlayerClassCombat>() ?? gameObject.AddComponent<PlayerClassCombat>();
+        Exploration = GetComponent<PlayerExplorationInteraction>() ?? gameObject.AddComponent<PlayerExplorationInteraction>();
         rb                  = GetComponent<Rigidbody>();
         animator            = GetComponent<Animator>();
         skillController     = GetComponent<PlayerSkillController>();
@@ -121,6 +137,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     private void OnEnable()
     {
         if (_playerInputActions == null) return;
+        Exploration?.Initialize(this, _playerInputActions);
 
         _playerInputActions.SprintStarted        += OnSprintStarted;
         _playerInputActions.SprintEnded          += OnSprintEnded;
@@ -129,11 +146,21 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         _playerInputActions.WalkStarted          += OnWalkStarted;
         _playerInputActions.WalkEnded            += OnWalkEnded;
         _playerInputActions.AttackTriggered      += OnAttackTriggered;
+        _playerInputActions.AttackReleased += ReleaseAttack;
         _playerInputActions.StanceToggleTriggered += OnStanceToggleTriggered;
+        _playerInputActions.GuardStarted += OnGuardStarted;
+        _playerInputActions.GuardEnded += OnGuardEnded;
+        _playerInputActions.LockTargetTriggered += OnLockTargetTriggered;
+        _playerInputActions.TargetCycleTriggered += OnTargetCycleTriggered;
     }
 
     private void OnDisable()
     {
+        TargetLock?.Clear();
+        Defense?.ResetDefense();
+        CancelHeldAttack(); HitFeedback?.ResetFeedback();
+        if (IsCharging || StateMachine.CurrentState is HurtState or AttackState)
+            StateMachine.ChangeState(new IdleState(this));
         ClearCombatInput();
         jumpRequestedUntil = float.NegativeInfinity;
         _sprintActive = _walkActive = false;
@@ -146,7 +173,12 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         _playerInputActions.WalkStarted          -= OnWalkStarted;
         _playerInputActions.WalkEnded            -= OnWalkEnded;
         _playerInputActions.AttackTriggered      -= OnAttackTriggered;
+        _playerInputActions.AttackReleased -= ReleaseAttack;
         _playerInputActions.StanceToggleTriggered -= OnStanceToggleTriggered;
+        _playerInputActions.GuardStarted -= OnGuardStarted;
+        _playerInputActions.GuardEnded -= OnGuardEnded;
+        _playerInputActions.LockTargetTriggered -= OnLockTargetTriggered;
+        _playerInputActions.TargetCycleTriggered -= OnTargetCycleTriggered;
     }
 
     private void Start()
@@ -157,6 +189,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private void Update()
     {
+        TargetLock?.Tick();
+        Defense?.Tick();
+        if (TargetLock != null && TargetLock.IsLocked && !IsRolling && StateMachine.CurrentState is not HurtState)
+        {
+            Vector3 direction = TargetLock.AimPoint - transform.position;
+            if (direction.x * direction.x + direction.z * direction.z > .01f)
+                yaw = Mathf.MoveTowardsAngle(yaw, Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg, 540f * Time.deltaTime);
+        }
         StateMachine.Update();
         ConsumeCombatInput();
 
@@ -177,15 +217,18 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         Vector2 look = _playerInputActions.LookInput;
         float mouseX = look.x * sensitivity;
         float mouseY = look.y * sensitivity;
-        yaw   += mouseX;
-        pitch += invertY ? mouseY : -mouseY;
-        pitch  = Mathf.Clamp(pitch, -35f, 60f);
+        // Hard lock owns both camera axes; do not accumulate invisible pitch that jumps on unlock.
+        if (TargetLock == null || !TargetLock.IsLocked)
+        {
+            yaw += mouseX;
+            pitch = Mathf.Clamp(pitch + (invertY ? mouseY : -mouseY), -35f, 60f);
+        }
     }
 
     private void FixedUpdate()
     {
         Motor.RefreshGrounded(Time.time);
-        if (!rb.isKinematic) rb.MoveRotation(FacingRotation);
+        if (!rb.isKinematic && StateMachine.CurrentState is not HurtState) rb.MoveRotation(FacingRotation);
         StateMachine.FixedUpdate();
         if (!GameplayInputEnabled || skillController != null && skillController.IsCasting) Motor.SetHorizontalVelocity(Vector3.zero);
     }
@@ -219,12 +262,17 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public void SetCombatAllowed(bool allowed)
     {
         ClearCombatInput();
+        CancelHeldAttack();
         CombatAllowed = allowed;
         if (!allowed)
         {
+            ClassCombat?.ResetCombat();
+            TargetLock?.Clear();
+            Defense?.ResetDefense();
             skillController?.InterruptSkill(force: true);
             GetComponent<AttackExecutor>()?.ResetCombat();
-            if (StateMachine.CurrentState is AttackState) ReturnToLocomotion();
+            HitFeedback?.ResetFeedback();
+            if (StateMachine.CurrentState is AttackState or ChargeAttackState or HurtState) ReturnToLocomotion();
         }
         if (Weapons != null) Weapons.SetCombatAllowed(allowed);
         else StanceController?.SetCombatAllowed(allowed);
@@ -232,22 +280,51 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     // ── IDamageable ────────────────────────────────────────────────────────────
 
-    public void TakeDamage(int damage) => ReceiveDamage(damage, true);
-    public void TakePeriodicDamage(int damage) => ReceiveDamage(damage, false);
-    void ReceiveDamage(int damage, bool interrupt)
+    public void TakeDamage(int damage)
     {
-        if (!CombatAllowed || combatLocked || IsDead || damage <= 0) return;
+        if (Defense != null && Defense.IsInvulnerable) { Defense.Resolve(damage, transform.position, null); return; }
+        ReceiveDamage(damage, true);
+    }
+    // Returns whether on-hit statuses/impact VFX may be applied. Avoided and guarded hits are consumed.
+    public bool ReceiveAttack(RPGSilent.Combat.AttackContext attack, Vector3 source)
+    {
+        if (attack == null || !CanReceiveCombatEffects || attack.Damage <= 0) return false;
+        DefenseOutcome outcome = Defense != null ? Defense.Resolve(attack.Damage, source, attack) : DefenseOutcome.Hit;
+        if (outcome == DefenseOutcome.Dodged || outcome == DefenseOutcome.PerfectDodge || outcome == DefenseOutcome.Parried) return false;
+        bool blocked = outcome == DefenseOutcome.Blocked;
+        bool broken = outcome == DefenseOutcome.GuardBroken;
+        ReceiveDamage(blocked ? DefenseRules.BlockDamage(attack.Damage) : attack.Damage, !blocked,
+            source, broken ? AttackImpact.Heavy : attack.Profile.Impact, broken);
+        return !blocked;
+    }
+    public void TakePeriodicDamage(int damage) => ReceiveDamage(damage, false);
+    void ReceiveDamage(int damage, bool interrupt, Vector3? source = null, AttackImpact impact = AttackImpact.Light, bool guardBroken = false)
+    {
+        if (!CanReceiveCombatEffects || damage <= 0) return;
 
         int scaledDamage = _gameSettings?.ScaleIncomingDamage(damage) ?? damage;
         scaledDamage = Mathf.Max(1, Mathf.CeilToInt(scaledDamage * (Statuses?.State.IncomingMultiplier ?? 1f)));
+        int before = _statsReader.CurrentHealth;
+        if (Training != null) { if (before <= 1) return; scaledDamage = Mathf.Min(scaledDamage, before - 1); }
         _takeDamageUseCase.Execute(scaledDamage);
-        if (interrupt || IsDead) ClearCombatInput();
-        if (interrupt || IsDead) skillController?.InterruptSkill(force: IsDead);
+        CombatRecord.Receive(before - _statsReader.CurrentHealth);
+        Vector3 origin = source ?? transform.position + transform.forward;
+        // Block already has its own feedback. DOT shows damage without causing flinch/knockback.
+        if (interrupt || !source.HasValue) HitFeedback?.Show(before - _statsReader.CurrentHealth, origin, impact, !interrupt);
 
         if (IsDead)
+        {
+            ClearCombatInput(); CancelHeldAttack(); skillController?.InterruptSkill(force: true);
+            TargetLock?.Clear(); Defense?.ResetDefense();
             StateMachine.ChangeState(new DeadState(this));
-        else if (interrupt)
-            StateMachine.ChangeState(new HurtState(this));
+        }
+        else if (interrupt && StateMachine.CurrentState is not HurtState && (guardBroken || HitFeedback == null || HitFeedback.CanReact)
+            && (skillController == null || skillController.TryInterruptSkill(force: impact == AttackImpact.Heavy)))
+        {
+            ClearCombatInput(); CancelHeldAttack(); Weapons?.CancelTransition();
+            Defense?.SuppressGuard();
+            StateMachine.ChangeState(new HurtState(this, origin, impact, guardBroken));
+        }
     }
 
     // ── IRewardable ────────────────────────────────────────────────────────────
@@ -277,6 +354,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void ResetForScene(Vector3 position, Quaternion rotation)
     {
+        ClassCombat?.ResetCombat();
+        CombatRecord.Reset();
         ClearCombatInput();
         Statuses?.State.Clear();
         Weapons?.CancelTransition();
@@ -299,6 +378,10 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void Teleport(Vector3 position, Quaternion rotation)
     {
+        CancelHeldAttack(); HitFeedback?.ResetFeedback();
+        if (IsCharging || StateMachine.CurrentState is HurtState) ReturnToLocomotion();
+        TargetLock?.Clear();
+        Defense?.ResetDefense();
         yaw = rotation.eulerAngles.y;
         pitch = 0f;
         jumpRequestedUntil = float.NegativeInfinity;
@@ -322,14 +405,23 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     private void OnWalkStarted()          => _walkActive   = true;
     private void OnWalkEnded()            => _walkActive   = false;
 
+    private void OnGuardStarted()
+    {
+        if (Cursor.lockState == CursorLockMode.Locked) { ClearCombatInput(); CancelCharge(); Defense?.PressGuard(); }
+    }
+    private void OnGuardEnded() => Defense?.ReleaseGuard();
+    private void OnLockTargetTriggered() => TargetLock?.Toggle();
+    private void OnTargetCycleTriggered(int direction) => TargetLock?.Cycle(direction);
+
     private void OnAttackTriggered()
     {
-        if (Cursor.lockState == CursorLockMode.Locked) RequestBasicAttack();
+        PressAttack();
     }
 
     private void OnRollTriggered()
     {
         if (!CanRoll || skillController != null && !skillController.TryInterruptSkill()) return;
+        CancelHeldAttack();
         ClearCombatInput();
         StateMachine.ChangeState(new RollState(this));
     }
@@ -358,6 +450,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         if (!IsGrounded && !Motor.CanCoyoteJump(Time.time)) return;
         jumpRequestedUntil = float.NegativeInfinity;
         ClearCombatInput();
+        Defense?.SuppressGuard();
+        CancelHeldAttack();
         StateMachine.ChangeState(new JumpState(this));
     }
 

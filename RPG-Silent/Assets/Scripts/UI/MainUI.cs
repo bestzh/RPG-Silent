@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using RPGSilent.Domain;
 using TMPro;
 using UnityEngine;
@@ -34,7 +34,8 @@ public partial class MainUI : UIBase
     private void Update()
     {
         RefreshCombatHud();
-        if (npcPromptText != null) npcPromptText.text = !string.IsNullOrEmpty(lootInteraction?.Prompt) ? lootInteraction.Prompt : npcInteraction != null ? npcInteraction.Prompt : string.Empty;
+        RefreshAdventureHud();
+        if (npcPromptText != null) npcPromptText.text = !string.IsNullOrEmpty(lootInteraction?.Prompt) ? lootInteraction.Prompt : !string.IsNullOrEmpty(combatPlayer?.Exploration?.Prompt) ? combatPlayer.Exploration.Prompt : npcInteraction != null ? npcInteraction.Prompt : string.Empty;
         if (classNameText != null) classNameText.text = _progress?.CurrentClass?.DisplayName ?? string.Empty;
     }
 
@@ -107,6 +108,8 @@ public partial class MainUI : UIBase
         RefreshSaveStatus();
         BuildQuestHud();
         BuildCombatHud();
+        BuildTargetHud();
+        BuildAdventureHud();
         if (weaponEquipment != null)
             weaponEquipment.Bind(_session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerWeaponEquipment>(true) : null);
         ApplyGameSettings(_gameSettings?.CurrentSettings);

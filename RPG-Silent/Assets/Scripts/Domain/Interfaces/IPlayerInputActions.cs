@@ -17,6 +17,10 @@ namespace RPGSilent.Domain
         InputAction Walk         { get; }
         InputAction Attack       { get; }
         InputAction Look         { get; }
+        InputAction LockTarget { get; }
+        InputAction Guard { get; }
+        InputAction NextTarget { get; }
+        InputAction PreviousTarget { get; }
         InputAction StanceToggle { get; }
         InputAction Pause        { get; }
         InputAction Interact     { get; }
@@ -29,6 +33,11 @@ namespace RPGSilent.Domain
         event Action WalkStarted;
         event Action WalkEnded;
         event Action AttackTriggered;
+        event Action<bool> AttackReleased;
+        event Action LockTargetTriggered;
+        event Action GuardStarted;
+        event Action GuardEnded;
+        event Action<int> TargetCycleTriggered;
         event Action StanceToggleTriggered;
         event Action PauseTriggered;
         event Action InteractTriggered;

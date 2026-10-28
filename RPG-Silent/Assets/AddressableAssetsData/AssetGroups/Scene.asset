@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a2b7235f35b7a5d4ab745d52ddcb41de
+    m_Address: Scenes/TrainingGround
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c0d88f7a4a8e18b40ae584043bc602fc
     m_Address: Scenes/Main
     m_ReadOnly: 0

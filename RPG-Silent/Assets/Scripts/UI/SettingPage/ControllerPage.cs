@@ -58,6 +58,10 @@ public class ControllerPage : MonoBehaviour
     [SerializeField] private Button jumpKeyButton;
     [SerializeField] private Button walkKeyButton;
     [SerializeField] private Button interactKeyButton;
+    [SerializeField] private Button lockTargetKeyButton;
+    [SerializeField] private Button guardKeyButton;
+    [SerializeField] private Button nextTargetKeyButton;
+    [SerializeField] private Button previousTargetKeyButton;
 
     [Header("确认 / 重置按钮")]
     [SerializeField] private Button okButton;
@@ -188,6 +192,10 @@ public class ControllerPage : MonoBehaviour
         BindRebindButton(jumpKeyButton,   _playerInputActions.Jump,         0);
         BindRebindButton(walkKeyButton,   _playerInputActions.Walk,         0);
         BindRebindButton(interactKeyButton, _playerInputActions.Interact, 0);
+        BindRebindButton(lockTargetKeyButton, _playerInputActions.LockTarget, 0);
+        BindRebindButton(guardKeyButton, _playerInputActions.Guard, 0);
+        BindRebindButton(nextTargetKeyButton, _playerInputActions.NextTarget, 0);
+        BindRebindButton(previousTargetKeyButton, _playerInputActions.PreviousTarget, 0);
     }
 
     private void BindRebindButton(Button button, InputAction action, int bindingIndex)
@@ -195,7 +203,9 @@ public class ControllerPage : MonoBehaviour
         if (button == null || action == null) return;
 
         button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(() => StartRebind(button, action, bindingIndex));
+        // Sprint duration changes rebuild the action map; resolve by stable name at click time.
+        string actionName = action.name;
+        button.onClick.AddListener(() => StartRebind(button, _playerInputActions.Move.actionMap.FindAction(actionName), bindingIndex));
     }
 
     // ── 改键流程 ───────────────────────────────────────────────────────────────
@@ -238,7 +248,8 @@ public class ControllerPage : MonoBehaviour
     {
         Button[] all = {
             forwardKeyButton, backwardKeyButton, toLeftKeyButton, toRightKeyButton,
-            attackKeyButton, sprintKeyButton, rollKeyButton, jumpKeyButton, walkKeyButton, interactKeyButton
+            attackKeyButton, sprintKeyButton, rollKeyButton, jumpKeyButton, walkKeyButton, interactKeyButton,
+            lockTargetKeyButton, guardKeyButton, nextTargetKeyButton, previousTargetKeyButton
         };
         foreach (var b in all)
             if (b != null) b.interactable = interactable;
@@ -260,6 +271,10 @@ public class ControllerPage : MonoBehaviour
         RefreshKeyLabel(jumpKeyButton,     _playerInputActions.Jump,   0);
         RefreshKeyLabel(walkKeyButton,     _playerInputActions.Walk,   0);
         RefreshKeyLabel(interactKeyButton, _playerInputActions.Interact, 0);
+        RefreshKeyLabel(lockTargetKeyButton, _playerInputActions.LockTarget, 0);
+        RefreshKeyLabel(guardKeyButton, _playerInputActions.Guard, 0);
+        RefreshKeyLabel(nextTargetKeyButton, _playerInputActions.NextTarget, 0);
+        RefreshKeyLabel(previousTargetKeyButton, _playerInputActions.PreviousTarget, 0);
     }
 
     private void RefreshKeyLabel(Button button, InputAction action, int bindingIndex)

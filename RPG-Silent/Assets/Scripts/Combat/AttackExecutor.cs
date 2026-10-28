@@ -44,11 +44,17 @@ public class AttackExecutor : MonoBehaviour
         selfDamageable = GetComponent<IDamageable>() ?? GetComponentInParent<IDamageable>();
     }
 
-    public void SetCurrentComboIndex(int comboIndex)
+    public void SetCurrentComboIndex(int comboIndex) => SetNormalAttack(comboIndex, 1f, 1f, 1f, 0f);
+
+    public void SetNormalAttack(int comboIndex, float damageMultiplier, float staggerMultiplier, float projectileSpeed, float energyOnHit)
     {
         AttackEnd();
         currentComboIndex = Mathf.Max(1, comboIndex);
-        normalAttack = CreateScaledAttack(GetCurrentProfile(), attackLoadout != null ? attackLoadout.DamageMultiplier : 1f);
+        var profile = GetCurrentProfile();
+        normalAttack = profile == null ? null : new AttackContext(profile, this,
+            damageMultiplier * (attackLoadout != null ? attackLoadout.DamageMultiplier : 1f) * (playerOwner?.Defense?.ConsumeCounter() ?? 1f),
+            staggerMultiplier: staggerMultiplier, projectileSpeedMultiplier: projectileSpeed, energyOnHit: energyOnHit);
+        if (normalAttack != null) normalAttack.Combo = currentComboIndex;
         if (normalAttack == null)
             Debug.LogWarning($"[AttackExecutor] 当前姿态第 {currentComboIndex} 段攻击未配置 AttackProfile。", this);
     }
@@ -66,6 +72,7 @@ public class AttackExecutor : MonoBehaviour
         profile != null ? new AttackContext(profile, this, damageMultiplier, aimPoint, areaPoint) : null;
 
     public void ConfigureEnemyTargeting() => enemyTargeting = true;
+    public void ConfigureCompanionTargeting() => enemyTargeting = false;
     public bool IsContextValid(AttackContext context) => Owns(context);
 
     public bool CanDamage(IDamageable target)
@@ -120,6 +127,7 @@ public class AttackExecutor : MonoBehaviour
     {
         if (!Owns(context) || context.IsClosed || context.HasReleased) return;
         context.HasReleased = true;
+        playerOwner?.CombatRecord.Release(context.IsSkill, context.Combo);
         if (context.Profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
             StartAttack(context);
         else
@@ -128,14 +136,15 @@ public class AttackExecutor : MonoBehaviour
 
     public void EndAttack(AttackContext context)
     {
-        if (!Owns(context) || context.IsClosed) return;
+        // Cleanup must also work after the owner is disabled or a scene policy revokes combat.
+        if (context == null || context.Owner != this || context.IsClosed) return;
         context.IsClosed = true;
         hitboxController?.DisableAttack(context);
         // 关闭释放入口和近战窗口，已发射的弹体/AOE 仍使用自己的命中记录。
     }
 
     private bool Owns(AttackContext context) =>
-        !combatSuspended && (playerOwner == null || playerOwner.CombatAllowed
+        !combatSuspended && (playerOwner == null || playerOwner.isActiveAndEnabled && playerOwner.CombatAllowed
             && !(playerOwner.Weapons != null && playerOwner.Weapons.IsBusy))
         && context != null && context.Owner == this && context.Profile != null
         && context.Generation == CombatGeneration;
@@ -173,15 +182,30 @@ public class AttackExecutor : MonoBehaviour
     // ── 伤害应用（接受接口，不依赖具体 EnemyController）──────────────────────
 
     public bool ApplyDamage(IDamageable target, AttackContext context,
-                            Vector3 hitPoint, bool allowRepeatedDamage = false)
+                            Vector3 hitPoint, bool allowRepeatedDamage = false, Vector3? sourcePosition = null)
     {
         if (!Owns(context) || target == null || target is Object obj && obj == null) return false;
         if (!CanDamage(target)) return false;
         if (!allowRepeatedDamage && !context.TryRegisterHit(target)) return false;
 
         AttackProfile profile = context.Profile;
-        if (target is EnemyController enemy) enemy.ReceiveHit(context.Damage, transform.position);
+        if (target is EnemyController enemy)
+        {
+            Vector3 origin = sourcePosition ?? transform.position;
+            float stagger = context.StaggerMultiplier;
+            int damage = playerOwner?.ClassCombat != null ? playerOwner.ClassCombat.ModifyHit(enemy, context, origin, out stagger) : context.Damage;
+            int before = enemy.CurrentHealth;
+            enemy.ReceiveHit(damage, origin, stagger);
+            playerOwner?.CombatRecord.Deal(before - enemy.CurrentHealth);
+            GetComponent<EnemyController>()?.CompanionOwner?.CombatRecord.Deal(before - enemy.CurrentHealth);
+        }
+        else if (target is PlayerController player)
+        {
+            if (!player.ReceiveAttack(context, sourcePosition ?? transform.position)) return true;
+        }
         else target.TakeDamage(context.Damage);
+        if (!context.EnergyRestored && context.EnergyOnHit > 0 && playerOwner != null && target is EnemyController)
+        { context.EnergyRestored = true; playerOwner.CombatStats?.RecoverEnergy(context.EnergyOnHit); }
         if (!target.IsDead && profile.StatusOnHit != null && target is Component receiver)
             receiver.GetComponent<CombatStatusController>()?.Apply(profile.StatusOnHit);
 
@@ -333,6 +357,9 @@ public class AttackExecutor : MonoBehaviour
 
     private Vector3 GetAimDirection(Vector3 origin)
     {
+        if (!enemyTargeting && playerOwner != null && playerOwner.TargetLock != null
+            && playerOwner.TargetLock.IsLocked && playerOwner.TargetLock.HasLineOfSight)
+            return (playerOwner.TargetLock.AimPoint - origin).normalized;
         if (enemyTargeting || aimCamera == null) return transform.forward;
 
         Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));

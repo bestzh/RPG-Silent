@@ -164,6 +164,8 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
         if (_cooldownRemaining[slotIndex] > 0f) return false;
         if (_stats == null || !_stats.TrySpendEnergy(skill.EnergyCost)) return false;
         TryFinishForLink();
+        _player?.CancelCharge();
+        _player?.Defense?.SuppressGuard();
         if (_player != null && _player.StateMachine.CurrentState is AttackState)
             _player.StateMachine.ChangeState(new IdleState(_player));
         BeginCast(slotIndex, skill);
@@ -255,6 +257,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
         StartCooldown(slotIndex, skill.CooldownTime);
 
         _attackContext = _attackExecutor?.CreateScaledAttack(skill.AttackProfile, _progress?.SkillDamageMultiplier(skill) ?? 1f);
+        if (_attackContext != null) { _attackContext.IsSkill = true; _attackContext.Element = skill.Element; }
 
         SpawnCastEffect(skill);
 
@@ -320,6 +323,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
             return;
         }
 
+        if (_castingSkill.SummonPrefab != null) _player?.ClassCombat?.Summon(_castingSkill, _progress?.GetSkillRank(_castingSkill) ?? 1);
         _attackExecutor.ReleaseAttack(_attackContext);
         _effectResolved = true;
     }
@@ -368,7 +372,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
 
     private void RecoverEnergy()
     {
-        if (_stats == null || energyRecoveryRate <= 0f) return;
+        if (_stats == null || energyRecoveryRate <= 0f || _player != null && (_player.IsCharging || _player.Defense != null && _player.Defense.IsGuarding)) return;
         _stats.RecoverEnergy(energyRecoveryRate * Time.deltaTime);
     }
 

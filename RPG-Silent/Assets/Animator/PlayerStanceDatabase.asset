@@ -56,7 +56,7 @@ MonoBehaviour:
   - Stance: 45
     OverrideController: {fileID: 22100000, guid: c5c9a9c073d806d43bf5e3730519c096, type: 2}
     DisplayName: "\u6CD5\u6756"
-    MaxComboCount: 1
+    MaxComboCount: 3
     CanRoll: 1
     CanJump: 1
     MaxJumpCount: 1

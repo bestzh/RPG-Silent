@@ -28,7 +28,7 @@ public class AttackProjectile : MonoBehaviour
     {
         if (profile == null || owner == null || !owner.IsContextValid(context)) { Destroy(gameObject); return; }
 
-        float step = profile.ProjectileSpeed * Time.deltaTime;
+        float step = profile.ProjectileSpeed * context.ProjectileSpeedMultiplier * Time.deltaTime;
         // 扫掠覆盖两帧之间的路程，避免低帧率下高速弹体穿过目标。
         int count = Physics.SphereCastNonAlloc(transform.position, radius, direction, sweepHits,
             step, ~0, QueryTriggerInteraction.Ignore);
@@ -47,7 +47,7 @@ public class AttackProjectile : MonoBehaviour
         {
             var hit = sweepHits[nearest];
             var target = hit.collider.GetComponentInParent<IDamageable>();
-            if (target != null) owner.ApplyDamage(target, context, hit.point);
+            if (target != null) owner.ApplyDamage(target, context, hit.point, sourcePosition: hit.point - direction);
             hasHit = true;
             Destroy(gameObject);
             return;
@@ -67,7 +67,7 @@ public class AttackProjectile : MonoBehaviour
         IDamageable target = other.GetComponentInParent<IDamageable>();
         if (target == null) return;
 
-        if (!owner.ApplyDamage(target, context, other.ClosestPoint(transform.position))) return;
+        if (!owner.ApplyDamage(target, context, other.ClosestPoint(transform.position), sourcePosition: transform.position - direction)) return;
         hasHit = true; // Destroy 延迟到帧末，复合碰撞体回调不能再次命中。
         Destroy(gameObject);
     }

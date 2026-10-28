@@ -18,6 +18,7 @@ public class AttackProfile : ScriptableObject
     [Header("Basic")]
     public AttackDeliveryType DeliveryType = AttackDeliveryType.MeleeArc;
     public int Damage = 20;
+    public AttackImpact Impact = AttackImpact.Light;
     public LayerMask TargetLayers = ~0;
 
     [Header("Attack Timing")]

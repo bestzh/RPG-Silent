@@ -6,6 +6,8 @@ public sealed class EnemyPerception
     private readonly Transform owner;
     private readonly RaycastHit[] hits = new RaycastHit[24];
     private float nextSearch;
+    private PlayerController companionOwner;
+    public void ConfigureCompanion(PlayerController player) { companionOwner = player; Target = null; Damageable = null; Rewardable = null; nextSearch = 0; }
     public Transform Target { get; private set; }
     public IDamageable Damageable { get; private set; }
     public IRewardable Rewardable { get; private set; }
@@ -16,6 +18,20 @@ public sealed class EnemyPerception
 
     public void Refresh()
     {
+        if (companionOwner != null)
+        {
+            if (Time.time < nextSearch) return;
+            nextSearch = Time.time + .3f;
+            EnemyController best = null; float distance = 16f * 16f;
+            foreach (var enemy in EnemyController.ActiveEnemies)
+            {
+                if (enemy == null || enemy.IsCompanion || enemy.IsDead || enemy.CombatLocked || !enemy.isActiveAndEnabled) continue;
+                float d = (enemy.transform.position - companionOwner.transform.position).sqrMagnitude;
+                if (d < distance) { best = enemy; distance = d; }
+            }
+            Target = best != null ? best.transform : null; Damageable = best; Rewardable = null;
+            return;
+        }
         if (IsAlive || Time.time < nextSearch) return;
         nextSearch = Time.time + 1f;
         var player = GameObject.FindWithTag("Player");
