@@ -9,6 +9,10 @@ using VContainer;
 [RequireComponent(typeof(Collider))]
 public class PortalTrigger : MonoBehaviour
 {
+    public static readonly System.Collections.Generic.HashSet<PortalTrigger> Active = new();
+    void OnEnable() => Active.Add(this);
+    void OnDisable() { Active.Remove(this); _playerInside = false; }
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] static void ResetActive() => Active.Clear();
     [Tooltip("对应 PortalDatabase 中的传送门 ID")]
     [SerializeField] private int portalId = 1;
 
