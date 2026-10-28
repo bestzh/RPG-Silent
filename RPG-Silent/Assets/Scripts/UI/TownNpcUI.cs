@@ -48,11 +48,13 @@ public sealed partial class TownNpcUI : UIBase
         progress.Changed -= Refresh;
         interaction = args.Length > 0 ? args[0] as PlayerNpcInteraction : null;
         advanceConfirmation = null; selectedSlot = 0; armorForge = gemForge = false; socketTarget = null;
-        questPage = false;
+        questPage = interaction?.Conversation != null && interaction.Conversation.Role >= TownNpcRole.Steward;
+        questCategory = 0;
         supplyPage = false;
         status.text = interaction != null && interaction.Conversation != null && interaction.Conversation.Role == TownNpcRole.Blacksmith
             ? "强化必定成功。武器需先装入武器槽；防具饰品可直接选择背包中的装备。"
             : "新技能自动装入第一个空槽。转职后可继续学习基础职业技能。";
+        if (questPage) status.text = interaction.Conversation.Greeting + "\n接取后完成目标，返回这里提交领取奖励。";
         progress.Changed += Refresh; Refresh();
     }
     public override void OnClose() { progress.Changed -= Refresh; var previous = interaction; interaction = null; previous?.Close(); }

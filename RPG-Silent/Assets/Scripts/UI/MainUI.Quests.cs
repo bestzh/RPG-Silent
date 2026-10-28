@@ -27,7 +27,7 @@ public partial class MainUI
     {
         if (questText == null || _progress == null) return;
         var q = _progress.TrackedQuest;
-        questText.text = q == null ? "任务追踪 [J]\n前往主城职业导师或铁匠接取委托。" :
+        questText.text = q == null ? "任务追踪 [J]\n广场执事：主线 · 商人：支线\n探险家：特殊委托\n头顶 ! 可接，? 可提交。" :
             $"{q.CategoryLabel} · {q.Title}\n{_progress.QuestObjectivesText(q.Id)}\n" +
             (_progress.GetQuestStatus(q.Id) == QuestStatus.Ready ? "可提交 · 返回" + _progress.QuestGiverText(q.Id) : "完成后返回" + _progress.QuestGiverText(q.Id));
     }
