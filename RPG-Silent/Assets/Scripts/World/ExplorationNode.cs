@@ -82,6 +82,7 @@ public sealed class ExplorationNode : MonoBehaviour
             if (MovingGate != null) StartCoroutine(OpenGate());
         }
         run.RecordExploration();
+        run.RecordExplorationObjective(Kind);
         return true;
     }
     void EliteDied(EnemyController enemy)

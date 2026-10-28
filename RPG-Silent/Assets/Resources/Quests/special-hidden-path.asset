@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: special-hidden-path
+  m_EditorClassIdentifier: 
+  Id: special-hidden-path
+  Title: "\u77F3\u7891\u80CC\u540E\u7684\u79D8\u5BC6"
+  Description: "\u68EE\u6797\u5C01\u95E8\u901A\u9053\u91CC\u85CF\u6709\u4E00\u5757\u9690\u853D\u77F3\u7891\u3002\u542F\u52A8\u5B83\u3001\u63ED\u5F00\u9690\u85CF\u652F\u8DEF\uFF0C\u518D\u5411\u7C73\u62C9\u62A5\u544A\u4F60\u7684\u53D1\u73B0\u3002"
+  Category: 3
+  Giver: 3
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 201
+  Objectives:
+  - Kind: 7
+    Label: "\u63ED\u5F00\u68EE\u6797\u9690\u85CF\u652F\u8DEF"
+    DungeonId: 1001
+    ItemId: 
+    NpcRole: 0
+    Required: 1
+  RewardGold: 250
+  RewardExp: 250
+  Rewards:
+  - itemId: crystal-shard
+    count: 2
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

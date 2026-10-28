@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: main-arrival
+  m_EditorClassIdentifier: 
+  Id: main-arrival
+  Title: "\u521D\u5230\u9759\u8C27\u57CE"
+  Description: "\u6267\u4E8B\u5E0C\u671B\u4F60\u5148\u62DC\u8BBF\u672C\u804C\u4E1A\u5BFC\u5E08\u3001\u94C1\u5320\u548C\u63A2\u9669\u5BB6\uFF0C\u4E86\u89E3\u6280\u80FD\u5B66\u4E60\u3001\u88C5\u5907\u6210\u957F\u4E0E\u57CE\u5916\u63A2\u7D22\u3002"
+  Category: 0
+  Giver: 2
+  FamilyId: 
+  PrerequisiteId: 
+  RequiredLevel: 1
+  Order: 0
+  Objectives:
+  - Kind: 6
+    Label: "\u62DC\u8BBF\u672C\u804C\u4E1A\u5BFC\u5E08"
+    DungeonId: 0
+    ItemId: 
+    NpcRole: 0
+    Required: 1
+  - Kind: 6
+    Label: "\u62DC\u8BBF\u94C1\u5320"
+    DungeonId: 0
+    ItemId: 
+    NpcRole: 1
+    Required: 1
+  - Kind: 6
+    Label: "\u62DC\u8BBF\u63A2\u9669\u5BB6\u7C73\u62C9"
+    DungeonId: 0
+    ItemId: 
+    NpcRole: 3
+    Required: 1
+  RewardGold: 80
+  RewardExp: 100
+  Rewards: []

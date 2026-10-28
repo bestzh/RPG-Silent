@@ -14,8 +14,9 @@ public sealed class QuestJournalUI : UIBase
     TMP_Text heading, description, objectives, rewards, destination, status;
     Button track;
     readonly Button[] tabs = new Button[3];
+    readonly Button[] categoryTabs = new Button[5];
     string selected;
-    int filter;
+    int filter, category;
     protected override void OnInit()
     {
         W.Panel(transform, "Shade", new Color(.015f, .025f, .04f, .94f));
@@ -24,9 +25,11 @@ public sealed class QuestJournalUI : UIBase
         W.Button(panel, Font, "Close", "关闭 [J]", 1040, 26, 148, 42, () => interaction?.Close());
         string[] labels = { "全部任务", "进行中", "已提交" };
         for (int i = 0; i < 3; i++) { int index = i; tabs[i] = W.Button(panel, Font, "Filter:" + i, labels[i], 32 + i * 132, 100, 122, 42, () => { filter = index; rows.anchoredPosition = Vector2.zero; Refresh(); }); }
-        var viewport = W.Rect(panel, "Viewport", 32, 158, 386, 552);
+        string[] categories = { "全部", "主线", "支线", "职业", "特殊" };
+        for (int i = 0; i < categories.Length; i++) { int index = i; categoryTabs[i] = W.Button(panel, Font, "Category:" + i, categories[i], 32 + i * 78, 154, 74, 40, () => { category = index; rows.anchoredPosition = Vector2.zero; Refresh(); }); }
+        var viewport = W.Rect(panel, "Viewport", 32, 208, 386, 502);
         viewport.gameObject.AddComponent<Image>().color = W.Card; viewport.gameObject.AddComponent<RectMask2D>();
-        rows = W.Rect(viewport, "Rows", 0, 0, 386, 552);
+        rows = W.Rect(viewport, "Rows", 0, 0, 386, 502);
         var scroll = viewport.gameObject.AddComponent<ScrollRect>(); scroll.viewport = viewport; scroll.content = rows;
         scroll.horizontal = false; scroll.movementType = ScrollRect.MovementType.Clamped; scroll.scrollSensitivity = 40;
         heading = W.Text(panel, Font, "QuestTitle", "", 452, 100, 736, 48, 28);
@@ -40,7 +43,7 @@ public sealed class QuestJournalUI : UIBase
     public override void OnOpen(params object[] args)
     {
         progress.Changed -= Refresh; interaction = args.Length > 0 ? args[0] as PlayerQuestInteraction : null;
-        filter = 0; selected = progress.TrackedQuest?.Id; status.text = "副本击杀和通关从接取后计数；交付材料提交时扣除。奖励须返回对应 NPC 领取。";
+        filter = category = 0; selected = progress.TrackedQuest?.Id; status.text = "先接取，再探索或挑战；头顶 ! 可接，? 可交。完成后回对应 NPC 提交并领取奖励。";
         progress.Changed += Refresh; Refresh();
     }
     public override void OnClose() { progress.Changed -= Refresh; var previous = interaction; interaction = null; previous?.OnUiClosed(); }
@@ -56,7 +59,9 @@ public sealed class QuestJournalUI : UIBase
         if (panel == null) return;
         foreach (Transform child in rows) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
         for (int i = 0; i < tabs.Length; i++) tabs[i].image.color = filter == i ? W.Accent : W.Card;
-        var quests = progress.Quests.Where(q => filter == 0 || (filter == 1 ? progress.GetQuestStatus(q.Id) == QuestStatus.Active || progress.GetQuestStatus(q.Id) == QuestStatus.Ready : progress.GetQuestStatus(q.Id) == QuestStatus.Rewarded)).ToArray();
+        for (int i = 0; i < categoryTabs.Length; i++) categoryTabs[i].image.color = category == i ? W.Accent : W.Card;
+        var quests = progress.Quests.Where(q => (category == 0 || (int)q.Category == category - 1) &&
+            (filter == 0 || (filter == 1 ? progress.GetQuestStatus(q.Id) == QuestStatus.Active || progress.GetQuestStatus(q.Id) == QuestStatus.Ready : progress.GetQuestStatus(q.Id) == QuestStatus.Rewarded))).ToArray();
         if (!quests.Any(q => q.Id == selected)) selected = quests.FirstOrDefault()?.Id;
         float y = 6;
         foreach (var q in quests)
@@ -64,8 +69,8 @@ public sealed class QuestJournalUI : UIBase
             string id = q.Id; var b = W.Button(rows, Font, "Quest:" + id, $"{q.CategoryLabel} · {q.Title}\n{StatusLabel(progress.GetQuestStatus(id))}{(progress.TrackedQuest == q ? " · 追踪中" : "")}", 6, y, 374, 80, () => Select(id));
             b.image.color = selected == id ? W.Accent : W.Ink; y += 88;
         }
-        if (quests.Length == 0) W.Text(rows, Font, "Empty", "此分类暂无任务。\n可向主城导师和铁匠接取。", 18, 20, 350, 120, 23);
-        rows.sizeDelta = new Vector2(386, Mathf.Max(552, y));
+        if (quests.Length == 0) W.Text(rows, Font, "Empty", "此分类暂无任务。\n可向执事、商人、探险家或本职业导师询问。", 18, 20, 350, 120, 23);
+        rows.sizeDelta = new Vector2(386, Mathf.Max(502, y));
         var chosen = progress.FindQuest(selected); track.gameObject.SetActive(chosen != null);
         if (chosen == null) { heading.text = "暂无任务"; description.text = objectives.text = rewards.text = destination.text = ""; return; }
         var state = progress.GetQuestStatus(selected);

@@ -2,8 +2,10 @@ using System;
 using RPGSilent.Domain;
 using UnityEngine;
 
-public enum QuestCategory { Main, Side, Profession }
-public enum QuestObjectiveKind { DefeatEnemies, ClearDungeon, DeliverMaterial, LearnSkills, ReachLevel, AdvanceClass }
+// Append values: existing assets and saved objective arrays retain their meaning.
+public enum QuestCategory { Main, Side, Profession, Special }
+public enum QuestObjectiveKind { DefeatEnemies, ClearDungeon, DeliverMaterial, LearnSkills, ReachLevel, AdvanceClass,
+    TalkToNpc, DiscoverSecret, DefeatElite, CompleteTimed, CompleteBossTrial, OpenChest }
 public enum QuestStatus { Locked, Available, Active, Ready, Rewarded }
 
 [Serializable]
@@ -13,8 +15,12 @@ public sealed class QuestObjective
     public string Label;
     public int DungeonId;
     public string ItemId = string.Empty;
+    public TownNpcRole NpcRole;
     [Range(1, 9999)] public int Required = 1;
-    public bool IsCounter => Kind == QuestObjectiveKind.DefeatEnemies || Kind == QuestObjectiveKind.ClearDungeon;
+    public bool IsCounter => Kind == QuestObjectiveKind.DefeatEnemies || Kind == QuestObjectiveKind.ClearDungeon || Kind >= QuestObjectiveKind.TalkToNpc;
+    public bool IsDungeonCounter => IsCounter && Kind != QuestObjectiveKind.TalkToNpc;
+    public bool MatchesEvent(QuestObjectiveKind kind, int dungeonId, TownNpcRole npcRole) => IsCounter && Kind == kind &&
+        (Kind == QuestObjectiveKind.TalkToNpc ? NpcRole == npcRole : DungeonId == dungeonId);
 }
 
 [CreateAssetMenu(menuName = "RPG/Quest")]
@@ -33,5 +39,5 @@ public sealed class QuestDefinition : ScriptableObject
     [Min(0)] public int RewardGold;
     [Min(0)] public int RewardExp;
     public ItemStackData[] Rewards = Array.Empty<ItemStackData>();
-    public string CategoryLabel => Category == QuestCategory.Main ? "主线" : Category == QuestCategory.Side ? "支线" : "职业";
+    public string CategoryLabel => Category switch { QuestCategory.Main => "主线", QuestCategory.Side => "支线", QuestCategory.Special => "特殊", _ => "职业" };
 }

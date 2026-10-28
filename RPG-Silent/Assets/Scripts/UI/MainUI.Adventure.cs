@@ -87,7 +87,9 @@ public partial class MainUI
         foreach(var enemy in EnemyController.ActiveEnemies)
             if(enemy!=null && !enemy.IsDead && !enemy.CombatLocked) AddMapMarker(ref index,enemy.transform.position,enemy.IsCompanion ? "+" : "•",enemy.IsCompanion ? Color.green : new Color(1,.35f,.3f));
         foreach(var npc in TownNpc.Active)
-            if(npc!=null) AddMapMarker(ref index,npc.transform.position,npc.Role==TownNpcRole.Mentor ? "师" : "匠",new Color(.5f,1,1));
+            if(npc!=null) AddMapMarker(ref index,npc.transform.position,string.IsNullOrEmpty(npc.QuestMarker) ? npc.MapSymbol : npc.QuestMarker,new Color(.5f,1,1));
+        foreach(var portal in PortalTrigger.Active)
+            if(portal!=null) AddMapMarker(ref index,portal.transform.position,"门",new Color(.4f,.75f,1));
         foreach(var drop in WorldLootPickup.Active)
             if(drop!=null && drop.Item!=null && !drop.IsCollected) AddMapMarker(ref index,drop.transform.position,"物",drop.QualityColor);
         for(int i=index;i<mapMarkers.Length;i++) mapMarkers[i].gameObject.SetActive(false);
