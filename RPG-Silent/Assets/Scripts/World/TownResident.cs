@@ -10,6 +10,10 @@ public sealed class TownResident : MonoBehaviour
     public Animator Animator;
     public float WalkSpeed = 1.5f;
     public Vector2 RestSeconds = new(2, 5);
+    public bool IsGuard;
+    public Vector3 HomePosition, WorkPosition;
+    [System.NonSerialized] public TownDayNight Clock;
+    public string Activity { get; private set; } = "闲逛";
     public bool IsWalking => agent != null && agent.enabled && agent.isOnNavMesh && !agent.isStopped && agent.velocity.sqrMagnitude > .01f;
     public int CompletedStops { get; private set; }
     NavMeshAgent agent;
@@ -20,6 +24,7 @@ public sealed class TownResident : MonoBehaviour
     float nextDecision, restUntil, stalledSince;
     bool travelling;
     Vector3 lastPosition;
+    int schedule = -1;
     static readonly int Moving = UnityEngine.Animator.StringToHash("Moving");
 
     void Awake()
@@ -43,6 +48,9 @@ public sealed class TownResident : MonoBehaviour
         nextDecision = Time.time + .15f;
         if (player == null && session?.PlayerRig != null) player = session.PlayerRig.GetComponentInChildren<PlayerController>();
         if (!agent.enabled || !agent.isOnNavMesh) { if (Animator != null) Animator.SetBool(Moving, false); return; }
+        int wanted = Waypoints.Length == 0 ? 0 : IsGuard ? 1 : Clock != null && Clock.IsNight ? 2 : Clock != null && Clock.Hour >= 9 && Clock.Hour < 17 ? 3 : 0;
+        Activity = Waypoints.Length == 0 ? "值守" : wanted == 1 ? "巡逻" : wanted == 2 ? "休息" : wanted == 3 ? "工作" : "闲逛";
+        if (schedule != wanted) { schedule = wanted; travelling = false; agent.ResetPath(); restUntil = Time.time; }
         bool yielding = player != null && (player.transform.position - transform.position).sqrMagnitude < 2.2f * 2.2f;
         agent.isStopped = yielding || !travelling;
         if (yielding)
@@ -64,7 +72,8 @@ public sealed class TownResident : MonoBehaviour
         }
         else if (!travelling && Time.time >= restUntil && Waypoints.Length > 0)
         {
-            var destination = Waypoints[nextPoint]; nextPoint = (nextPoint + 1) % Waypoints.Length;
+            var destination = schedule == 2 ? HomePosition : schedule == 3 ? WorkPosition : Waypoints[nextPoint];
+            if (schedule != 2 && schedule != 3) nextPoint = (nextPoint + 1) % Waypoints.Length;
             if ((destination - transform.position).sqrMagnitude > 1 && agent.CalculatePath(destination, path) && path.status == NavMeshPathStatus.PathComplete)
             { agent.SetPath(path); travelling = true; agent.isStopped = false; stalledSince = 0; lastPosition = transform.position; }
             else restUntil = Time.time + 1;

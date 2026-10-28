@@ -34,6 +34,7 @@ public partial class MainUI : UIBase
     private void Update()
     {
         RefreshCombatHud();
+        RefreshJourneyHud();
         RefreshAdventureHud();
         if (npcPromptText != null) npcPromptText.text = !string.IsNullOrEmpty(lootInteraction?.Prompt) ? lootInteraction.Prompt : !string.IsNullOrEmpty(combatPlayer?.Exploration?.Prompt) ? combatPlayer.Exploration.Prompt : npcInteraction != null ? npcInteraction.Prompt : string.Empty;
         if (classNameText != null) classNameText.text = _progress?.CurrentClass?.DisplayName ?? string.Empty;
@@ -110,6 +111,7 @@ public partial class MainUI : UIBase
         BuildCombatHud();
         BuildTargetHud();
         BuildAdventureHud();
+        BuildJourneyHud();
         if (weaponEquipment != null)
             weaponEquipment.Bind(_session?.PlayerRig != null ? _session.PlayerRig.GetComponentInChildren<PlayerWeaponEquipment>(true) : null);
         ApplyGameSettings(_gameSettings?.CurrentSettings);
