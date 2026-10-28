@@ -34,6 +34,28 @@ public sealed class DungeonRunService : IDisposable
     private DungeonDatabase.DifficultyTier difficultyTier;
     public EnemyController Boss { get; private set; }
     public string Objective => encounter != null ? encounter.Objective : "清除敌人";
+    public DungeonChallenge Challenge { get; private set; }
+    float startedAt, finishedAt;
+    readonly string challengeRewardId = Guid.NewGuid().ToString("N");
+    public PlayerCombatRecord CombatRecord => player?.CombatRecord;
+    public int ExplorationCount { get; private set; }
+    public float Elapsed => State == DungeonRunState.Inactive ? 0 : Mathf.Max(0, (HasResult ? finishedAt : Time.time) - startedAt);
+    public float TimeLimit => Dungeon?.ChallengeTimeLimit ?? 300;
+    public bool ChallengeCompleted => DungeonChallengeRules.Completed(Challenge, Succeeded, Elapsed, TimeLimit);
+    public int ChallengeGold { get; private set; }
+    public bool ChallengeRewardPending { get; private set; }
+    public string RewardError { get; private set; }
+    public string ChallengeSummary => DungeonChallengeRules.Label(Challenge) + " · " + DungeonChallengeRules.Duration(Elapsed) +
+        (Challenge == DungeonChallenge.Timed ? " / " + DungeonChallengeRules.Duration(TimeLimit) + (Elapsed > TimeLimit ? " · 已超时，仍可完成清理" : "") : "");
+    public void RecordExploration() { ExplorationCount++; Changed?.Invoke(); }
+    public void RegisterOptionalEnemy(EnemyController enemy) { if (State != DungeonRunState.Running) return; TotalEnemies++; RegisterEnemy(enemy); }
+    public bool ClaimChallengeReward()
+    {
+        if (!ChallengeRewardPending) return true;
+        if (!progress.TryCollectWorldLoot(challengeRewardId, Array.Empty<ItemStackData>(), ChallengeGold, ChallengeGold, out var error))
+        { RewardError = error; Changed?.Invoke(); return false; }
+        ChallengeRewardPending = false; RewardError = null; Changed?.Invoke(); return true;
+    }
 
     public DungeonRunState State { get; private set; }
     public DungeonDatabase.Entry Dungeon { get; private set; }
@@ -61,7 +83,8 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Inactive || !DungeonLaunchContext.HasValue) return;
         var database = Resources.Load<DungeonDatabase>("DungeonDatabase");
         Dungeon = database != null ? database.GetById(DungeonLaunchContext.DungeonId) : null;
-        if (Dungeon == null || !Dungeon.MatchesScene(scene.name)) return;
+        if (Dungeon == null || !Dungeon.MatchesScene(scene.name) || Dungeon.IsTraining) return;
+        Challenge = DungeonLaunchContext.Challenge; startedAt = Time.time;
         Difficulty = DungeonLaunchContext.Difficulty;
         lootTable = Resources.Load<DungeonLootTable>("Loot/Dungeon" + Dungeon.Id);
         lootPresentation = Resources.Load<LootPresentation>("Loot/Presentation");
@@ -69,6 +92,10 @@ public sealed class DungeonRunService : IDisposable
         difficultyTier = tier;
         player = session.PlayerRig != null ? session.PlayerRig.GetComponentInChildren<PlayerController>(true) : null;
         State = DungeonRunState.Running;
+        player?.CombatRecord.Reset();
+        foreach (var root in scene.GetRootGameObjects())
+            foreach (var node in root.GetComponentsInChildren<ExplorationNode>(true))
+            { node.Initialize(this); if (Challenge == DungeonChallenge.BossTrial) node.gameObject.SetActive(false); }
         ui.OpenUI(UiKey);
         if (!Dungeon.IsEnabled || tier == null || player == null || lootTable == null || lootPresentation == null)
         {
@@ -90,7 +117,7 @@ public sealed class DungeonRunService : IDisposable
             encounter.Completed += OnEncounterCompleted;
             encounter.Failed += OnEncounterFailed;
             if (stats.IsDead) Finish(false, "角色已倒下。");
-            else encounter.Begin();
+            else { encounter.Begin(); TotalEnemies = encounter.TotalEnemies; }
             return;
         }
 
@@ -111,6 +138,7 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed || State != DungeonRunState.Running || !remaining.Add(enemy)) return;
         enemy.ConfigureDungeon(difficultyTier);
+        if (Challenge == DungeonChallenge.BossTrial && enemy.IsBoss) enemy.ConfigureElite();
         enemies.Add(enemy);
         enemy.Died += OnEnemyDied;
         if (enemy.IsBoss)
@@ -139,7 +167,7 @@ public sealed class DungeonRunService : IDisposable
         progress.RecordQuestDungeonEvent(Dungeon.Id, false);
         SpawnDrops(enemy);
         if (stats.IsDead) Finish(false, "角色已倒下。");
-        else if (encounter == null && remaining.Count == 0) Finish(true);
+        else if ((encounter == null || encounter.IsComplete) && remaining.Count == 0) Finish(true);
         else Changed?.Invoke();
     }
 
@@ -151,7 +179,11 @@ public sealed class DungeonRunService : IDisposable
     private void Finish(bool success, string reason = null)
     {
         if (disposed || State != DungeonRunState.Running) return;
+        finishedAt = Time.time;
         State = settledState = success ? DungeonRunState.Succeeded : DungeonRunState.Failed;
+        ChallengeGold = DungeonChallengeRules.BonusGold(Challenge, ChallengeCompleted, difficultyTier?.RewardMultiplier ?? 1);
+        ChallengeRewardPending = ChallengeGold > 0;
+        if (ChallengeRewardPending) ClaimChallengeReward();
         if (success) progress.RecordQuestDungeonEvent(Dungeon.Id, true);
         player?.Statuses?.State.Clear();
         FailureReason = reason;
@@ -190,6 +222,26 @@ public sealed class DungeonRunService : IDisposable
             drop.Collected += OnDropCollected; drops.Add(drop);
         }
     }
+    public void SpawnExplorationLoot(Vector3 position)
+    {
+        if (disposed || lootTable == null || lootPresentation == null) return;
+        var items = lootTable.RollEnemy(Difficulty, true, random);
+        for (int i = 0; i <= items.Length; i++)
+        {
+            var go = new GameObject("Exploration loot");
+            SceneManager.MoveGameObjectToScene(go, SceneManager.GetActiveScene());
+            Vector3 candidate = position + Quaternion.Euler(0, i * 137.5f, 0) * Vector3.forward * .7f;
+            var ground = Physics.RaycastAll(candidate + Vector3.up * 2, Vector3.down, 5, ~0, QueryTriggerInteraction.Ignore)
+                .Where(h => h.normal.y > .6f && h.collider.GetComponentInParent<EnemyController>() == null && h.collider.GetComponentInParent<PlayerController>() == null)
+                .OrderBy(h => h.distance).ToArray();
+            go.transform.position = (ground.Length > 0 ? ground[0].point : candidate) + Vector3.up * .05f;
+            var drop = go.AddComponent<WorldLootPickup>();
+            drop.InitializeRolled(i == 0 ? null : progress.FindItem(items[i-1].itemId), i == 0 ? null : items[i-1],
+                i == 0 ? Mathf.RoundToInt(30 * difficultyTier.RewardMultiplier) : 0, 0, lootPresentation);
+            drop.Collected += OnDropCollected; drops.Add(drop);
+        }
+        Changed?.Invoke();
+    }
     void OnDropCollected(WorldLootPickup pickup)
     {
         AwardedGold += pickup.Gold; AwardedExp += pickup.Experience;
@@ -215,6 +267,7 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed || !HasResult || State == DungeonRunState.Leaving || loader.IsLoading ||
             ui.IsUIOpen("UI/LoadingUI") || string.IsNullOrEmpty(sceneKey)) return;
+        if (!ClaimChallengeReward()) { TravelError = "挑战奖励尚未保存，请先重试领取。"; Changed?.Invoke(); return; }
         if (!progress.Save()) { TravelError = "进度尚未保存，无法离开。请检查存储后再次点击重试或返回。"; Changed?.Invoke(); return; }
         TravelError = string.Empty;
         State = DungeonRunState.Leaving;

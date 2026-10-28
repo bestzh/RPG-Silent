@@ -76,6 +76,8 @@ public class DungeonDatabase : ScriptableObject
         [Header("场景")]
         [Tooltip("五档难度共用同一场景，难度差异由副本内逻辑处理")]
         public string SceneKey;
+        public bool IsTraining;
+        [Min(30)] public float ChallengeTimeLimit = 300f;
 
         [Tooltip("进入该副本后玩家的初始位置（世界坐标）")]
         public Vector3 SpawnPosition;

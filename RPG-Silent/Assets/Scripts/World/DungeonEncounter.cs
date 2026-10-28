@@ -36,6 +36,14 @@ public sealed class DungeonEncounter : MonoBehaviour
             foreach (var spawn in wave.Enemies)
                 if (spawn.Prefab == null || spawn.Point == null) { Failed?.Invoke("关卡敌人或出生点配置缺失。"); return; }
         }
+        if (DungeonLaunchContext.Challenge == DungeonChallenge.BossTrial)
+        {
+            var bosses = new List<Spawn>();
+            foreach (var wave in Waves) foreach (var spawn in wave.Enemies)
+                if (spawn.Prefab.GetComponent<BossPhaseController>() != null) bosses.Add(spawn);
+            if (bosses.Count == 0) { Failed?.Invoke("本关未配置首领。"); return; }
+            Waves = new[] { new Wave { Name = "首领试炼", Enemies = bosses.ToArray() } };
+        }
         running = true;
         SpawnWave();
     }

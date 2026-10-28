@@ -19,6 +19,8 @@ MonoBehaviour:
     Icon: {fileID: 0}
     BackgroundImage: {fileID: 21300000, guid: b534effd95649274795afe9f76b4dbce, type: 3}
     SceneKey: Scenes/Dungeon01
+    IsTraining: 0
+    ChallengeTimeLimit: 300
     SpawnPosition: {x: 13, y: 1.878, z: -53}
     SpawnEulerAngles: {x: 0, y: 290, z: 0}
     DifficultyTiers:
@@ -50,6 +52,8 @@ MonoBehaviour:
     Icon: {fileID: 0}
     BackgroundImage: {fileID: 21300000, guid: 62c2148be0b1afb4f9db8dd2bf68b031, type: 3}
     SceneKey: Scenes/Dungeon02
+    IsTraining: 0
+    ChallengeTimeLimit: 420
     SpawnPosition: {x: 0, y: 0.05, z: -23}
     SpawnEulerAngles: {x: 0, y: 0, z: 0}
     DifficultyTiers:
@@ -74,4 +78,23 @@ MonoBehaviour:
       EnemyHealthMultiplier: 2
       EnemyDamageMultiplier: 2
       RewardMultiplier: 2
+    IsEnabled: 1
+  - Id: 1003
+    DisplayName: "\u8BAD\u7EC3\u573A"
+    Description: "\u6CBF\u7528\u6676\u7A9F\u77F3\u5EAD\u7684\u72EC\u7ACB\u8BAD\u7EC3\u533A\u57DF\u3002\u4F7F\u7528\u8FDE\u6BB5\u9776\u7EC3\u4E60\u666E\u653B\u548C\u6280\u80FD\uFF0C\u5207\u6362\u9632\u5FA1\u966A\u7EC3\u89C2\u5BDF\u8D77\u624B\u3001\u7EC3\u4E60\u95EA\u907F\u4E0E\u7CBE\u51C6\u683C\u6321\uFF1B\u6BCF\u4E94\u79D2\u6062\u590D\u751F\u547D\u4E0E\u80FD\u91CF\uFF0C\u53EF\u968F\u65F6\u91CD\u7F6E\u6216\u8FD4\u56DE\u4E3B\u57CE\u3002"
+    Icon: {fileID: 0}
+    BackgroundImage: {fileID: 21300000, guid: 62c2148be0b1afb4f9db8dd2bf68b031, type: 3}
+    SceneKey: Scenes/TrainingGround
+    IsTraining: 1
+    ChallengeTimeLimit: 300
+    SpawnPosition: {x: 0, y: 0.08, z: -18}
+    SpawnEulerAngles: {x: 0, y: 0, z: 0}
+    DifficultyTiers:
+    - Difficulty: 2
+      RecommendedLevel: 1
+      MinLevel: 0
+      IsEnabled: 1
+      EnemyHealthMultiplier: 1
+      EnemyDamageMultiplier: 1
+      RewardMultiplier: 1
     IsEnabled: 1

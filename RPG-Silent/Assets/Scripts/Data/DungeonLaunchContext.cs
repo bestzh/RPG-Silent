@@ -8,9 +8,12 @@ public static class DungeonLaunchContext
     public static bool HasValue { get; private set; }
     public static int DungeonId { get; private set; }
     public static DungeonDifficulty Difficulty { get; private set; }
+    public static DungeonChallenge Challenge { get; private set; }
+    public static void SetChallenge(DungeonChallenge mode) => Challenge = mode;
 
     public static void Set(int dungeonId, DungeonDifficulty difficulty)
     {
+        Challenge = DungeonChallenge.Exploration;
         DungeonId  = dungeonId;
         Difficulty = difficulty;
         HasValue   = true;
@@ -18,6 +21,7 @@ public static class DungeonLaunchContext
 
     public static void Clear()
     {
+        Challenge = DungeonChallenge.Exploration;
         DungeonId  = 0;
         Difficulty = default;
         HasValue   = false;

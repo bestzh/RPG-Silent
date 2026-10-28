@@ -22,6 +22,8 @@ public class SkillSlotUI : MonoBehaviour
     private Color _defaultIconColor = Color.white;
     private Color _defaultBackgroundColor = Color.white;
     private bool _colorsCached;
+    private TMP_Text cooldownNumbers;
+    private SkillData boundSkill;
 
     private void Awake()
     {
@@ -67,6 +69,13 @@ public class SkillSlotUI : MonoBehaviour
         if (hotkeyText != null)
             hotkeyText.text = string.IsNullOrEmpty(hotkey) ? string.Empty : hotkey;
 
+        boundSkill = skill;
+        if (cooldownNumbers == null && hotkeyText != null)
+        {
+            cooldownNumbers = ProgressionUIWidgets.Text(transform, hotkeyText.font, "CooldownSeconds", "", 0, 0, 64, 28, 22);
+            var r = cooldownNumbers.rectTransform; r.anchorMin = r.anchorMax = r.pivot = new Vector2(.5f,.5f); r.anchoredPosition = Vector2.zero;
+            cooldownNumbers.alignment = TextAlignmentOptions.Center;
+        }
         bool equipped = skill != null;
 
         if (icon != null)
@@ -97,8 +106,8 @@ public class SkillSlotUI : MonoBehaviour
         if (_canvasGroup != null)
             _canvasGroup.alpha = equipped ? 1f : emptySlotAlpha;
 
-        if (cooldownMask != null && !equipped)
-            cooldownMask.fillAmount = 0f;
+        if (cooldownMask != null && !equipped) cooldownMask.fillAmount = 0f;
+        if (!equipped && cooldownNumbers != null) cooldownNumbers.text = "";
     }
 
     public void SetCooldownNormalized(float normalized)
@@ -106,5 +115,6 @@ public class SkillSlotUI : MonoBehaviour
         CacheRefs();
         if (cooldownMask == null) return;
         cooldownMask.fillAmount = Mathf.Clamp01(normalized);
+        if (cooldownNumbers != null) cooldownNumbers.text = boundSkill != null && normalized > 0 ? Mathf.CeilToInt(normalized * boundSkill.CooldownTime).ToString() : "";
     }
 }

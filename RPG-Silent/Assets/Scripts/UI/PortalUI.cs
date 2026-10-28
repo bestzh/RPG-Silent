@@ -66,10 +66,34 @@ public class PortalUI : UIBase
     private readonly List<DungeonItem> _items = new List<DungeonItem>();
     private List<DungeonDatabase.DifficultyTier> _currentTiers = new List<DungeonDatabase.DifficultyTier>();
     private DungeonDatabase.Entry _selectedDungeon;
+    private Button challengeButton;
+    private DungeonChallenge challenge;
 
     protected override void OnInit()
     {
         AutoBind();
+        if (bgImage != null && descriptionText != null)
+        {
+            var backdrop = ProgressionUIWidgets.Rect(bgImage.transform, "DescriptionCard", 0, 0, 0, 300);
+            backdrop.anchorMin = new Vector2(0, 0); backdrop.anchorMax = new Vector2(1, 0);
+            backdrop.pivot = new Vector2(.5f, 0); backdrop.sizeDelta = new Vector2(-80, 300);
+            backdrop.anchoredPosition = new Vector2(0, 8);
+            backdrop.gameObject.AddComponent<Image>().color = new Color(.04f, .07f, .1f, .9f);
+            var description = descriptionText.rectTransform;
+            description.anchorMin = new Vector2(0, 0); description.anchorMax = new Vector2(1, 0);
+            description.pivot = new Vector2(.5f, 0); description.sizeDelta = new Vector2(-120, 260);
+            description.anchoredPosition = new Vector2(0, 28);
+            descriptionText.fontSize = 28; descriptionText.enableAutoSizing = false;
+            descriptionText.alignment = TextAlignmentOptions.TopLeft;
+            description.SetAsLastSibling();
+        }
+        if (difficultyDropdown != null && descriptionText != null)
+        {
+            challengeButton = ProgressionUIWidgets.Button(bgImage != null ? bgImage.transform : difficultyDropdown.transform.parent, descriptionText.font, "ChallengeMode", "", 0, 0, 340, 48, () =>
+            { challenge = (DungeonChallenge)(((int)challenge + 1) % 3); OnDifficultyChanged(difficultyDropdown.value); });
+            var rect = challengeButton.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = rect.pivot = Vector2.one; rect.anchoredPosition = new Vector2(-32,-28);
+        }
 
         if (portalDatabase == null)
             portalDatabase = Resources.Load<PortalDatabase>("PortalDatabase");
@@ -150,6 +174,7 @@ public class PortalUI : UIBase
     private void SelectItem(DungeonItem item)
     {
         _selectedDungeon = item.Dungeon;
+        challenge = DungeonChallenge.Exploration;
         UpdateHighlight(item);
 
         if (bgImage != null)
@@ -227,9 +252,13 @@ public class PortalUI : UIBase
     {
         if (_selectedDungeon == null || descriptionText == null || index < 0 || index >= _currentTiers.Count) return;
         var tier = _currentTiers[index];
-        descriptionText.text = $"{_selectedDungeon.Description}\n\n清除全部敌人后统一获得奖励；失败不发奖。\n" +
-            $"敌人生命 ×{tier.EnemyHealthMultiplier:0.##}  攻击 ×{tier.EnemyDamageMultiplier:0.##}\n" +
-            $"通关奖励 ×{tier.RewardMultiplier:0.##}\n设置中的全局难度还会影响玩家承伤。";
+        if (challengeButton != null)
+        { challengeButton.gameObject.SetActive(!_selectedDungeon.IsTraining); challengeButton.GetComponentInChildren<TMP_Text>().text = "模式：" + DungeonChallengeRules.Label(challenge) + "  >"; }
+        descriptionText.text = _selectedDungeon.IsTraining ? _selectedDungeon.Description + "\n\n训练不发放金币、经验或物品；使用已学技能。训练区可战斗，主城仍然禁战。" :
+            $"{_selectedDungeon.Description}\n\n{DungeonChallengeRules.Label(challenge)} · 敌人生命 ×{tier.EnemyHealthMultiplier:0.##} / 攻击 ×{tier.EnemyDamageMultiplier:0.##}\n" +
+            (challenge == DungeonChallenge.Timed ? $"目标：{DungeonChallengeRules.Duration(_selectedDungeon.ChallengeTimeLimit)} 内通关，额外奖励随难度提升。超时仍可继续探索。\n" :
+             challenge == DungeonChallenge.BossTrial ? "只挑战强化首领：额外生命 ×2、伤害 ×1.25，击败后获得试炼奖励。\n" : "宝箱、机关和隐藏支路可探索，精英事件可选。\n") +
+            "金币 / 经验自动吸附，装备与材料靠近后按交互键拾取。";
     }
 
     private void OnConfirmClicked()
@@ -254,12 +283,15 @@ public class PortalUI : UIBase
         bool previousHasValue = DungeonLaunchContext.HasValue;
         int previousDungeonId = DungeonLaunchContext.DungeonId;
         DungeonDifficulty previousDifficulty = DungeonLaunchContext.Difficulty;
+        DungeonChallenge previousChallenge = DungeonLaunchContext.Challenge;
         System.Action restoreSelection = () =>
         {
             if (previousHasValue) DungeonLaunchContext.Set(previousDungeonId, previousDifficulty);
             else DungeonLaunchContext.Clear();
+            DungeonLaunchContext.SetChallenge(previousChallenge);
         };
         DungeonLaunchContext.Set(_selectedDungeon.Id, tier.Difficulty);
+        DungeonLaunchContext.SetChallenge(_selectedDungeon.IsTraining ? DungeonChallenge.Exploration : challenge);
         Debug.Log($"[PortalUI] 进入副本「{_selectedDungeon.DisplayName}」难度：{tier.DifficultyLabel}");
 
         string sceneKey = _selectedDungeon.SceneKey;

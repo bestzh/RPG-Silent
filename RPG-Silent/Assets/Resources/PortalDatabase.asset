@@ -15,5 +15,5 @@ MonoBehaviour:
   dungeonDatabase: {fileID: 11400000, guid: 7e9a3bbf167e7bc47ba2edf4a34955a1, type: 2}
   entries:
   - Id: 101
-    DungeonIds: e9030000ea030000
+    DungeonIds: e9030000ea030000eb030000
     IsEnabled: 1
