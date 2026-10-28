@@ -12,6 +12,7 @@ public class StartUI : UIBase
     [Inject] private PlayerProgressService _progress;
     private bool _starting;
     private CharacterCreationView classSelection;
+    private CharacterSelectionView characterSelection;
 
     public Button StartButton;
     public Button ContinueButton;
@@ -27,8 +28,7 @@ public class StartUI : UIBase
         StartButton?.onClick.AddListener(() =>
         {
             if (_starting) return;
-            if (_progress.HasStoredProgress) NewGameConfirmation.SetActive(true);
-            else StartNewGame();
+            StartNewGame();
         });
 
         ConfirmNewGameButton?.onClick.AddListener(StartNewGame);
@@ -36,13 +36,7 @@ public class StartUI : UIBase
         ContinueButton?.onClick.AddListener(() =>
         {
             if (_starting) return;
-            if (!_playerSession.BeginContinueGame(out string message))
-            {
-                RefreshSaveState();
-                SaveStatusText.text = message;
-                return;
-            }
-            LoadMain();
+            OpenCharacters();
         });
 
         SettingsButton?.onClick.AddListener(() =>
@@ -65,6 +59,7 @@ public class StartUI : UIBase
     private void StartNewGame()
     {
         if (_starting) return;
+        if (characterSelection != null) characterSelection.gameObject.SetActive(false);
         NewGameConfirmation.SetActive(false);
         if (classSelection != null) { classSelection.gameObject.SetActive(true); return; }
         var overlay = ProgressionUIWidgets.Panel(transform, "ClassSelection", new Color(.025f, .04f, .055f, 1));
@@ -77,7 +72,25 @@ public class StartUI : UIBase
     public void SelectCharacter(string classId, PlayerGender gender)
     {
         if (_starting || !_progress.Classes.Any(c => c.Id == classId && !c.IsAdvanced)) return;
-        _playerSession.BeginNewCharacter(classId, gender);
+        if (!_playerSession.TryBeginNewCharacter(classId, gender, out string message))
+        { SaveStatusText.text = message; classSelection?.ShowFailure(message); return; }
+        LoadMain();
+    }
+
+    public void OpenCharacters()
+    {
+        if (_starting) return;
+        if (classSelection != null) classSelection.gameObject.SetActive(false);
+        if (characterSelection != null) { characterSelection.gameObject.SetActive(true); characterSelection.Refresh(); return; }
+        var overlay = ProgressionUIWidgets.Panel(transform, "CharacterSelection", new Color(.025f, .04f, .055f, 1));
+        characterSelection = overlay.gameObject.AddComponent<CharacterSelectionView>();
+        characterSelection.Initialize(_progress, SaveStatusText.font, ContinueCharacter, StartNewGame, () => characterSelection.gameObject.SetActive(false));
+    }
+    public void ContinueCharacter(string key)
+    {
+        if (_starting) return;
+        if (!_playerSession.BeginContinueCharacter(key, out string message))
+        { RefreshSaveState(); SaveStatusText.text = message; characterSelection?.ShowFailure(message); return; }
         LoadMain();
     }
 
@@ -90,9 +103,12 @@ public class StartUI : UIBase
 
     private void RefreshSaveState()
     {
-        var result = _progress.InspectSave();
-        ContinueButton.interactable = result.CanContinue && !_starting;
-        SaveStatusText.text = result.Message;
+        var characters = _progress.GetCharacters(out string message);
+        ContinueButton.interactable = characters.Length > 0 && !_starting;
+        ContinueButton.GetComponentInChildren<TMP_Text>().text = "选择角色";
+        StartButton.GetComponentInChildren<TMP_Text>().text = "创建角色";
+        SaveStatusText.text = characters.Length > 0 ? $"已有 {characters.Length} 个角色。选择角色继续冒险，创建新角色不会覆盖进度。" : "创建角色，选择职业与外观后开始冒险。";
+        if (!string.IsNullOrEmpty(message)) SaveStatusText.text += "\n" + message;
         if (_progress.HasUnsavedChanges) SaveStatusText.text += "\n上一局存在未保存的进度。";
     }
 
@@ -101,6 +117,7 @@ public class StartUI : UIBase
         base.OnOpen(args);
         _starting = false;
         if (classSelection != null) classSelection.gameObject.SetActive(false);
+        if (characterSelection != null) characterSelection.gameObject.SetActive(false);
         NewGameConfirmation.SetActive(false);
         RefreshSaveState();
         Debug.Log("[StartUI] 已打开。");
@@ -109,6 +126,7 @@ public class StartUI : UIBase
     public override void OnClose()
     {
         if (classSelection != null) classSelection.gameObject.SetActive(false);
+        if (characterSelection != null) characterSelection.gameObject.SetActive(false);
         base.OnClose();
         Debug.Log("[StartUI] 已关闭。");
     }
