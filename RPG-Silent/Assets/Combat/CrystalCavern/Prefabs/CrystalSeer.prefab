@@ -27154,6 +27154,7 @@ GameObject:
   - component: {fileID: 196534679191672293}
   - component: {fileID: 3307319334743480209}
   - component: {fileID: 2997770248242019331}
+  - component: {fileID: 7290008839723329560}
   m_Layer: 0
   m_Name: CrystalSeer
   m_TagString: Untagged
@@ -27369,6 +27370,21 @@ MonoBehaviour:
   m_EvaluationType: 0
   m_MaxEvaluationCount: 1
   m_Subtree: {fileID: 11400000, guid: 9913ac4aa1ed5ad44b9b78a1646d862b, type: 2}
+--- !u!114 &7290008839723329560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3656271079704313907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255b7f8466429641bf91a38d0dbb15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}
+  ImpactSound: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+  Mixer: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
 --- !u!1 &3657462676189422750
 GameObject:
   m_ObjectHideFlags: 0

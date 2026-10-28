@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: side-crystal
+  m_EditorClassIdentifier: 
+  Id: side-crystal
+  Title: "\u6676\u6838\u7814\u7A76"
+  Description: "\u4ECE\u6C34\u6676\u6D1E\u7A9F\u5E26\u56DE\u6676\u6838\u788E\u7247\uFF0C\u5E2E\u52A9\u94C1\u5320\u638C\u63E1\u5B9D\u77F3\u5DE5\u827A\u3002\u4EA4\u4ED8
+    3 \u679A\u788E\u7247\u540E\u53EF\u4EE5\u83B7\u5F97\u4E00\u9897\u751F\u547D\u5B9D\u77F3\u3002\u63D0\u4EA4\u524D\u6750\u6599\u5FC5\u987B\u653E\u5728\u80CC\u5305\u3002"
+  Category: 1
+  Giver: 1
+  FamilyId: 
+  PrerequisiteId: main-forest
+  RequiredLevel: 3
+  Order: 40
+  Objectives:
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u6676\u6838\u788E\u7247\uFF08\u63D0\u4EA4\u65F6\u6D88\u8017\uFF09"
+    DungeonId: 0
+    ItemId: crystal-shard
+    Required: 3
+  RewardGold: 350
+  RewardExp: 300
+  Rewards:
+  - itemId: gem-vitality
+    count: 1
+    instanceId: 
+    upgradeLevel: 0
+    gemId: 
+    isLocked: 0
+    affixes: []
+    legacyReserve: 0

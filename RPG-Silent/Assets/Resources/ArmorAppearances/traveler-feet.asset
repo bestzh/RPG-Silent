@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9580037a0444e3a47b756fc2626984f6, type: 3}
+  m_Name: traveler-feet
+  m_EditorClassIdentifier: 
+  Slot: 2
+  Primary: {r: 0.52, g: 0.47, b: 0.38, a: 1}
+  Secondary: {r: 0.69049996, g: 0.657, b: 0.556, a: 1}
+  Metal: {r: 0.54, g: 0.58, b: 0.6, a: 1}
+  Male:
+    HiddenRegions: 16
+    Parts:
+    - Mesh: {fileID: 4300848, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/UpperLeg_L/LowerLeg_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L/Ball_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L/Ball_L/Toes_L
+      RootBonePath: Root/Hips/UpperLeg_L/LowerLeg_L
+      Bounds:
+        m_Center: {x: 27.96334, y: 1.8419857, z: 0.58422756}
+        m_Extent: {x: 25.125687, y: 25.550308, z: 11.787642}
+    - Mesh: {fileID: 4300808, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/UpperLeg_R/LowerLeg_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R/Ball_R
+      RootBonePath: Root/Hips/UpperLeg_R/LowerLeg_R
+      Bounds:
+        m_Center: {x: -27.963385, y: -1.8419743, z: -0.5842676}
+        m_Extent: {x: 25.125704, y: 25.55031, z: 11.787639}
+  Female:
+    HiddenRegions: 16
+    Parts:
+    - Mesh: {fileID: 4301806, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/UpperLeg_R/LowerLeg_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R/Ankle_R/Ball_R
+      RootBonePath: Root/Hips/UpperLeg_R/LowerLeg_R
+      Bounds:
+        m_Center: {x: -27.373446, y: -1.0236416, z: -0.705719}
+        m_Extent: {x: 24.470007, y: 24.529379, z: 11.322401}
+    - Mesh: {fileID: 4301770, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/UpperLeg_L/LowerLeg_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L/Ankle_L/Ball_L
+      RootBonePath: Root/Hips/UpperLeg_L/LowerLeg_L
+      Bounds:
+        m_Center: {x: 27.373405, y: 1.023653, z: 0.705678}
+        m_Extent: {x: 24.469994, y: 24.529377, z: 11.322405}

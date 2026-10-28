@@ -6,14 +6,14 @@ using RPGSilent.Domain;
 using UnityEngine;
 
 /// <summary>Owns durable progression. Transactions reach disk before charging or granting.</summary>
-public sealed class PlayerProgressService : IDisposable
+public sealed partial class PlayerProgressService : IDisposable
 {
     readonly PlayerStats stats;
     readonly ProgressSaveStore store;
     readonly Dictionary<string, SkillData> catalog = new();
     readonly Dictionary<string, WeaponDefinition> weaponCatalog = new();
     readonly Dictionary<string, PlayerClassDefinition> classes = new();
-    readonly Dictionary<string, int> learned = new(), upgrades = new();
+    readonly Dictionary<string, int> learned = new();
     PlayerWeaponEquipment weapons;
     PlayerSkillController skills;
     PlayerStanceController stance;
@@ -24,7 +24,7 @@ public sealed class PlayerProgressService : IDisposable
     public const int MaxWeaponLevel = 5;
     public bool HasUnsavedChanges { get; private set; }
     public string StatusMessage { get; private set; } = string.Empty;
-    public bool HasStoredProgress => store.HasFiles;
+    public bool HasStoredProgress => store.ListCharacters(out _).Length > 0;
     public PlayerClassDefinition CurrentClass => classes.TryGetValue(classId, out var c) ? c : null;
     public PlayerGender CurrentGender { get; private set; } = PlayerGender.Male;
     public IEnumerable<PlayerClassDefinition> Classes => classes.Values.OrderBy(c => c.Id);
@@ -44,37 +44,52 @@ public sealed class PlayerProgressService : IDisposable
         foreach (var c in Resources.LoadAll<PlayerClassDefinition>("Classes"))
             if (string.IsNullOrEmpty(c.Id) || !classes.TryAdd(c.Id, c))
                 throw new InvalidOperationException("职业标识缺失或重复：" + c.name);
+        LoadItemCatalog();
+        LoadQuestCatalog();
     }
-    public ProgressLoadResult InspectSave()
+    public ProgressLoadResult InspectSave() => ValidateLoadedCharacter(store.Load());
+    ProgressLoadResult ValidateLoadedCharacter(ProgressLoadResult result)
     {
-        var result = store.Load();
         if (!result.CanContinue) return result;
         var d = result.Data;
         if (!classes.TryGetValue(d.classId, out var definition) || definition.GetModel((PlayerGender)d.gender) == null || d.learnedSkills.Any(e => !catalog.ContainsKey(e.skillId)) ||
             d.weaponIds.Any(id => id.Length > 0 && !weaponCatalog.ContainsKey(id)) || d.weaponUpgrades.Any(e => !weaponCatalog.ContainsKey(e.weaponId)))
-            return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported, Message = "存档中的职业、技能或武器资源不可用，原文件已保留。" };
+            return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported, Message = "存档中的职业、技能、武器或物品资源不可用，原文件已保留。" };
+        try
+        {
+            EquipmentInstances.Migrate(d, FindItem);
+            ProgressSaveStore.Validate(d);
+            if (!ValidInventoryContent(d.inventory)) throw new InvalidDataException();
+            if (!ValidQuestContent(d.quests, d.classId)) throw new InvalidDataException();
+            if (!ValidConsumableContent(d.consumables)) throw new InvalidDataException();
+        }
+        catch (InvalidDataException) { return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported, Message = "装备、任务、药品记录或对应资源不可用，原文件已保留。" }; }
         return result;
     }
     public void BeginNewGame() => BeginNewGameAs("swordsman");
     public void BeginNewGameAs(string id) => BeginNewCharacter(id, PlayerGender.Male);
     public void BeginNewCharacter(string id, PlayerGender gender)
     {
-        if (!classes.TryGetValue(id, out var selected) || selected.IsAdvanced) throw new ArgumentException("请选择基础职业。", nameof(id));
-        if ((gender != PlayerGender.Male && gender != PlayerGender.Female) || selected.GetModel(gender) == null)
-            throw new ArgumentException("请选择有效的角色外观。", nameof(gender));
-        CurrentGender = gender;
-        pending = null; classId = id; learned.Clear(); upgrades.Clear();
-        profileId = Guid.NewGuid().ToString("N"); lastSavedPayload = null; newProfile = true;
-        HasUnsavedChanges = false; StatusMessage = string.Empty; stats.ResetForNewGame();
+        ValidateNewCharacter(id, gender);
+        if (!TryBeginNewCharacter(id, gender, out string message)) throw new InvalidOperationException(message);
     }
     public bool BeginContinue(out string message)
     {
+        if (!store.HasFiles)
+        {
+            var recent = GetCharacters(out _).FirstOrDefault(x => x.Progress.CanContinue);
+            if (recent != null) return BeginContinueCharacter(recent.Key, out message);
+        }
         var result = InspectSave(); message = result.Message;
         if (!result.CanContinue) return false;
+        ApplyLoadedCharacter(result); return true;
+    }
+    void ApplyLoadedCharacter(ProgressLoadResult result)
+    {
         pending = result.Data; profileId = pending.profileId; ApplyRecords(pending);
         lastSavedPayload = null; newProfile = false; HasUnsavedChanges = false;
         StatusMessage = result.Status == ProgressLoadStatus.Recovered ? result.Message : "进度已读取";
-        stats.RestoreProgress(pending.gold, pending.totalExp); return true;
+        stats.RestoreProgress(pending.gold, pending.totalExp);
     }
     public void Attach(GameObject rig)
     {
@@ -87,7 +102,7 @@ public sealed class PlayerProgressService : IDisposable
         applying = true;
         try
         {
-            appearance?.ApplySelection(CurrentClass, CurrentGender);
+            appearance?.ApplyLoadout(CurrentClass, CurrentGender, EquippedItems);
             for (int i = 0; i < PlayerSkillController.MaxSlots; i++) skills.EquipSkill(i,
                 pending == null || pending.skillIds[i].Length == 0 ? null : catalog[pending.skillIds[i]]);
             var restored = new WeaponDefinition[PlayerWeaponEquipment.SlotCount];
@@ -98,17 +113,19 @@ public sealed class PlayerProgressService : IDisposable
                 restored[0] = CurrentClass.StartingWeapon;
                 restored[1] = classId == "swordsman" ? weaponCatalog[WeaponDefinition.StarterGreatswordId] : weaponCatalog[WeaponDefinition.StarterSwordId];
             }
+            weapons.RestoreInstanceIds(pending?.weaponInstanceIds ?? restored.Select(w => ResolveWeaponKey(w)).ToArray());
             weapons.RestoreEquipment(restored, pending?.activeWeaponSlot ?? 0);
             pending = null; attached = true;
+            ApplyEquipmentBonuses();
             stats.OnProgressChanged += OnProgressChanged; skills.OnSlotsChanged += OnProgressChanged; weapons.EquipmentChanged += OnProgressChanged;
         }
         finally { applying = false; }
         Save();
     }
     public int GetSkillRank(SkillData s) => s != null && learned.TryGetValue(s.PersistentId, out int rank) ? rank : 0;
-    public int GetWeaponLevel(WeaponDefinition w) => w != null && upgrades.TryGetValue(w.PersistentId, out int level) ? level : 0;
-    public float SkillDamageMultiplier(SkillData s) => (1f + Mathf.Max(0, GetSkillRank(s) - 1) * s.DamagePerRank) * (CurrentClass?.DamageMultiplier ?? 1f);
-    public float WeaponDamageMultiplier(WeaponDefinition w) => (1f + GetWeaponLevel(w) * 0.1f) * (CurrentClass?.DamageMultiplier ?? 1f);
+    public int GetWeaponLevel(WeaponDefinition w) => GetInstanceLevel(ResolveWeaponKey(w));
+    public float SkillDamageMultiplier(SkillData s) => (1f + Mathf.Max(0, GetSkillRank(s) - 1) * s.DamagePerRank) * (CurrentClass?.DamageMultiplier ?? 1f) * EquipmentDamageMultiplier;
+    public float WeaponDamageMultiplier(WeaponDefinition w) => (1f + GetWeaponLevel(w) * 0.1f) * (CurrentClass?.DamageMultiplier ?? 1f) * EquipmentDamageMultiplier * (w != null ? w.DamageMultiplier : 1f);
     public IEnumerable<SkillData> AvailableLessons => CurrentClass == null ? Enumerable.Empty<SkillData>() :
         (CurrentClass.IsAdvanced ? CurrentClass.BaseClass.Lessons : Array.Empty<SkillData>()).Concat(CurrentClass.Lessons).Where(s => s != null).Distinct();
     public IEnumerable<SkillData> LearnedSkills => learned.Keys.Select(id => catalog[id]);
@@ -143,15 +160,20 @@ public sealed class PlayerProgressService : IDisposable
     }
     public bool TryUpgradeWeapon(WeaponDefinition w, int expectedLevel, out string message)
     {
+        return TryUpgradeWeaponInstance(ResolveWeaponKey(w), expectedLevel, out message);
+    }
+    public bool TryUpgradeWeaponInstance(string key, int expectedLevel, out string message)
+    {
         message = "请先装备要强化的武器。";
-        if (!attached || w == null || !weaponCatalog.TryGetValue(w.PersistentId, out var known) || known != w ||
-            !Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Any(i => weapons.GetWeapon(i) == w)) return false;
-        int level = GetWeaponLevel(w);
+        var item = FindItem(key);
+        if (!attached || item?.Kind != ItemKind.Weapon || inventory.Find(key) == null || weapons.IsBusy ||
+            !Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Any(i => weapons.GetInstanceId(i) == key)) return false;
+        int level = GetInstanceLevel(key);
         if (level != expectedLevel) { message = "强化等级已变化，请重新选择。"; return false; }
         if (level >= MaxWeaponLevel) { message = "武器已达到强化上限。"; return false; }
         var d = Capture();
-        d.weaponUpgrades = d.weaponUpgrades.Where(e => e.weaponId != w.PersistentId).Append(new WeaponUpgradeData { weaponId = w.PersistentId, level = level + 1 }).ToArray();
-        return CommitPurchase(d, WeaponUpgradeCost(level + 1), $"{w.DisplayName} 强化至 +{level + 1}。", out message);
+        d.inventory.Find(key).upgradeLevel = level + 1;
+        return CommitPurchase(d, WeaponUpgradeCost(level + 1), $"{item.DisplayName} 强化至 +{level + 1}。", out message);
     }
     public bool TryAdvanceClass(PlayerClassDefinition target, out string message)
     {
@@ -179,7 +201,7 @@ public sealed class PlayerProgressService : IDisposable
                     skills.EquipSkill(i, d.skillIds[i].Length == 0 ? null : catalog[d.skillIds[i]]);
             if (changedClass)
             {
-                weapons.CancelTransition(); appearance?.ApplySelection(CurrentClass, CurrentGender);
+                weapons.CancelTransition(); appearance?.ApplyLoadout(CurrentClass, CurrentGender, EquippedItems);
                 weapons.RestoreEquipment(Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetWeapon).ToArray(), weapons.ActiveSlot);
             }
             newProfile = false; lastSavedPayload = JsonUtility.ToJson(d); HasUnsavedChanges = false; message = StatusMessage = success;
@@ -189,9 +211,12 @@ public sealed class PlayerProgressService : IDisposable
     }
     void ApplyRecords(PlayerProgressData d)
     {
-        classId = d.classId; CurrentGender = (PlayerGender)d.gender; learned.Clear(); upgrades.Clear();
+        classId = d.classId; CurrentGender = (PlayerGender)d.gender; learned.Clear();
         foreach (var e in d.learnedSkills) learned.Add(e.skillId, e.rank);
-        foreach (var e in d.weaponUpgrades) upgrades.Add(e.weaponId, e.level);
+        inventory = d.inventory.Copy();
+        journal = d.quests.Copy();
+        consumables = d.consumables.Copy();
+        ApplyEquipmentBonuses();
     }
     PlayerProgressData Capture()
     {
@@ -199,7 +224,8 @@ public sealed class PlayerProgressService : IDisposable
             stance = (int)stance.CurrentStance, classId = classId, gender = (int)CurrentGender, activeWeaponSlot = weapons.ActiveSlot,
             skillIds = new string[PlayerSkillController.MaxSlots], weaponIds = new string[PlayerWeaponEquipment.SlotCount],
             learnedSkills = learned.OrderBy(p => p.Key).Select(p => new SkillProgressData { skillId = p.Key, rank = p.Value }).ToArray(),
-            weaponUpgrades = upgrades.OrderBy(p => p.Key).Select(p => new WeaponUpgradeData { weaponId = p.Key, level = p.Value }).ToArray() };
+            weaponUpgrades = Array.Empty<WeaponUpgradeData>(), equipmentVersion = 1, quests = journal.Copy(), consumables = consumables.Copy(),
+            weaponInstanceIds = Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetInstanceId).ToArray(), inventory = inventory.Copy() };
         for (int i = 0; i < d.weaponIds.Length; i++)
         {
             var w = weapons.GetWeapon(i); d.weaponIds[i] = w?.PersistentId ?? string.Empty;
@@ -218,14 +244,14 @@ public sealed class PlayerProgressService : IDisposable
         try
         {
             var d = Capture(); string payload = JsonUtility.ToJson(d);
-            if (payload == lastSavedPayload && !HasUnsavedChanges) return true;
+            if (payload == lastSavedPayload && !HasUnsavedChanges) { Changed?.Invoke(); return true; }
             if (!store.TrySave(d, newProfile, out string error)) throw new InvalidDataException(error);
             newProfile = false; lastSavedPayload = payload; HasUnsavedChanges = false; StatusMessage = "进度已保存";
         }
         catch (InvalidDataException ex) { HasUnsavedChanges = true; StatusMessage = ex.Message; }
         Changed?.Invoke(); return !HasUnsavedChanges;
     }
-    void OnProgressChanged() { if (!applying) Save(); }
+    void OnProgressChanged() { if (!applying) { ApplyEquipmentBonuses(); Save(); } }
     public void Detach()
     {
         if (!attached) { pending = null; return; }

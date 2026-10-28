@@ -4,7 +4,7 @@ using UnityEngine;
 using VContainer;
 
 [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
-public class PlayerController : MonoBehaviour, IDamageable, IRewardable
+public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 {
     // ── VContainer 注入 ────────────────────────────────────────────────────────
     [Inject] private IInputService              _inputService;
@@ -54,7 +54,10 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public float WalkSpeed   = 2.5f;
     public float MoveSpeed   = 5f;
     public float SprintSpeed = 8f;
-    public float CurrentMoveSpeed => IsSprinting ? SprintSpeed : IsWalking ? WalkSpeed : MoveSpeed;
+    public float CurrentMoveSpeed => (IsSprinting ? SprintSpeed : IsWalking ? WalkSpeed : MoveSpeed) * (Statuses?.State.MovementMultiplier ?? 1f);
+    public CombatStatusController Statuses { get; private set; }
+    public bool CanReceiveCombatEffects => CombatAllowed && !combatLocked && !IsDead;
+    public bool CanUseConsumables => isActiveAndEnabled && GameplayInputEnabled && !combatLocked && !IsDead && !(Weapons != null && Weapons.IsBusy);
 
     public bool IsGrounded => Motor != null && Motor.IsGrounded;
     public PlayerMotor Motor { get; private set; }
@@ -106,6 +109,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
         AnimationController = GetComponent<PlayerAnimationController>();
         StanceController    = GetComponent<PlayerStanceController>();
         Weapons             = GetComponent<PlayerWeaponEquipment>();
+        Statuses = GetComponent<CombatStatusController>() ?? gameObject.AddComponent<CombatStatusController>();
         rb                  = GetComponent<Rigidbody>();
         animator            = GetComponent<Animator>();
         skillController     = GetComponent<PlayerSkillController>();
@@ -130,6 +134,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private void OnDisable()
     {
+        ClearCombatInput();
         jumpRequestedUntil = float.NegativeInfinity;
         _sprintActive = _walkActive = false;
         if (_playerInputActions == null) return;
@@ -153,6 +158,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
     private void Update()
     {
         StateMachine.Update();
+        ConsumeCombatInput();
 
         if (IsDead || !GameplayInputEnabled)
         {
@@ -181,7 +187,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
         Motor.RefreshGrounded(Time.time);
         if (!rb.isKinematic) rb.MoveRotation(FacingRotation);
         StateMachine.FixedUpdate();
-        if (!GameplayInputEnabled) Motor.SetHorizontalVelocity(Vector3.zero);
+        if (!GameplayInputEnabled || skillController != null && skillController.IsCasting) Motor.SetHorizontalVelocity(Vector3.zero);
     }
 
     public Vector3 MovementVelocity(float speed)
@@ -212,6 +218,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void SetCombatAllowed(bool allowed)
     {
+        ClearCombatInput();
         CombatAllowed = allowed;
         if (!allowed)
         {
@@ -225,17 +232,21 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     // ── IDamageable ────────────────────────────────────────────────────────────
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage) => ReceiveDamage(damage, true);
+    public void TakePeriodicDamage(int damage) => ReceiveDamage(damage, false);
+    void ReceiveDamage(int damage, bool interrupt)
     {
         if (!CombatAllowed || combatLocked || IsDead || damage <= 0) return;
 
         int scaledDamage = _gameSettings?.ScaleIncomingDamage(damage) ?? damage;
+        scaledDamage = Mathf.Max(1, Mathf.CeilToInt(scaledDamage * (Statuses?.State.IncomingMultiplier ?? 1f)));
         _takeDamageUseCase.Execute(scaledDamage);
-        skillController?.InterruptSkill(force: IsDead);
+        if (interrupt || IsDead) ClearCombatInput();
+        if (interrupt || IsDead) skillController?.InterruptSkill(force: IsDead);
 
         if (IsDead)
             StateMachine.ChangeState(new DeadState(this));
-        else
+        else if (interrupt)
             StateMachine.ChangeState(new HurtState(this));
     }
 
@@ -266,6 +277,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void ResetForScene(Vector3 position, Quaternion rotation)
     {
+        ClearCombatInput();
+        Statuses?.State.Clear();
         Weapons?.CancelTransition();
         skillController?.ResetForScene();
         GetComponent<AttackExecutor>()?.ResetCombat();
@@ -311,17 +324,13 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private void OnAttackTriggered()
     {
-        if (!GameplayInputEnabled || !CanAttack || Cursor.lockState != CursorLockMode.Locked) return;
-
-        if (StateMachine.CurrentState is AttackState attackState)
-            attackState.RequestCombo();
-        else
-            StateMachine.ChangeState(new AttackState(this));
+        if (Cursor.lockState == CursorLockMode.Locked) RequestBasicAttack();
     }
 
     private void OnRollTriggered()
     {
         if (!CanRoll || skillController != null && !skillController.TryInterruptSkill()) return;
+        ClearCombatInput();
         StateMachine.ChangeState(new RollState(this));
     }
 
@@ -348,6 +357,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
         if (!IsGrounded && !Motor.CanCoyoteJump(Time.time)) return;
         jumpRequestedUntil = float.NegativeInfinity;
+        ClearCombatInput();
         StateMachine.ChangeState(new JumpState(this));
     }
 

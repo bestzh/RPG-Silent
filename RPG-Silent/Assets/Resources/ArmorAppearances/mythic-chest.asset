@@ -1,0 +1,310 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9580037a0444e3a47b756fc2626984f6, type: 3}
+  m_Name: mythic-chest
+  m_EditorClassIdentifier: 
+  Slot: 1
+  Primary: {r: 0.57, g: 0.12, b: 0.14, a: 1}
+  Secondary: {r: 0.713, g: 0.4995, b: 0.448, a: 1}
+  Metal: {r: 0.36, g: 0.3, b: 0.29, a: 1}
+  Male:
+    HiddenRegions: 8
+    Parts:
+    - Mesh: {fileID: 4300524, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips
+      - Root/Hips/Spine_01
+      - Root/Hips/Spine_01/Spine_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      RootBonePath: Root/Hips
+      Bounds:
+        m_Center: {x: -31.409904, y: 2.3666706, z: 0.0000009536743}
+        m_Extent: {x: 35.256905, y: 26.686647, z: 31.624722}
+    - Mesh: {fileID: 4300800, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/UpperLeg_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R
+      - Root/Hips/UpperLeg_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L
+      - Root/Hips
+      RootBonePath: Root/Hips
+      Bounds:
+        m_Center: {x: 21.5709, y: -4.8395314, z: 0}
+        m_Extent: {x: 30.034794, y: 18.161263, z: 25.633842}
+    - Mesh: {fileID: 4301384, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      Bounds:
+        m_Center: {x: 28.312145, y: 3.388957, z: -8.332821}
+        m_Extent: {x: 19.262463, y: 9.463503, z: 16.561287}
+    - Mesh: {fileID: 4301388, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      Bounds:
+        m_Center: {x: 46.378906, y: 0.30102348, z: -1.2665253}
+        m_Extent: {x: 16.06417, y: 9.566569, z: 10.043155}
+    - Mesh: {fileID: 4300712, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1/Thumb_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1/Thumb_02 1/Thumb_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1/IndexFinger_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1/IndexFinger_03 1/IndexFinger_04 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1/Finger_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1/Finger_03 1/Finger_04 1
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      Bounds:
+        m_Center: {x: 10.231034, y: 2.779235, z: -1.8416405}
+        m_Extent: {x: 12.261998, y: 6.450368, z: 10.377818}
+    - Mesh: {fileID: 4301238, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_Attachment_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_Attachment_R
+      Bounds:
+        m_Center: {x: 7.282296, y: 5.875839, z: 0.6373501}
+        m_Extent: {x: 13.861482, y: 12.787905, z: 20.697954}
+    - Mesh: {fileID: 4301386, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      Bounds:
+        m_Center: {x: -28.312126, y: -3.388606, z: 8.332813}
+        m_Extent: {x: 19.262451, y: 9.463503, z: 16.56128}
+    - Mesh: {fileID: 4301390, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      Bounds:
+        m_Center: {x: -46.378906, y: -0.30132484, z: 1.2665253}
+        m_Extent: {x: 16.06417, y: 9.566568, z: 10.043155}
+    - Mesh: {fileID: 4300748, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02/Thumb_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03/IndexFinger_04
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03/Finger_04
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      Bounds:
+        m_Center: {x: -10.231033, y: -2.7793875, z: 1.8416572}
+        m_Extent: {x: 12.2619705, y: 6.450369, z: 10.377808}
+    - Mesh: {fileID: 4301280, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_Attachment_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_Attachment_L
+      Bounds:
+        m_Center: {x: -6.473231, y: 5.711823, z: 0.6226177}
+        m_Extent: {x: 14.525984, y: 12.356449, z: 20.69436}
+  Female:
+    HiddenRegions: 8
+    Parts:
+    - Mesh: {fileID: 4301474, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips
+      - Root/Hips/Spine_01
+      - Root/Hips/Spine_01/Spine_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      RootBonePath: Root/Hips
+      Bounds:
+        m_Center: {x: -31.972687, y: 3.4628, z: 0.15778637}
+        m_Extent: {x: 35.396362, y: 26.688824, z: 30.328293}
+    - Mesh: {fileID: 4301760, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips
+      - Root/Hips/UpperLeg_R
+      - Root/Hips/UpperLeg_R/LowerLeg_R
+      - Root/Hips/UpperLeg_L
+      - Root/Hips/UpperLeg_L/LowerLeg_L
+      RootBonePath: Root/Hips
+      Bounds:
+        m_Center: {x: 20.851685, y: -6.201721, z: -0.0000009536743}
+        m_Extent: {x: 31.169903, y: 17.20914, z: 27.092888}
+    - Mesh: {fileID: 4301880, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R
+      Bounds:
+        m_Center: {x: 27.652706, y: 2.6509275, z: -7.4900475}
+        m_Extent: {x: 20.054955, y: 9.120303, z: 16.234625}
+    - Mesh: {fileID: 4301956, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R
+      Bounds:
+        m_Center: {x: 46.49704, y: 0.5462055, z: -0.32910728}
+        m_Extent: {x: 15.899479, y: 9.559343, z: 8.273443}
+    - Mesh: {fileID: 4302022, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1/Thumb_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Thumb_01
+        1/Thumb_02 1/Thumb_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1/IndexFinger_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/IndexFinger_01
+        1/IndexFinger_02 1/IndexFinger_03 1/IndexFinger_04 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1/Finger_03 1
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/Finger_01
+        1/Finger_02 1/Finger_03 1/Finger_04 1
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R
+      Bounds:
+        m_Center: {x: 10.231034, y: 2.779235, z: -1.8416405}
+        m_Extent: {x: 12.261998, y: 6.450368, z: 10.377818}
+    - Mesh: {fileID: 4301238, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_Attachment_R
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_Attachment_R
+      Bounds:
+        m_Center: {x: 7.282296, y: 5.875839, z: 0.6373501}
+        m_Extent: {x: 13.861482, y: 12.787905, z: 20.697954}
+    - Mesh: {fileID: 4301918, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L
+      Bounds:
+        m_Center: {x: -27.652706, y: -2.6505785, z: 7.4900455}
+        m_Extent: {x: 20.054958, y: 9.120305, z: 16.234627}
+    - Mesh: {fileID: 4301990, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L
+      Bounds:
+        m_Center: {x: -46.497032, y: -0.5465088, z: 0.32910728}
+        m_Extent: {x: 15.899483, y: 9.559341, z: 8.273441}
+    - Mesh: {fileID: 4302054, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Thumb_01/Thumb_02/Thumb_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/IndexFinger_01/IndexFinger_02/IndexFinger_03/IndexFinger_04
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L/Finger_01/Finger_02/Finger_03/Finger_04
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_L/Elbow_L/Hand_L
+      Bounds:
+        m_Center: {x: -10.231033, y: -2.7793875, z: 1.8416581}
+        m_Extent: {x: 12.2619705, y: 6.450369, z: 10.377806}
+    - Mesh: {fileID: 4301280, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_Attachment_L
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_L/Shoulder_Attachment_L
+      Bounds:
+        m_Center: {x: -6.473231, y: 5.711823, z: 0.6226177}
+        m_Extent: {x: 14.525984, y: 12.356449, z: 20.69436}

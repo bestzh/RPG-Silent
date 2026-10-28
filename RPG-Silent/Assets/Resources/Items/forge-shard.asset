@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9fbedbdcc05fc4fb6dea7686f5bcd4, type: 3}
+  m_Name: forge-shard
+  m_EditorClassIdentifier: 
+  Id: forge-shard
+  DisplayName: "\u953B\u9020\u788E\u7247"
+  Description: "\u526F\u672C\u6389\u843D\u6216\u5206\u89E3\u9632\u5177\u83B7\u5F97\uFF0C\u53EF\u5728\u4E3B\u57CE\u94C1\u5320\u5904\u4E0E\u91D1\u5E01\u4E00\u8D77\u6D88\u8017\uFF0C\u7528\u4E8E\u5F3A\u5316\u9632\u5177\u548C\u9970\u54C1\u3002"
+  Kind: 2
+  Rarity: 0
+  Slot: 0
+  Icon: {fileID: 21300000, guid: b38d6ebe85fd24d7284bd900c53c2627, type: 3}
+  Weapon: {fileID: 0}
+  Appearance: {fileID: 0}
+  RequiredLevel: 1
+  Health: 0
+  Energy: 0
+  AttackPercent: 0
+  DefensePercent: 0
+  SellPrice: 8

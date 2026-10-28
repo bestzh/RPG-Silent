@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb6af8bb6fab4004580915b29c2208d4, type: 3}
+  m_Name: ShadowFinale
+  m_EditorClassIdentifier: 
+  DisplayName: "\u6697\u5F71\u7EC8\u594F"
+  RequiredPhase: 3
+  Cooldown: 13
+  BetweenAttacks: 0.4
+  RecoveryDuration: 2.4
+  Steps:
+  - {fileID: 11400000, guid: fa3a2a391b83625488f62c154e801c09, type: 2}
+  - {fileID: 11400000, guid: f4af131a546ea844084156be15059586, type: 2}
+  - {fileID: 11400000, guid: eca326dc3e927ab41ad5a60f80b01300, type: 2}
+  - {fileID: 11400000, guid: acfcddca93609674daa02aab115b0fe3, type: 2}

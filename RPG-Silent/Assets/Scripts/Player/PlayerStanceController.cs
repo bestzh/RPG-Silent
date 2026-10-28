@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -37,6 +38,13 @@ public class PlayerStanceController : MonoBehaviour
     public bool CanJump => stanceDatabase == null || stanceDatabase.CanJump(EffectiveStance);
     public int MaxJumpCount => stanceDatabase != null ? stanceDatabase.GetMaxJumpCount(EffectiveStance) : 1;
     public bool CanSprint => stanceDatabase == null || stanceDatabase.CanSprint(EffectiveStance);
+
+    // Presentation-only lookup: trying a weapon must not change the live player's stance.
+    public AnimationClip GetPreviewIdle(PlayerStance stance)
+    {
+        var controller = (RuntimeAnimatorController)ResolveOverride(stance, out _) ?? baseController;
+        return controller != null ? controller.animationClips.FirstOrDefault(c => c.name.EndsWith("Idle", StringComparison.OrdinalIgnoreCase)) : null;
+    }
 
     private void Awake()
     {

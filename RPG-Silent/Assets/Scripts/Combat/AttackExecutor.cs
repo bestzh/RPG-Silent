@@ -180,7 +180,10 @@ public class AttackExecutor : MonoBehaviour
         if (!allowRepeatedDamage && !context.TryRegisterHit(target)) return false;
 
         AttackProfile profile = context.Profile;
-        target.TakeDamage(context.Damage);
+        if (target is EnemyController enemy) enemy.ReceiveHit(context.Damage, transform.position);
+        else target.TakeDamage(context.Damage);
+        if (!target.IsDead && profile.StatusOnHit != null && target is Component receiver)
+            receiver.GetComponent<CombatStatusController>()?.Apply(profile.StatusOnHit);
 
         if (profile.HitEffectPrefab != null)
         {

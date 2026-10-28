@@ -5574,6 +5574,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6c5681314704bc4c9cd161655680551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ArmorMeshRoot: Modular_Characters
+  ArmorBodyParts:
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_01_Hair/Chr_Hair_07
+    Region: 2
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_04_Back_Attachment/Chr_BackAttachment_13
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_07_Elbow_Attachment_Right/Chr_ElbowAttachRight_02
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_08_Elbow_Attachment_Left/Chr_ElbowAttachLeft_02
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_09_Hips_Attachment/Chr_HipsAttachment_09
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_10_Knee_Attachement_Right/Chr_KneeAttachRight_02
+    Region: 16
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_11_Knee_Attachement_Left/Chr_KneeAttachLeft_02
+    Region: 16
+  - RendererPath: Modular_Characters/Male_Parts/Male_00_Head/Male_Head_All_Elements/Chr_Head_Male_21
+    Region: 4
+  - RendererPath: Modular_Characters/Male_Parts/Male_01_Eyebrows/Chr_Eyebrow_Male_10
+    Region: 4
+  - RendererPath: Modular_Characters/Male_Parts/Male_02_FacialHair/Chr_FacialHair_Male_10
+    Region: 4
+  - RendererPath: Modular_Characters/Male_Parts/Male_03_Torso/Chr_Torso_Male_07
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_04_Arm_Upper_Right/Chr_ArmUpperRight_Male_01
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_05_Arm_Upper_Left/Chr_ArmUpperLeft_Male_01
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_06_Arm_Lower_Right/Chr_ArmLowerRight_Male_12
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_07_Arm_Lower_Left/Chr_ArmLowerLeft_Male_00
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_08_Hand_Right/Chr_HandRight_Male_00
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_09_Hand_Left/Chr_HandLeft_Male_17
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_10_Hips/Chr_Hips_Male_26
+    Region: 8
+  - RendererPath: Modular_Characters/Male_Parts/Male_11_Leg_Right/Chr_LegLeft_Male_08
+    Region: 16
+  - RendererPath: Modular_Characters/Male_Parts/Male_12_Leg_Left/Chr_LegRight_Male_08
+    Region: 16
   UnitsPerMeter: 100
   RightHandBasis: {x: -0.000000059604645, y: -0.000000014901161, z: 0.000000029802326, w: 1.0000001}
   LeftHandBasis: {x: -0.000000029802326, y: 8.881784e-16, z: 0.000000029802326, w: 1.0000002}

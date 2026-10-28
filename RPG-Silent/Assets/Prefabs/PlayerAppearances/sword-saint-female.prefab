@@ -1926,6 +1926,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6c5681314704bc4c9cd161655680551, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ArmorMeshRoot: Modular_Characters
+  ArmorBodyParts:
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_02_Head_Attachment/Helmet/Chr_HelmetAttachment_05
+    Region: 1
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_05_Shoulder_Attachment_Right/Chr_ShoulderAttachRight_18
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_06_Shoulder_Attachment_Left/Chr_ShoulderAttachLeft_18
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_07_Elbow_Attachment_Right/Chr_ElbowAttachRight_06
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_09_Hips_Attachment/Chr_HipsAttachment_04
+    Region: 8
+  - RendererPath: Modular_Characters/All_Gender_Parts/All_10_Knee_Attachement_Right/Chr_KneeAttachRight_06
+    Region: 16
+  - RendererPath: Modular_Characters/Female_Parts/Female_00_Head/Female_Head_No_Elements/Chr_Head_No_Elements_Female_13
+    Region: 1
+  - RendererPath: Modular_Characters/Female_Parts/Female_03_Torso/Chr_Torso_Female_15
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_04_Arm_Upper_Right/Chr_ArmUpperRight_Female_20
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_05_Arm_Upper_Left/Chr_ArmUpperLeft_Female_20
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_06_Arm_Lower_Right/Chr_ArmLowerRight_Female_14
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_07_Arm_Lower_Left/Chr_ArmLowerLeft_Female_14
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_08_Hand_Right/Chr_HandRight_Female_03
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_09_Hand_Left/Chr_HandLeft_Female_03
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_10_Hips/Chr_Hips_Female_27
+    Region: 8
+  - RendererPath: Modular_Characters/Female_Parts/Female_11_Leg_Right/Chr_LegRight_Female_08
+    Region: 16
+  - RendererPath: Modular_Characters/Female_Parts/Female_12_Leg_Left/Chr_LegLeft_Female_17
+    Region: 16
   UnitsPerMeter: 100
   RightHandBasis: {x: -0.000000059604645, y: -0.000000014901161, z: 0.000000029802326, w: 1.0000001}
   LeftHandBasis: {x: -0.000000029802326, y: 8.881784e-16, z: 0.000000029802326, w: 1.0000002}

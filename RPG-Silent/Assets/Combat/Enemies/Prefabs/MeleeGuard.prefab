@@ -1821,6 +1821,7 @@ GameObject:
   - component: {fileID: 983409935956638808}
   - component: {fileID: 8566992323805845166}
   - component: {fileID: 1514304347013071525}
+  - component: {fileID: 2046934839029148805}
   m_Layer: 0
   m_Name: MeleeGuard
   m_TagString: Enemy
@@ -2083,6 +2084,21 @@ MonoBehaviour:
   m_EvaluationType: 0
   m_MaxEvaluationCount: 1
   m_Subtree: {fileID: 11400000, guid: bb1ddb226cfe8b54e9021c3232e6773c, type: 2}
+--- !u!114 &2046934839029148805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2856070512681521305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255b7f8466429641bf91a38d0dbb15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}
+  ImpactSound: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+  Mixer: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
 --- !u!1 &2939822239500945877
 GameObject:
   m_ObjectHideFlags: 0

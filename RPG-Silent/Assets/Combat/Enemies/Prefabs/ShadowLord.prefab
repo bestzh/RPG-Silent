@@ -2831,6 +2831,7 @@ GameObject:
   - component: {fileID: 6916046397528413291}
   - component: {fileID: 8639277416439810054}
   - component: {fileID: 2397472118409157606}
+  - component: {fileID: 5389865880124294205}
   m_Layer: 0
   m_Name: ShadowLord
   m_TagString: Enemy
@@ -3078,6 +3079,13 @@ MonoBehaviour:
   TransitionAnimation: Phase
   TransitionEffect: {fileID: 9110955666620933787, guid: 2bd13ae15b2f85546aa212896000d6b6, type: 3}
   EnrageAura: {fileID: 6593584551875268558, guid: d4fc54980aa57ee45b4fd03d4ae45197, type: 3}
+  EnableThirdPhase: 1
+  ThirdPhaseThreshold: 0.25
+  SecondPhaseName: "\u72C2\u6012"
+  ThirdPhaseName: "\u6697\u5F71\u51B3\u6218"
+  SecondPhaseHint: "\u8FDE\u7EED\u65A9\u51FB\u540E\u7559\u6709\u7834\u7EFD"
+  ThirdPhaseHint: "\u4E09\u8FDE\u65A9\u540E\u63A5\u9668\u51FB \xB7 \u6536\u62DB\u540E\u53CD\u51FB"
+  ThirdPhaseDamageMultiplier: 1.15
 --- !u!114 &2397472118409157606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3110,6 +3118,21 @@ MonoBehaviour:
   m_EvaluationType: 0
   m_MaxEvaluationCount: 1
   m_Subtree: {fileID: 11400000, guid: f52372d5d38ae5143a87b68049543f96, type: 2}
+--- !u!114 &5389865880124294205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4229876449119304116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255b7f8466429641bf91a38d0dbb15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}
+  ImpactSound: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+  Mixer: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
 --- !u!1 &4232025633696523621
 GameObject:
   m_ObjectHideFlags: 0

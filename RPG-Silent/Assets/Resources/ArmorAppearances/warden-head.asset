@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9580037a0444e3a47b756fc2626984f6, type: 3}
+  m_Name: warden-head
+  m_EditorClassIdentifier: 
+  Slot: 0
+  Primary: {r: 0.43, g: 0.24, b: 0.56, a: 1}
+  Secondary: {r: 0.65, g: 0.5535, b: 0.637, a: 1}
+  Metal: {r: 0.54, g: 0.58, b: 0.6, a: 1}
+  Male:
+    HiddenRegions: 7
+    Parts:
+    - Mesh: {fileID: 4302076, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      Bounds:
+        m_Center: {x: -18.569908, y: -1.4658699, z: 0}
+        m_Extent: {x: 21.182323, y: 19.199615, z: 13.297135}
+  Female:
+    HiddenRegions: 7
+    Parts:
+    - Mesh: {fileID: 4302102, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      Bounds:
+        m_Center: {x: -18.569908, y: -1.4658699, z: 0}
+        m_Extent: {x: 21.182323, y: 19.199615, z: 13.297135}

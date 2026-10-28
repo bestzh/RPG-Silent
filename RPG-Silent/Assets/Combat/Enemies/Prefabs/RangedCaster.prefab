@@ -58836,6 +58836,7 @@ GameObject:
   - component: {fileID: 5774224047852015307}
   - component: {fileID: 8679555937875929748}
   - component: {fileID: 273094344348518222}
+  - component: {fileID: 2316720451120153581}
   m_Layer: 0
   m_Name: RangedCaster
   m_TagString: Untagged
@@ -59052,6 +59053,21 @@ MonoBehaviour:
   m_EvaluationType: 0
   m_MaxEvaluationCount: 1
   m_Subtree: {fileID: 11400000, guid: 131d2cdaf0334814d931d9e3805e2578, type: 2}
+--- !u!114 &2316720451120153581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7411528392941652724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255b7f8466429641bf91a38d0dbb15e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Font: {fileID: 11400000, guid: 4a2acd6e5e149024a94b1b144045586b, type: 2}
+  ImpactSound: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+  Mixer: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
 --- !u!1 &7415594525368595368
 GameObject:
   m_ObjectHideFlags: 0

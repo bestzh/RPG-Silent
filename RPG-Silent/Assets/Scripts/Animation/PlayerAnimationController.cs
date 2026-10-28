@@ -103,5 +103,6 @@ public class PlayerAnimationController : MonoBehaviour
     public void StopAnimation() => EndCurrentAnimation();
 
     public bool IsPlayingAnimation() => isPlaying;
+    public float NormalizedProgress => isPlaying && currentDuration > 0f ? Mathf.Clamp01(currentTimer / currentDuration) : 1f;
     public string CurrentAnimationName() => currentAnimation != null ? currentAnimation.AnimationName : null;
 }

@@ -31,6 +31,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1c77b1cd29659aa4b95b7b8c4208e0b3, type: 2}
   - {fileID: 11400000, guid: acfcddca93609674daa02aab115b0fe3, type: 2}
   AttackSequences:
+  - {fileID: 11400000, guid: 03fa3e09b55b82446b4a513f7a33a2aa, type: 2}
   - {fileID: 11400000, guid: d2488c303c75d924683f5b14f990a9fc, type: 2}
   HitEffect: {fileID: 2030332738282557456, guid: 08e8d855b222a8d458ed8b55e3a6fa78, type: 3}
   DeathEffect: {fileID: 5610560069491694539, guid: 0def5d88622eaa74681191f2c29a1126, type: 3}

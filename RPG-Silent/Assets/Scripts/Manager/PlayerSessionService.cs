@@ -32,17 +32,36 @@ public sealed class PlayerSessionService
     public void BeginNewGameAs(string classId) => BeginNewCharacter(classId, PlayerGender.Male);
     public void BeginNewCharacter(string classId, PlayerGender gender)
     {
+        if (!TryBeginNewCharacter(classId, gender, out string message)) throw new System.InvalidOperationException(message);
+    }
+
+    public bool TryBeginNewCharacter(string classId, PlayerGender gender, out string message)
+    {
+        if (IsActive && !_progress.Save()) { message = _progress.StatusMessage; return false; }
         EndSession();
-        _progress.BeginNewCharacter(classId, gender);
+        if (!_progress.TryBeginNewCharacter(classId, gender, out message)) return false;
         IsActive = true;
         _input.SetGameplayInputEnabled(true);
         _cursor.EnterGameplayCursor();
+        return true;
     }
 
     public bool BeginContinueGame(out string message)
     {
+        if (IsActive && !_progress.Save()) { message = _progress.StatusMessage; return false; }
         EndSession();
         if (!_progress.BeginContinue(out message)) return false;
+        IsActive = true;
+        _input.SetGameplayInputEnabled(true);
+        _cursor.EnterGameplayCursor();
+        return true;
+    }
+
+    public bool BeginContinueCharacter(string key, out string message)
+    {
+        if (IsActive && !_progress.Save()) { message = _progress.StatusMessage; return false; }
+        EndSession();
+        if (!_progress.BeginContinueCharacter(key, out message)) return false;
         IsActive = true;
         _input.SetGameplayInputEnabled(true);
         _cursor.EnterGameplayCursor();
@@ -62,6 +81,8 @@ public sealed class PlayerSessionService
     public void EndSession()
     {
         _progress.Detach();
+        _ui.CloseUI(PlayerQuestInteraction.UiKey);
+        _ui.CloseUI(PlayerInventoryInteraction.UiKey);
         _ui.CloseUI("UI/MainUI");
         _ui.CloseUI("UI/TownNpcUI");
         _ui.CloseUI("UI/PortalUI");

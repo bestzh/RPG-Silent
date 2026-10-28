@@ -8,6 +8,8 @@ public sealed class EnemyMotor
     private readonly NavMeshAgent agent;
     private readonly Rigidbody body;
     private readonly bool useAgent;
+    private readonly CombatStatusController statuses;
+    float EffectiveSpeed => Speed * (statuses != null ? statuses.State.MovementMultiplier : 1f);
     private Vector3 direction;
     private float nextPathUpdate;
     private float stuckTime;
@@ -25,6 +27,7 @@ public sealed class EnemyMotor
     public EnemyMotor(GameObject owner, bool useNavMesh, float speed, float turnSpeed)
     {
         transform = owner.transform;
+        statuses = owner.GetComponent<CombatStatusController>();
         agent = owner.GetComponent<NavMeshAgent>();
         body = owner.GetComponent<Rigidbody>();
         useAgent = useNavMesh;
@@ -58,6 +61,7 @@ public sealed class EnemyMotor
         direction = offset.normalized;
         if (CanNavigate)
         {
+            agent.speed = EffectiveSpeed;
             agent.stoppingDistance = stopDistance;
             agent.isStopped = false;
             if (Time.time >= nextPathUpdate)
@@ -139,7 +143,7 @@ public sealed class EnemyMotor
     public void FixedTick(bool moving)
     {
         if (CanNavigate) return;
-        Vector3 velocity = moving ? direction * Speed : Vector3.zero;
+        Vector3 velocity = moving ? direction * EffectiveSpeed : Vector3.zero;
         if (body != null && !body.isKinematic)
             body.linearVelocity = new Vector3(velocity.x, body.linearVelocity.y, velocity.z);
         else if (moving) transform.position += velocity * Time.fixedDeltaTime;

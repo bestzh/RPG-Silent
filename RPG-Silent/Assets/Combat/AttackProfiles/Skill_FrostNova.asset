@@ -39,3 +39,4 @@ MonoBehaviour:
   AreaDuration: 5
   TickInterval: 1
   HitEffectPrefab: {fileID: 1607713453557310720, guid: 0edef91621bb6b34384ccc9dbb98729c, type: 3}
+  StatusOnHit: {fileID: 11400000, guid: 48c5f47e9ec209f4db4a2017cf905a82, type: 2}

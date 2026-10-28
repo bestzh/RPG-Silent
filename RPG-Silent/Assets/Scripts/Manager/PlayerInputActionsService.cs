@@ -35,6 +35,13 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public event Action StanceToggleTriggered;
     public event Action PauseTriggered;
     public event Action InteractTriggered;
+    public event Action InventoryTriggered;
+    public event Action JournalTriggered;
+    public event Action<int> ConsumableTriggered;
+    public InputAction[] ConsumableSlots { get; private set; }
+    public string GetConsumableSlotDisplay(int slotIndex) => ConsumableSlots != null && slotIndex >= 0 && slotIndex < ConsumableSlots.Length ? GetDisplayString(ConsumableSlots[slotIndex], 0) : "";
+    private InputAction journalAction;
+    private InputAction inventoryAction;
     public event Action CursorToggleTriggered;
     public event Action<int> SkillSlotTriggered;
 
@@ -297,6 +304,14 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
             SkillSlots[i].AddBinding(skillPaths[i]);
         }
 
+        ConsumableSlots = new InputAction[3];
+        string[] consumablePaths = { "<Keyboard>/q", "<Keyboard>/r", "<Keyboard>/f" };
+        for (int i = 0; i < ConsumableSlots.Length; i++)
+        {
+            int slot = i;
+            ConsumableSlots[i] = _map.AddAction("ConsumableSlot" + i, InputActionType.Button, consumablePaths[i]);
+            ConsumableSlots[i].performed += _ => { if (GameplayInputEnabled) ConsumableTriggered?.Invoke(slot); };
+        }
         SubscribeHandlers();
     }
 
@@ -308,6 +323,10 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         Pause = _uiMap.AddAction("Pause", InputActionType.Button);
         Pause.AddBinding("<Keyboard>/escape");
         Pause.performed += OnPausePerformed;
+        inventoryAction = _uiMap.AddAction("Inventory", InputActionType.Button, "<Keyboard>/b");
+        inventoryAction.performed += OnInventoryPerformed;
+        journalAction = _uiMap.AddAction("Journal", InputActionType.Button, "<Keyboard>/j");
+        journalAction.performed += OnJournalPerformed;
     }
 
     // ── 私有：内部事件桥接 ────────────────────────────────────────────────────────
@@ -356,6 +375,8 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     {
         UnsubscribeGameplayHandlers();
         if (Pause != null) Pause.performed -= OnPausePerformed;
+        if (inventoryAction != null) inventoryAction.performed -= OnInventoryPerformed;
+        if (journalAction != null) journalAction.performed -= OnJournalPerformed;
     }
 
     private void RaiseGameplayAction(Action action)
@@ -373,6 +394,8 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     private void OnStanceTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(StanceToggleTriggered);
     private void OnCursorTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(CursorToggleTriggered);
     private void OnPausePerformed(InputAction.CallbackContext _)       => PauseTriggered?.Invoke();
+    private void OnInventoryPerformed(InputAction.CallbackContext _) => InventoryTriggered?.Invoke();
+    private void OnJournalPerformed(InputAction.CallbackContext _) => JournalTriggered?.Invoke();
     private void OnInteractPerformed(InputAction.CallbackContext _) => RaiseGameplayAction(InteractTriggered);
 
     public string GetSkillSlotDisplay(int slotIndex)

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.EventSystems;
@@ -10,7 +12,12 @@ using UnityEngine.UI;
 public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScrollHandler
 {
     const int PreviewLayer = 31;
-    GameObject stage, model;
+    GameObject stage, model, sourcePrefab, weaponModel;
+    Animator animator;
+    ModularArmorAppearance armor;
+    WeaponDefinition shownWeapon;
+    AnimationClip shownIdle;
+    bool shownSheathed;
     Camera previewCamera;
     RenderTexture texture;
     PlayableGraph animationGraph;
@@ -22,58 +29,97 @@ public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScroll
     public PlayerGender Gender { get; private set; }
 
     public void Show(PlayerClassDefinition definition, PlayerGender gender)
+        => ShowPreview(definition, gender, System.Array.Empty<ItemDefinition>(), definition?.StartingWeapon, false, definition?.PreviewIdle, true);
+
+    public void ShowLoadout(PlayerClassDefinition definition, PlayerGender gender, IReadOnlyList<ItemDefinition> equipped,
+        WeaponDefinition weapon, bool sheathed, AnimationClip idle)
+        => ShowPreview(definition, gender, equipped, weapon, sheathed, idle, false);
+
+    void ShowPreview(PlayerClassDefinition definition, PlayerGender gender, IReadOnlyList<ItemDefinition> equipped,
+        WeaponDefinition weapon, bool sheathed, AnimationClip idle, bool resetView)
     {
-        ClearModel();
-        Definition = definition; Gender = gender;
-        if (definition == null || definition.GetModel(gender) == null) return;
-        EnsureStage();
-        model = Instantiate(definition.GetModel(gender), stage.transform);
-        model.name = "Preview - " + definition.Id + " - " + gender;
-        model.transform.localPosition = Vector3.zero;
-        model.transform.localScale = Vector3.one;
-        var animator = model.GetComponent<Animator>();
-        animator.runtimeAnimatorController = null;
-        animator.applyRootMotion = false;
-        animator.fireEvents = false;
-        animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-        if (definition.PreviewIdle != null)
+        if (definition == null) { Hide(); return; }
+        var visualGender = definition.GetVisualGender(gender, equipped.Any(item => item != null && item.Appearance != null));
+        var prefab = definition.GetModel(visualGender);
+        if (prefab == null) { Hide(); return; }
+        bool reset = resetView || model == null || Definition != definition || Gender != gender;
+        float zoom = distance / Mathf.Max(.01f, framedDistance);
+        if (model == null || sourcePrefab != prefab)
         {
-            animationGraph = PlayableGraph.Create("Character creation idle");
-            animationGraph.SetTimeUpdateMode(DirectorUpdateMode.UnscaledGameTime);
-            var output = AnimationPlayableOutput.Create(animationGraph, "Idle", animator);
-            output.SetSourcePlayable(AnimationClipPlayable.Create(animationGraph, definition.PreviewIdle));
-            animationGraph.Play(); animationGraph.Evaluate(0);
+            ClearModel(); EnsureStage(); sourcePrefab = prefab;
+            model = Instantiate(prefab, stage.transform);
+            model.name = "Preview - " + definition.Id + " - " + gender;
+            model.transform.localPosition = Vector3.zero; model.transform.localScale = Vector3.one; model.SetActive(true);
+            animator = model.GetComponent<Animator>();
+            animator.runtimeAnimatorController = null; animator.applyRootMotion = false;
+            animator.fireEvents = false; animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            var rig = model.GetComponent<CharacterRigProfile>();
+            if (rig != null && !string.IsNullOrEmpty(rig.ArmorMeshRoot))
+                armor = new ModularArmorAppearance(model.transform, rig, visualGender);
         }
-        var weapon = definition.StartingWeapon;
-        var profile = model.GetComponent<CharacterRigProfile>();
-        if (weapon != null && weapon.ModelPrefab != null && animator.isHuman)
+        Definition = definition; Gender = gender;
+        armor?.Apply(equipped);
+        if (shownIdle != idle)
         {
-            var bone = animator.GetBoneTransform(weapon.HandBone);
-            if (bone != null)
+            if (animationGraph.IsValid()) animationGraph.Destroy();
+            shownIdle = idle;
+            if (idle != null)
             {
-                var prop = Instantiate(weapon.ModelPrefab, bone);
-                prop.transform.localPosition = profile != null ? profile.MountPosition(weapon, true) : weapon.HandPosition;
-                prop.transform.localRotation = profile != null ? profile.MountRotation(weapon, true) : Quaternion.Euler(weapon.HandRotation);
-                prop.transform.localScale = profile != null ? profile.Scale(weapon.ModelScale) : weapon.ModelScale;
+                animationGraph = PlayableGraph.Create("Character preview idle");
+                animationGraph.SetTimeUpdateMode(DirectorUpdateMode.UnscaledGameTime);
+                var output = AnimationPlayableOutput.Create(animationGraph, "Idle", animator);
+                output.SetSourcePlayable(AnimationClipPlayable.Create(animationGraph, idle));
+                animationGraph.Play(); animationGraph.Evaluate(0);
+            }
+        }
+        if (shownWeapon != weapon || shownSheathed != sheathed)
+        {
+            if (weaponModel != null) { weaponModel.SetActive(false); Release(weaponModel); }
+            weaponModel = null; shownWeapon = weapon; shownSheathed = sheathed;
+            var profile = model.GetComponent<CharacterRigProfile>();
+            if (weapon != null && weapon.ModelPrefab != null && animator.isHuman)
+            {
+                var bone = animator.GetBoneTransform(sheathed ? weapon.SheathBone : weapon.HandBone);
+                if (bone != null)
+                {
+                    weaponModel = Instantiate(weapon.ModelPrefab, bone);
+                    weaponModel.transform.localPosition = profile != null ? profile.MountPosition(weapon, !sheathed) : sheathed ? weapon.SheathPosition : weapon.HandPosition;
+                    weaponModel.transform.localRotation = profile != null ? profile.MountRotation(weapon, !sheathed) : Quaternion.Euler(sheathed ? weapon.SheathRotation : weapon.HandRotation);
+                    weaponModel.transform.localScale = profile != null ? profile.Scale(weapon.ModelScale) : weapon.ModelScale;
+                }
             }
         }
         foreach (var t in model.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = PreviewLayer;
         foreach (var collider in model.GetComponentsInChildren<Collider>(true)) collider.enabled = false;
         foreach (var body in model.GetComponentsInChildren<Rigidbody>(true)) { body.isKinematic = true; body.detectCollisions = false; }
-        if (animator.isHuman)
+        FrameModel();
+        if (reset) ResetView();
+        else { distance = framedDistance * zoom; UpdateView(); }
+    }
+
+    void FrameModel()
+    {
+        if (animator != null && animator.isHuman)
         {
             float top = animator.GetBoneTransform(HumanBodyBones.Head).position.y - stage.transform.position.y + .3f;
             float bottom = Mathf.Min(animator.GetBoneTransform(HumanBodyBones.LeftFoot).position.y,
                 animator.GetBoneTransform(HumanBodyBones.RightFoot).position.y) - stage.transform.position.y - .1f;
+            float radius = .65f;
             foreach (var propRenderer in model.GetComponentsInChildren<MeshRenderer>())
             {
+                if (!propRenderer.gameObject.activeInHierarchy) continue;
                 top = Mathf.Max(top, propRenderer.bounds.max.y - stage.transform.position.y + .1f);
                 bottom = Mathf.Min(bottom, propRenderer.bounds.min.y - stage.transform.position.y - .1f);
+                var center = propRenderer.bounds.center - stage.transform.position;
+                radius = Mathf.Max(radius, new Vector2(center.x, center.z).magnitude +
+                    new Vector2(propRenderer.bounds.extents.x, propRenderer.bounds.extents.z).magnitude);
             }
             targetHeight = (top + bottom) * .5f;
-            framedDistance = Mathf.Max(3f, (top - bottom) * 2.2f);
+            var rect = ((RectTransform)transform).rect;
+            float aspect = rect.width / Mathf.Max(1, rect.height);
+            framedDistance = Mathf.Max(3f, (top - bottom) * 2.2f,
+                radius * 1.05f / (Mathf.Tan(previewCamera.fieldOfView * Mathf.Deg2Rad * .5f) * Mathf.Max(.25f, aspect)));
         }
-        ResetView();
     }
 
     void EnsureStage()
@@ -117,7 +163,7 @@ public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScroll
     public void OnDrag(PointerEventData e)
     {
         if (e.button == PointerEventData.InputButton.Left)
-            Rotate(-e.delta.x * .35f / Mathf.Max(.01f, GetComponentInParent<Canvas>().scaleFactor));
+            Rotate(-e.delta.x * .35f / Mathf.Max(.01f, GetComponentInParent<Canvas>()?.scaleFactor ?? 1f));
     }
     public void OnScroll(PointerEventData e) { distance = Mathf.Clamp(distance - e.scrollDelta.y * .16f, framedDistance * .7f, framedDistance * 1.2f); UpdateView(); }
     void UpdateView()
@@ -143,14 +189,18 @@ public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScroll
     void ClearModel()
     {
         if (animationGraph.IsValid()) animationGraph.Destroy();
-        if (model != null) { model.SetActive(false); Destroy(model); model = null; }
+        armor?.Dispose(); armor = null;
+        if (model != null) { model.SetActive(false); Release(model); model = null; }
+        sourcePrefab = weaponModel = null; shownWeapon = null; shownIdle = null; animator = null;
     }
-    void OnDisable()
+    public void Hide()
     {
         ClearModel();
-        if (stage != null) { stage.SetActive(false); Destroy(stage); stage = null; }
+        if (stage != null) { stage.SetActive(false); Release(stage); stage = null; }
         if (image != null) image.texture = null;
-        if (texture != null) { texture.Release(); Destroy(texture); texture = null; }
+        if (texture != null) { texture.Release(); Release(texture); texture = null; }
         previewCamera = null;
     }
+    static void Release(Object target) { if (Application.isPlaying) Destroy(target); else DestroyImmediate(target); }
+    void OnDisable() => Hide();
 }

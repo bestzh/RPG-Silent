@@ -137,6 +137,7 @@ public sealed class CharacterCreationView : MonoBehaviour
         start.interactable = false;
         confirm?.Invoke(SelectedClass.Id, SelectedGender);
     }
+    public void ShowFailure(string message) { RefreshAppearance(); error.text = message; }
     void OnEnable() { if (SelectedClass != null) RefreshAppearance(); }
     void Update()
     {

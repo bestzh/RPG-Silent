@@ -101,6 +101,7 @@ public sealed class EnemySkillRunner
         Current = null;
         ClearWarning();
     }
+    public void ResetCooldowns() { Cancel(); readyAt.Clear(); }
 
     private void ClearWarning()
     {

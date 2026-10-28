@@ -4,6 +4,14 @@ using UnityEngine;
 public sealed class CharacterRigProfile : MonoBehaviour
 {
     [System.Serializable]
+    public sealed class BodyPart
+    {
+        public string RendererPath;
+        public ArmorBodyRegion Region;
+    }
+    public string ArmorMeshRoot;
+    public BodyPart[] ArmorBodyParts = new BodyPart[0];
+    [System.Serializable]
     public sealed class DrawnMount
     {
         public WeaponDefinition Weapon;
@@ -23,13 +31,13 @@ public sealed class CharacterRigProfile : MonoBehaviour
     public Vector3 MountPosition(WeaponDefinition weapon, bool drawn)
     {
         if (drawn) foreach (var mount in DrawnMounts)
-            if (mount != null && mount.Weapon == weapon) return Position(weapon.HandBone, mount.Position);
+            if (mount != null && mount.Weapon == (weapon.MountTemplate != null ? weapon.MountTemplate : weapon)) return Position(weapon.HandBone, mount.Position);
         return Position(drawn ? weapon.HandBone : weapon.SheathBone, drawn ? weapon.HandPosition : weapon.SheathPosition);
     }
     public Quaternion MountRotation(WeaponDefinition weapon, bool drawn)
     {
         if (drawn) foreach (var mount in DrawnMounts)
-            if (mount != null && mount.Weapon == weapon) return Rotation(weapon.HandBone, mount.Rotation);
+            if (mount != null && mount.Weapon == (weapon.MountTemplate != null ? weapon.MountTemplate : weapon)) return Rotation(weapon.HandBone, mount.Rotation);
         return Rotation(drawn ? weapon.HandBone : weapon.SheathBone, drawn ? weapon.HandRotation : weapon.SheathRotation);
     }
 }

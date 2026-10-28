@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9fbedbdcc05fc4fb6dea7686f5bcd4, type: 3}
+  m_Name: royal-chest
+  m_EditorClassIdentifier: 
+  Id: royal-chest
+  DisplayName: "\u738B\u6743\u62A4\u7532"
+  Description: "\u8574\u542B\u6C34\u6676\u529B\u91CF\u7684\u5B88\u671B\u8005\u88C5\u5907\u3002"
+  Kind: 0
+  Rarity: 4
+  Slot: 1
+  Icon: {fileID: 21300000, guid: 158a8c105d2fe4e9f986f1a51be218ce, type: 3}
+  Weapon: {fileID: 0}
+  Appearance: {fileID: 11400000, guid: 720722c27b1f856489a283c0491e9a57, type: 2}
+  Set: {fileID: 11400000, guid: b64d8ab4afd9a134cb68da799cfd7f1c, type: 2}
+  IsGem: 0
+  RequiredLevel: 12
+  Health: 100
+  Energy: 0
+  AttackPercent: 0
+  DefensePercent: 15
+  SellPrice: 100

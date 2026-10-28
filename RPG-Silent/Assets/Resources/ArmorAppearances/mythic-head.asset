@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9580037a0444e3a47b756fc2626984f6, type: 3}
+  m_Name: mythic-head
+  m_EditorClassIdentifier: 
+  Slot: 0
+  Primary: {r: 0.57, g: 0.12, b: 0.14, a: 1}
+  Secondary: {r: 0.713, g: 0.4995, b: 0.448, a: 1}
+  Metal: {r: 0.36, g: 0.3, b: 0.29, a: 1}
+  Male:
+    HiddenRegions: 7
+    Parts:
+    - Mesh: {fileID: 4302088, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      Bounds:
+        m_Center: {x: -19.858368, y: -3.196682, z: 0}
+        m_Extent: {x: 20.124313, y: 20.097095, z: 12.551095}
+  Female:
+    HiddenRegions: 7
+    Parts:
+    - Mesh: {fileID: 4302114, guid: 038320a534bd8b444b43734860d1a211, type: 3}
+      Materials:
+      - {fileID: 2100000, guid: ea128b040f8b0af4c9d2de400aaff30a, type: 2}
+      BonePaths:
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck/Head
+      - Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      RootBonePath: Root/Hips/Spine_01/Spine_02/Spine_03/Neck
+      Bounds:
+        m_Center: {x: -18.99762, y: -3.196682, z: 0}
+        m_Extent: {x: 20.985062, y: 20.097095, z: 12.551095}
