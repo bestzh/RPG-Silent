@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ExplorationKind { Chest, Mechanism, HiddenPassage, EliteEvent, TrainingCombo, TrainingDefense, TrainingReset, ReturnToTown }
+public enum ExplorationKind { Chest, Mechanism, HiddenPassage, EliteEvent, TrainingCombo, TrainingDefense, TrainingReset, ReturnToTown, ExpeditionEvent }
 
 /// <summary>Authored scene objectives. Rewards are world drops and reset with the instance.</summary>
 public sealed class ExplorationNode : MonoBehaviour
@@ -22,7 +22,7 @@ public sealed class ExplorationNode : MonoBehaviour
     public bool Used { get; private set; }
     public bool Discovered { get; private set; }
     public string Status { get; private set; }
-    public bool Reusable => Kind >= ExplorationKind.TrainingCombo;
+    public bool Reusable => Kind >= ExplorationKind.TrainingCombo && Kind <= ExplorationKind.ReturnToTown;
     public string Symbol => Kind == ExplorationKind.Chest ? "箱" : Kind == ExplorationKind.EliteEvent ? "!" : Kind == ExplorationKind.ReturnToTown ? "城" : "机";
     public bool VisibleOnMap => (!Hidden || Discovered) && (!Used || Reusable);
     DungeonRunService run;
@@ -32,6 +32,7 @@ public sealed class ExplorationNode : MonoBehaviour
     Camera viewer;
     void Start()
     {
+        if (Kind == ExplorationKind.ExpeditionEvent) return; // The event owns its moving label.
         var presentation = Resources.Load<LootPresentation>("Loot/Presentation");
         var go = new GameObject("Exploration label"); go.transform.SetParent(transform,false);
         go.transform.localPosition = Vector3.up * 1.8f;
@@ -58,6 +59,11 @@ public sealed class ExplorationNode : MonoBehaviour
             Vector3.Distance(player.transform.position, transform.position) > 2.8f) return false;
         if (Reusable) return training != null && training.Activate(Kind);
         if (run == null || run.State == DungeonRunState.Leaving || run.State == DungeonRunState.Failed) return false;
+        if (Kind == ExplorationKind.ExpeditionEvent)
+        {
+            if (!run.TryStartExpeditionEvent(player)) return false;
+            Used = Discovered = true; Status = "额外事件已开始，规则与进度见副本目标。"; run.RecordExploration(); return true;
+        }
         if (Kind == ExplorationKind.EliteEvent && run.State != DungeonRunState.Running) { Status = "本次已结算，重试副本可开启事件"; return false; }
         if (Kind == ExplorationKind.EliteEvent && (ElitePrefab == null || EnemyPoints == null || EnemyPoints.Length == 0)) return false;
         Used = Discovered = true;
@@ -97,7 +103,7 @@ public sealed class ExplorationNode : MonoBehaviour
     IEnumerator OpenGate()
     {
         foreach (var collider in MovingGate.GetComponentsInChildren<Collider>()) collider.enabled = false;
-        var obstacle = MovingGate.GetComponent<UnityEngine.AI.NavMeshObstacle>(); if (obstacle != null) obstacle.enabled = false;
+        foreach (var obstacle in MovingGate.GetComponentsInChildren<UnityEngine.AI.NavMeshObstacle>()) obstacle.enabled = false;
         Vector3 start = MovingGate.position; float elapsed = 0;
         while (elapsed < .8f && MovingGate != null)
         { elapsed += Time.deltaTime; MovingGate.position = Vector3.Lerp(start, start + Vector3.down * 4, Mathf.SmoothStep(0,1,elapsed/.8f)); yield return null; }
