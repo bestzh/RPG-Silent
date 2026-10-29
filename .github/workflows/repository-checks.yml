@@ -32,7 +32,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
-          # Sparse checkout also enables blob:none; large assets are fetched only when inspected.
+          # Preload blobs below the policy hard limit in one fetch.
+          # Avoid one network fetch per file during large asset checks.
+          filter: blob:limit=100m
+          # Keep asset files out of the runner worktree.
           sparse-checkout: |
             .github
             RPG-Silent/Tools/Git
