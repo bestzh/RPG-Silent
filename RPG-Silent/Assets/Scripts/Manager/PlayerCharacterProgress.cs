@@ -42,7 +42,8 @@ public sealed partial class PlayerProgressService
             weaponIds = new[] { selected.StartingWeapon.PersistentId, id == "swordsman" ? WeaponDefinition.StarterGreatswordId : WeaponDefinition.StarterSwordId },
             activeWeaponSlot = 0, equipmentVersion = 1,
             learnedSkills = Array.Empty<SkillProgressData>(), weaponUpgrades = Array.Empty<WeaponUpgradeData>(),
-            inventory = new InventoryData(), quests = new QuestJournalData(), consumables = new ConsumableLoadoutData()
+            inventory = new InventoryData(), quests = new QuestJournalData(), consumables = new ConsumableLoadoutData(),
+            tutorial = new TutorialData { enabled = true }
         };
         data.inventory.AddRewards(data.weaponIds.Distinct().Select(key => EquipmentInstances.Create(FindItem(key), null)));
         data.weaponInstanceIds = data.weaponIds.Select(key => data.inventory.bag.Single(item => item.itemId == key).Key).ToArray();

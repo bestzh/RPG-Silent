@@ -21,7 +21,34 @@ public class AttackExecutor : MonoBehaviour
     private bool combatSuspended;
     private bool enemyTargeting;
     private PlayerController playerOwner;
+    private EnemyController enemyOwner;
+    private GameAudioService audio;
+    public void ConfigureAudio(GameAudioService service) => audio = service;
+    internal string EquipmentWeaponKey => playerOwner?.Weapons?.GetInstanceId(playerOwner.Weapons.ActiveSlot) ?? "";
     private readonly RaycastHit[] aimHits = new RaycastHit[32];
+    private readonly RaycastHit[] combatSightHits = new RaycastHit[64];
+    internal void LockEnemyGeometry(AttackContext context)
+    {
+        if (enemyOwner == null || context == null || context.Owner != this) return;
+        var spawn = ResolveSpawnPoint(context.Profile);
+        context.LockEnemyGeometry(transform.position, transform.rotation, spawn != null ? spawn.position : transform.position + Vector3.up);
+    }
+    bool HasWorldSight(AttackContext context, Component target, Vector3? source)
+    {
+        Vector3 origin = EnemyAttackGeometry.IsCircle(context.Profile.DeliveryType)
+            ? EnemyAttackGeometry.Center(context.Profile, context.EnemyOrigin.Value, context.EnemyRotation, context.AreaPoint) : context.EnemyOrigin.Value;
+        origin = (source ?? origin) + Vector3.up;
+        Vector3 delta = target.transform.position + Vector3.up - origin;
+        int count = Physics.RaycastNonAlloc(origin, delta.normalized, combatSightHits, delta.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == combatSightHits.Length) return false;
+        for (int i = 0; i < count; i++)
+        {
+            var hit = combatSightHits[i];
+            if (hit.transform.IsChildOf(transform) || hit.transform.IsChildOf(target.transform) || hit.collider.GetComponentInParent<IDamageable>() != null) continue;
+            return false;
+        }
+        return true;
+    }
     internal int CombatGeneration { get; private set; }
 
     // 场景边界/结算使旧弹体和延迟攻击失效，普通连击收招不影响它们。
@@ -38,6 +65,7 @@ public class AttackExecutor : MonoBehaviour
     private void Awake()
     {
         playerOwner = GetComponent<PlayerController>();
+        enemyOwner = GetComponent<EnemyController>();
         if (attackLoadout == null)   attackLoadout   = GetComponent<PlayerAttackLoadout>();
         if (hitboxController == null) hitboxController = GetComponentInChildren<AttackHitboxController>();
         if (aimCamera == null)        aimCamera        = Camera.main;
@@ -52,14 +80,20 @@ public class AttackExecutor : MonoBehaviour
         currentComboIndex = Mathf.Max(1, comboIndex);
         var profile = GetCurrentProfile();
         normalAttack = profile == null ? null : new AttackContext(profile, this,
-            damageMultiplier * (attackLoadout != null ? attackLoadout.DamageMultiplier : 1f) * (playerOwner?.Defense?.ConsumeCounter() ?? 1f),
-            staggerMultiplier: staggerMultiplier, projectileSpeedMultiplier: projectileSpeed, energyOnHit: energyOnHit);
+            damageMultiplier * (attackLoadout != null ? attackLoadout.DamageMultiplier : 1f) * (playerOwner?.Defense?.ConsumeCounter() ?? 1f) * (playerOwner?.Progress?.SpecializationBasicDamage ?? 1f),
+            staggerMultiplier: staggerMultiplier * (playerOwner?.Progress?.SpecializationBasicStagger ?? 1f), projectileSpeedMultiplier: projectileSpeed, energyOnHit: energyOnHit);
         if (normalAttack != null) normalAttack.Combo = currentComboIndex;
         if (normalAttack == null)
             Debug.LogWarning($"[AttackExecutor] 当前姿态第 {currentComboIndex} 段攻击未配置 AttackProfile。", this);
     }
 
     public AttackProfile GetCurrentAttackProfile() => normalAttack?.Profile ?? GetCurrentProfile();
+    public void SetHeavyAttack(bool heavy) { if (normalAttack != null) normalAttack.IsHeavyAttack = heavy; }
+    internal AttackContext CreateEquipmentProc(AttackContext source, int damage, float stagger)
+    {
+        var context = new AttackContext(source.Profile, this, 0f, staggerMultiplier: stagger);
+        context.SetEquipmentProcDamage(damage); context.Element = source.Element; return context;
+    }
 
     public AttackContext CreateAttack(AttackProfile profile) =>
         profile != null ? new AttackContext(profile, this) : null;
@@ -127,6 +161,7 @@ public class AttackExecutor : MonoBehaviour
     {
         if (!Owns(context) || context.IsClosed || context.HasReleased) return;
         context.HasReleased = true;
+        (playerOwner != null ? playerOwner.Audio : audio)?.Play(GameSound.Attack, transform.position);
         playerOwner?.CombatRecord.Release(context.IsSkill, context.Combo);
         if (context.Profile.DeliveryType == AttackDeliveryType.MeleeHitbox)
             StartAttack(context);
@@ -146,6 +181,7 @@ public class AttackExecutor : MonoBehaviour
     private bool Owns(AttackContext context) =>
         !combatSuspended && (playerOwner == null || playerOwner.isActiveAndEnabled && playerOwner.CombatAllowed
             && !(playerOwner.Weapons != null && playerOwner.Weapons.IsBusy))
+        && (enemyOwner == null || !enemyOwner.IsCompanion || enemyOwner.CompanionOwner != null && enemyOwner.CompanionOwner.CanReceiveCombatEffects)
         && context != null && context.Owner == this && context.Profile != null
         && context.Generation == CombatGeneration;
 
@@ -165,13 +201,13 @@ public class AttackExecutor : MonoBehaviour
                 break;
             case AttackDeliveryType.AoeAtPoint:
             case AttackDeliveryType.InstantAoe:
-                ExecuteAoeAtPoint(context, context.AreaPoint ?? transform.position + transform.rotation * profile.AoeOffset);
+                ExecuteAoeAtPoint(context, context.AreaPoint ?? (context.EnemyOrigin ?? transform.position) + (context.EnemyOrigin.HasValue ? context.EnemyRotation : transform.rotation) * profile.AoeOffset);
                 break;
             case AttackDeliveryType.SelfAoe:
-                ExecuteAoeAtPoint(context, transform.position + profile.AoeOffset);
+                ExecuteAoeAtPoint(context, (context.EnemyOrigin ?? transform.position) + profile.AoeOffset);
                 break;
             case AttackDeliveryType.PersistentAoe:
-                ExecutePersistentAoe(context, context.AreaPoint ?? transform.position + transform.rotation * profile.AoeOffset);
+                ExecutePersistentAoe(context, context.AreaPoint ?? (context.EnemyOrigin ?? transform.position) + (context.EnemyOrigin.HasValue ? context.EnemyRotation : transform.rotation) * profile.AoeOffset);
                 break;
             case AttackDeliveryType.MeleeHitbox:
                 StartAttack(context);
@@ -186,6 +222,8 @@ public class AttackExecutor : MonoBehaviour
     {
         if (!Owns(context) || target == null || target is Object obj && obj == null) return false;
         if (!CanDamage(target)) return false;
+        if (context.EnemyOrigin.HasValue && context.Profile.DeliveryType != AttackDeliveryType.Projectile && target is Component sightTarget &&
+            !HasWorldSight(context, sightTarget, sourcePosition)) return false;
         if (!allowRepeatedDamage && !context.TryRegisterHit(target)) return false;
 
         AttackProfile profile = context.Profile;
@@ -193,11 +231,23 @@ public class AttackExecutor : MonoBehaviour
         {
             Vector3 origin = sourcePosition ?? transform.position;
             float stagger = context.StaggerMultiplier;
-            int damage = playerOwner?.ClassCombat != null ? playerOwner.ClassCombat.ModifyHit(enemy, context, origin, out stagger) : context.Damage;
+            int damage = !context.IsEquipmentProc && playerOwner?.ClassCombat != null ? playerOwner.ClassCombat.ModifyHit(enemy, context, origin, out stagger) : context.Damage;
+            if (enemyOwner != null && enemyOwner.IsCompanion && enemyOwner.CompanionOwner?.EquipmentEffects != null)
+                damage = enemyOwner.CompanionOwner.EquipmentEffects.CompanionDamage(damage, enemyOwner);
             int before = enemy.CurrentHealth;
-            enemy.ReceiveHit(damage, origin, stagger);
-            playerOwner?.CombatRecord.Deal(before - enemy.CurrentHealth);
-            GetComponent<EnemyController>()?.CompanionOwner?.CombatRecord.Deal(before - enemy.CurrentHealth);
+            var record = playerOwner?.CombatRecord ?? enemyOwner?.CompanionOwner?.CombatRecord;
+            record?.BeginHit();
+            try
+            {
+                enemy.ReceiveHit(damage, origin, stagger);
+                int actual = before - enemy.CurrentHealth;
+                record?.Deal(actual);
+                record?.CountHit(actual, context.IsSkill, context.IsHeavyAttack,
+                    profile.DeliveryType == AttackDeliveryType.Projectile || profile.DeliveryType == AttackDeliveryType.Raycast,
+                    enemyOwner != null && enemyOwner.IsCompanion, context.IsEquipmentProc);
+            }
+            finally { record?.EndHit(); }
+            if (!context.IsEquipmentProc) playerOwner?.EquipmentEffects?.OnHit(enemy, context, before - enemy.CurrentHealth, hitPoint);
         }
         else if (target is PlayerController player)
         {
@@ -206,7 +256,7 @@ public class AttackExecutor : MonoBehaviour
         else target.TakeDamage(context.Damage);
         if (!context.EnergyRestored && context.EnergyOnHit > 0 && playerOwner != null && target is EnemyController)
         { context.EnergyRestored = true; playerOwner.CombatStats?.RecoverEnergy(context.EnergyOnHit); }
-        if (!target.IsDead && profile.StatusOnHit != null && target is Component receiver)
+        if (!context.IsEquipmentProc && !target.IsDead && profile.StatusOnHit != null && target is Component receiver)
             receiver.GetComponent<CombatStatusController>()?.Apply(profile.StatusOnHit);
 
         if (profile.HitEffectPrefab != null)
@@ -234,7 +284,9 @@ public class AttackExecutor : MonoBehaviour
     private void ExecuteMeleeArc(AttackContext context)
     {
         AttackProfile profile = context.Profile;
-        Vector3 center = transform.position + transform.forward * profile.Range;
+        Vector3 origin = context.EnemyOrigin ?? transform.position;
+        Quaternion rotation = context.EnemyOrigin.HasValue ? context.EnemyRotation : transform.rotation;
+        Vector3 center = origin + rotation * Vector3.forward * profile.Range;
         Collider[] hits = Physics.OverlapSphere(center, profile.Radius, profile.TargetLayers);
 
         foreach (Collider hit in hits)
@@ -243,12 +295,12 @@ public class AttackExecutor : MonoBehaviour
             if (target == null) continue;
 
             if (target is not Component targetComp) continue;
-            Vector3 toTarget = targetComp.transform.position - transform.position;
+            Vector3 toTarget = targetComp.transform.position - (context.EnemyOrigin.HasValue ? center : origin);
             toTarget.y = 0f;
 
             if (toTarget.sqrMagnitude > 0.001f)
             {
-                float angle = Vector3.Angle(transform.forward, toTarget.normalized);
+                float angle = Vector3.Angle(rotation * Vector3.forward, toTarget.normalized);
                 if (angle > profile.Angle * 0.5f) continue;
             }
 
@@ -260,19 +312,19 @@ public class AttackExecutor : MonoBehaviour
     {
         AttackProfile profile = context.Profile;
         Transform spawnPoint = ResolveSpawnPoint(profile);
-        Vector3 origin    = spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
+        Vector3 origin    = context.EnemyOrigin.HasValue ? context.EnemyLaunchOrigin : spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
         Vector3 direction = context.AimPoint.HasValue ? (context.AimPoint.Value - origin).normalized : GetAimDirection(origin);
         direction = ApplySpread(direction, profile.SpreadAngle);
 
         RaycastHit hit;
         bool hasHit = profile.CastRadius > 0f
-            ? Physics.SphereCast(origin, profile.CastRadius, direction, out hit, profile.MaxDistance, profile.TargetLayers)
-            : Physics.Raycast(origin, direction, out hit, profile.MaxDistance, profile.TargetLayers);
+            ? Physics.SphereCast(origin, profile.CastRadius, direction, out hit, profile.MaxDistance, context.EnemyOrigin.HasValue ? ~0 : profile.TargetLayers.value)
+            : Physics.Raycast(origin, direction, out hit, profile.MaxDistance, context.EnemyOrigin.HasValue ? ~0 : profile.TargetLayers.value);
 
         if (hasHit)
         {
             IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
-            ApplyDamage(target, context, hit.point);
+            if ((profile.TargetLayers.value & (1 << hit.collider.gameObject.layer)) != 0) ApplyDamage(target, context, hit.point);
         }
     }
 
@@ -286,7 +338,7 @@ public class AttackExecutor : MonoBehaviour
         }
 
         Transform spawnPoint = ResolveSpawnPoint(profile);
-        Vector3 origin    = spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
+        Vector3 origin    = context.EnemyOrigin.HasValue ? context.EnemyLaunchOrigin : spawnPoint != null ? spawnPoint.position : transform.position + Vector3.up;
         Vector3 direction = context.AimPoint.HasValue ? (context.AimPoint.Value - origin).normalized : GetAimDirection(origin);
         direction = ApplySpread(direction, profile.SpreadAngle);
 
@@ -312,6 +364,16 @@ public class AttackExecutor : MonoBehaviour
     }
 
     private void ExecutePersistentAoe(AttackContext context, Vector3 center)
+    {
+        if (context.Profile.AoeDelay > 0f) { StartCoroutine(ExecutePersistentAfterDelay(context, center)); return; }
+        SpawnPersistentAoe(context, center);
+    }
+    private IEnumerator ExecutePersistentAfterDelay(AttackContext context, Vector3 center)
+    {
+        yield return new WaitForSeconds(context.Profile.AoeDelay);
+        if (Owns(context)) SpawnPersistentAoe(context, center);
+    }
+    private void SpawnPersistentAoe(AttackContext context, Vector3 center)
     {
         AttackProfile profile = context.Profile;
         GameObject areaObject;

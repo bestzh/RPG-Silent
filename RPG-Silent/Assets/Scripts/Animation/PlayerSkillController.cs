@@ -45,7 +45,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
     public bool CanQueueSlot(int slot) => IsValidSlot(slot) && equippedSkills[slot] != null
         && (_progress == null || _progress.GetSkillRank(equippedSkills[slot]) > 0)
         && _cooldownRemaining[slot] <= CombatActionBuffer.Lifetime
-        && _stats != null && _stats.CurrentEnergy >= equippedSkills[slot].EnergyCost;
+        && _stats != null && _stats.CurrentEnergy >= (_progress?.SkillEnergyCost(equippedSkills[slot]) ?? equippedSkills[slot].EnergyCost);
     public bool TryFinishForLink()
     {
         if (!CanLink) return false;
@@ -162,7 +162,7 @@ public class PlayerSkillController : MonoBehaviour, IPlayerSkillReader
         if (skill == null) return false;
         if (_progress != null && _progress.GetSkillRank(skill) == 0) return false;
         if (_cooldownRemaining[slotIndex] > 0f) return false;
-        if (_stats == null || !_stats.TrySpendEnergy(skill.EnergyCost)) return false;
+        if (_stats == null || !_stats.TrySpendEnergy(_progress?.SkillEnergyCost(skill) ?? skill.EnergyCost)) return false;
         TryFinishForLink();
         _player?.CancelCharge();
         _player?.Defense?.SuppressGuard();

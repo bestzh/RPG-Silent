@@ -27,6 +27,7 @@ public sealed partial class PlayerProgressService
         if (!data.inventory.TrySpendMaterial(ArmorUpgradeMaterialId, material))
         { message = $"{materialDefinition.DisplayName}不足，需要 {material} 个（背包持有 {ArmorUpgradeMaterials} 个）。"; return false; }
         data.inventory.Find(key).upgradeLevel = nextLevel;
+        data.tutorial.Record(TutorialStep.Enhance);
         // The candidate snapshot contains both the spent material and new level. Nothing
         // authoritative changes until the existing purchase transaction reaches disk.
         return CommitPurchase(data, gold, $"{item.DisplayName} 强化至 +{nextLevel}，消耗 {gold} 金币、{materialDefinition.DisplayName} ×{material}。", out message);

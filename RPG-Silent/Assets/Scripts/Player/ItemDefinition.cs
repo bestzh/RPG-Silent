@@ -12,6 +12,7 @@ public sealed class ItemDefinition : ScriptableObject
     [TextArea] public string Description;
     public ItemKind Kind;
     public ItemRarity Rarity;
+    public RPGSilent.Domain.EquipmentSpecialEffect SpecialEffect;
     public EquipmentSlot Slot;
     public Sprite Icon;
     public WeaponDefinition Weapon;

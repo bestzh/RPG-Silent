@@ -59,7 +59,9 @@ public sealed class PlayerClassCombat : MonoBehaviour
         if (companion != null) Destroy(companion.gameObject);
         companion = Instantiate(skill.SummonPrefab, hit.position, transform.rotation);
         SceneManager.MoveGameObjectToScene(companion.gameObject, SceneManager.GetActiveScene());
-        companion.ConfigureCompanion(player, skill.SummonDuration + (rank - 1) * 3, 1f + (rank - 1) * .2f);
+        companion.ConfigureCompanion(player, skill.SummonDuration + (rank - 1) * 3 + player.Progress.SpecializationSummonDuration,
+            (1f + (rank - 1) * .2f) * player.Progress.SpecializationSummonDamage);
+        player.EquipmentEffects?.OnSummoned();
         feedback = "兽灵助战 · 技能升级增强伤害与持续时间"; feedbackUntil = Time.time + 2;
         return true;
     }
