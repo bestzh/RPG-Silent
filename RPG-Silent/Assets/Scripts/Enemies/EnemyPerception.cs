@@ -49,12 +49,23 @@ public sealed class EnemyPerception
         Vector3 offset = Target.position + Vector3.up - origin;
         int count = alliesBlock ? Physics.SphereCastNonAlloc(origin, 0.2f, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore) :
             Physics.RaycastNonAlloc(origin, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == hits.Length) return false;
         for (int i = 0; i < count; i++)
         {
             Transform hit = hits[i].transform;
             if (hit.IsChildOf(owner) || hit.IsChildOf(Target) || (!alliesBlock && hit.GetComponentInParent<IDamageable>() != null)) continue;
             return false;
         }
+        return true;
+    }
+    public bool CanSee(Transform target)
+    {
+        if (target == null || !target.gameObject.activeInHierarchy) return false;
+        Vector3 origin = owner.position + Vector3.up, offset = target.position + Vector3.up - origin;
+        int count = Physics.RaycastNonAlloc(origin, offset.normalized, hits, offset.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        if (count == hits.Length) return false;
+        for (int i = 0; i < count; i++)
+            if (!hits[i].transform.IsChildOf(owner) && !hits[i].transform.IsChildOf(target) && hits[i].collider.GetComponentInParent<IDamageable>() == null) return false;
         return true;
     }
 }

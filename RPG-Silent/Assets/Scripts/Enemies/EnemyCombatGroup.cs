@@ -27,7 +27,8 @@ public sealed class EnemyCombatGroup
 
     public void Register(EnemyController enemy)
     {
-        if (stopped || enemy == null || enemy.IsBoss || !enemy.isActiveAndEnabled || enemy.IsDead || Find(enemy) != null) return;
+        if (stopped || enemy == null || enemy.IsBoss || enemy.IsCompanion || enemy.IsTrainingTarget || enemy.CombatLocked ||
+            !enemy.isActiveAndEnabled || enemy.IsDead || Find(enemy) != null) return;
         members.Add(new Member { Enemy = enemy });
     }
 
@@ -103,6 +104,22 @@ public sealed class EnemyCombatGroup
     }
 
     private static bool IsRanged(EnemyController enemy) => enemy.Definition != null && enemy.Definition.Behavior == EnemyBehaviorStyle.Ranged;
+    public bool TryFindMendTarget(EnemyController source, out EnemyController target)
+    {
+        target = null;
+        if (stopped || source == null || Find(source) == null || source.EliteTrait != EnemyEliteTrait.Mender) return false;
+        float lowest = .8f;
+        foreach (var member in members)
+        {
+            var enemy = member.Enemy;
+            if (enemy == null || enemy == source || !enemy.CanReceiveSupportHealing || enemy.gameObject.scene != source.gameObject.scene ||
+                Vector3.Distance(source.transform.position, enemy.transform.position) > EnemyTraitState.MendRange || !source.HasSupportSight(enemy)) continue;
+            float fraction = (float)enemy.CurrentHealth / enemy.MaxHealth;
+            if (fraction >= lowest) continue;
+            lowest = fraction; target = enemy;
+        }
+        return target != null;
+    }
     private static bool Engaged(Member member) => member.Enemy != null && member.Enemy.isActiveAndEnabled &&
         !member.Enemy.IsDead && member.Enemy.HasAggro && !member.Enemy.ReturningHome;
     private Member Find(EnemyController enemy)
