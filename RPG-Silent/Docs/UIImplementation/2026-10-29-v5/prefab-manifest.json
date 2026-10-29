@@ -1,0 +1,122 @@
+[
+  {
+    "path": "Assets/Resources_moved/UI/StartUI.prefab",
+    "guid": "20f96d79307ebdd49b042d5f1830a543",
+    "bytes": 502803,
+    "sha256": "22d896f27a9c74ac026d5e9987791b46ae83189797993723b4bf54147cc0b765"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/MainUI.prefab",
+    "guid": "983cb7809ccf9524c8662d64e3185a4e",
+    "bytes": 1101355,
+    "sha256": "c1c0b09cf87a583785500ef1b4f00829236daa3262730b4c8bd4525e3d36f210"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/InventoryUI.prefab",
+    "guid": "920ed84022329b64d81777b272d5e7ac",
+    "bytes": 1657666,
+    "sha256": "b66b6af53f17609c082af5d4f62517120a9ad34a3e38be764e4596d980b211e9"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/TownNpcUI.prefab",
+    "guid": "df31b31ca74b97541b0cc1644d034db1",
+    "bytes": 1002140,
+    "sha256": "60b3e135d7534851fb97257e656157cf0c01cbd1ae20590bcdb63e41450286f6"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/QuestJournalUI.prefab",
+    "guid": "b6fa1e5d823f3c94896bd699953b544e",
+    "bytes": 284781,
+    "sha256": "706b4366df81ac195d4eaba36bbb2b716b1b0784fbedb95ad3f36ec66f551268"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/PortalUI.prefab",
+    "guid": "81e62f022af6ae04da630979182cafe5",
+    "bytes": 170392,
+    "sha256": "f4c874d1904e2dab9c57d8bad5dde8e18f0d532e6b9db0d8fec666675db04178"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/DungeonUI.prefab",
+    "guid": "94aa08aa90a33184a8b82305c9035d8e",
+    "bytes": 267318,
+    "sha256": "c7184a783da251fbce5af533d788c7a48307a8bc94b798fa0a030c457a5054c2"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/SettingsUI.prefab",
+    "guid": "b96876fb23e69634e98bc0777ce35c7d",
+    "bytes": 804649,
+    "sha256": "3c96bfe4ed534d6edf8ae056da3d7b67d236b96fae52b80a5e902465cd23bef4"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/PauseUI.prefab",
+    "guid": "8027b3cdf932cb74c90d55a89eb49bd8",
+    "bytes": 81656,
+    "sha256": "5febef50ec9b5d712cb65d49b2c803cbc261af7c3f9e12935917da79b70806e8"
+  },
+  {
+    "path": "Assets/Resources_moved/UI/LoadingUI.prefab",
+    "guid": "89146148d77ad5e43b515f388b429c79",
+    "bytes": 67360,
+    "sha256": "85399f255362f8f94403bcc879494c5a4a14ed4bec04d30b851df5c1bcd84d42"
+  },
+  {
+    "path": "Assets/Prefabs/UI/CanvasRoot.prefab",
+    "guid": "4e4930bb591778a4890d676d062d4c19",
+    "bytes": 7868,
+    "sha256": "417cf34d570a0bf8d71861c136d1f5d77897cdab8d7385dcbc91b8bc23ddfe35"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Dialog_ServiceConfirmation.prefab",
+    "guid": "3fb49b4a39c4bd24b9bd14824112411e",
+    "bytes": 35261,
+    "sha256": "253c81b7fe7838c31d6eedc9bf5e25629a594620e59547976584b56fd958f6cd"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_CharacterCreation.prefab",
+    "guid": "1fae7f6e1603a1e4297ecd252ef4b5d6",
+    "bytes": 215668,
+    "sha256": "1a7a62c9ead990c6fead10bc1d66b8cd653c643fa94fa191d8d2883616359312"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_CharacterSelection.prefab",
+    "guid": "4768a975fc4fbd04689d81455c347809",
+    "bytes": 157380,
+    "sha256": "068afb08e7ef691fe4278f37263e824010710bc53d0a68c6c9da2a8a2778b498"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_SettingsController.prefab",
+    "guid": "c3d65126f1cf7894ba39a08f74a7d5b6",
+    "bytes": 277850,
+    "sha256": "2cfacd69ea78ce008ab2388b5f9a6c96c1a5dd0edfb9bf8848f9d9b5dd1b9de3"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_SettingsGame.prefab",
+    "guid": "e63f97e1c95d64d4199e32bf5074bfc1",
+    "bytes": 172384,
+    "sha256": "8d6c023b15f6c3952794f6742e81a5996471c988476e8ca6f41c5a42f206e336"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_SettingsScreen.prefab",
+    "guid": "1ce91db7735a027499195b7418612390",
+    "bytes": 133925,
+    "sha256": "8fc360c526d7fdf9b4f7258c9e9562dfdce8d988a666a654a188c2318475d6fa"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Page_SettingsSound.prefab",
+    "guid": "4d88e4a1c0fbecf4bae35b2604d0cdba",
+    "bytes": 98010,
+    "sha256": "370f03c5649b9b4ddf02b09847b6620e2e58f0126f4ad9778797fb39a0e69b92"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Row_Destination.prefab",
+    "guid": "0ba1417c82a347545b0ce5da60209a14",
+    "bytes": 9154,
+    "sha256": "73f3d7c95e159d233a3e474322d07d3ca771ff272b114fadb417fe1e0f2d5ef2"
+  },
+  {
+    "path": "Assets/Prefabs/UI/Templates/Row_ServiceOrJournal.prefab",
+    "guid": "52e0e849d4725eb4aad78e5400131f4c",
+    "bytes": 56676,
+    "sha256": "f10e26146c85fb8f356f51ae82d48cea612031758d6935d8888f9ca7b62eab3f"
+  }
+]

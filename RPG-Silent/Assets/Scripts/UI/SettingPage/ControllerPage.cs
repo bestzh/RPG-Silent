@@ -32,6 +32,7 @@ public class ControllerPage : MonoBehaviour
         if (!resolver.TryResolve<IPlayerInputActions>(out var playerInputActions))
             Debug.LogWarning("[ControllerPage] IPlayerInputActions 未注册，改键功能不可用。");
         _playerInputActions = playerInputActions;
+        if (isActiveAndEnabled) { RefreshUI(); _savedSnapshot = CloneSettings(_controllerService.CurrentSettings); }
     }
 
     // ── 灵敏度 / 冲刺时间 / 反转Y ─────────────────────────────────────────────
@@ -214,6 +215,7 @@ public class ControllerPage : MonoBehaviour
     {
         if (_isRebinding) return;
         _isRebinding = true;
+        GetComponentInParent<SettingsUI>()?.ShowNotice("请按新按键；Esc 取消；冲刺与闪避共享按键。重复键和保留键会被拒绝。");
 
         SetAllRebindButtonsInteractable(false);
 
@@ -235,12 +237,15 @@ public class ControllerPage : MonoBehaviour
                 // 不在此处保存，等用户点「应用」后才写入 PlayerPrefs
                 _isRebinding = false;
                 SetAllRebindButtonsInteractable(true);
+                RefreshAllKeyLabels();
+                GetComponentInParent<SettingsUI>()?.ShowNotice(_playerInputActions.LastRebindMessage);
             },
             onCancel: () =>
             {
                 if (label != null) label.text = originalText;
                 _isRebinding = false;
                 SetAllRebindButtonsInteractable(true);
+                GetComponentInParent<SettingsUI>()?.ShowNotice(_playerInputActions.LastRebindMessage);
             });
     }
 
@@ -306,14 +311,12 @@ public class ControllerPage : MonoBehaviour
     {
         if (_controllerService == null) return;
 
-        // 重置控制器参数（灵敏度、冲刺时间、反转Y），不立即保存
-        _controllerService.Reset();
+        _controllerService.Apply(_controllerService.Defaults);
 
         // 重置按键绑定到默认，不立即保存（等用户点「应用」）
         _playerInputActions?.ResetBindings();
 
         RefreshUI();
-        _savedSnapshot = CloneSettings(_controllerService.CurrentSettings);
     }
 
     // ── 工具方法 ───────────────────────────────────────────────────────────────

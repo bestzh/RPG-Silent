@@ -12,6 +12,7 @@ using UnityEngine.UI;
 public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScrollHandler
 {
     const int PreviewLayer = 31;
+    [SerializeField] Color background = Color.clear;
     GameObject stage, model, sourcePrefab, weaponModel;
     Animator animator;
     ModularArmorAppearance armor;
@@ -133,7 +134,7 @@ public sealed class CharacterModelPreview : MonoBehaviour, IDragHandler, IScroll
         cameraObject.transform.SetParent(stage.transform, false);
         previewCamera = cameraObject.AddComponent<Camera>();
         previewCamera.clearFlags = CameraClearFlags.SolidColor;
-        previewCamera.backgroundColor = new Color(.055f, .09f, .12f, 1);
+        previewCamera.backgroundColor = background;
         previewCamera.cullingMask = 1 << PreviewLayer;
         previewCamera.nearClipPlane = .05f; previewCamera.farClipPlane = 12f;
         previewCamera.fieldOfView = 34f;

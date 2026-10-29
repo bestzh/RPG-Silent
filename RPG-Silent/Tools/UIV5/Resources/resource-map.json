@@ -1,0 +1,594 @@
+{
+  "entries": [
+    {
+      "id": "bg-castle",
+      "path": "Assets/Resources/BG/BG.png",
+      "guid": "327ad631296486c42819b93a05c847c7"
+    },
+    {
+      "id": "bg-hall",
+      "path": "Assets/Resources/BG/BG2.png",
+      "guid": "8861fd55b02109f4a8339265049ad04e"
+    },
+    {
+      "id": "bg-workshop",
+      "path": "Assets/Resources/BG/BG3.png",
+      "guid": "6bd452d9361441d4ea7e491dbef89bb1"
+    },
+    {
+      "id": "bg-portal",
+      "path": "Assets/Resources/BG/SettingBG.png",
+      "guid": "84047c1f037b8614296fb17229ce4ca0"
+    },
+    {
+      "id": "bg-loading",
+      "path": "Assets/Resources/BG/Loding.png",
+      "guid": "d2e99973b7b66db4a87509fcd35f387d"
+    },
+    {
+      "id": "panel",
+      "path": "Assets/Fantasy UI/PNG/UI_Panel_Window_Blank.png",
+      "guid": "1430e41db55d0410eae9ca1f4cfd6554"
+    },
+    {
+      "id": "paper",
+      "path": "Assets/Fantasy UI/PNG/UI_Panel_Paper.png",
+      "guid": "0d6731c5aad4f4e03bea1c341e977c59"
+    },
+    {
+      "id": "paper-inset",
+      "path": "Assets/Fantasy UI/PNG/UI_Panel_Paper_Inset.png",
+      "guid": "b476dd01c25bd4bf7a1e8bd355d305ba"
+    },
+    {
+      "id": "button-grey",
+      "path": "Assets/Fantasy UI/PNG/UI_Button_Grey.png",
+      "guid": "d4c0d50c6039f4b89b1cd08c9d1b4c53"
+    },
+    {
+      "id": "button-gold",
+      "path": "Assets/Fantasy UI/PNG/UI_Button_Orange.png",
+      "guid": "3e5224fe88e144f68b198fdee4a58b2d"
+    },
+    {
+      "id": "bar-frame",
+      "path": "Assets/Fantasy UI/PNG/UI_Bar.png",
+      "guid": "36c9a8aa03d904d5f8dbb471d4d496d2"
+    },
+    {
+      "id": "bar-red",
+      "path": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Red.png",
+      "guid": "b1d03668ea891406e9cd884f85a0252f"
+    },
+    {
+      "id": "bar-blue",
+      "path": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Blue.png",
+      "guid": "b6a18a999eb8a4fb8814bdcf49b03a72"
+    },
+    {
+      "id": "bar-gold",
+      "path": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Orange.png",
+      "guid": "6179b742a99dd43e3967b14e2b9bef7c"
+    },
+    {
+      "id": "divider",
+      "path": "Assets/Resources/UI/ui-divider.png",
+      "guid": "827ebc2705bc0a748bf8c51324f94bab"
+    },
+    {
+      "id": "button-paper",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/paper button.png",
+      "guid": "9615de458a253744886f10966dc4058b"
+    },
+    {
+      "id": "glyph-map",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Map.png",
+      "guid": "b2ddc58e35f914ef4847b001edbfdab4"
+    },
+    {
+      "id": "glyph-energy",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Energy.png",
+      "guid": "2fd9b6411a9f54fa096bcb9b5082d81f"
+    },
+    {
+      "id": "glyph-heart",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Heart.png",
+      "guid": "08ba2b0c2636a4d70b6010def026ae13"
+    },
+    {
+      "id": "glyph-skull",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Skull.png",
+      "guid": "ffa80a5081ce64b3fa134439d447fdc6"
+    },
+    {
+      "id": "glyph-invboots",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvBoots.png",
+      "guid": "3b5b486ddcd4043e2b0a4e5f3a5120b5"
+    },
+    {
+      "id": "glyph-invring",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvRing.png",
+      "guid": "2917ca411b9e94173a81b626cde3ec17"
+    },
+    {
+      "id": "glyph-gem",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Gem.png",
+      "guid": "ae478d0ec651f45f6ac962b9647d2091"
+    },
+    {
+      "id": "glyph-star",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Star.png",
+      "guid": "0de15fbdba6a54c37bdb631584579502"
+    },
+    {
+      "id": "glyph-question",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Question.png",
+      "guid": "cd968fe28a1454ed98525b0d1156685f"
+    },
+    {
+      "id": "glyph-invpotion",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvPotion.png",
+      "guid": "141f9cd2b688541f7a6ec2e52cc5e736"
+    },
+    {
+      "id": "glyph-arrowleft",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_ArrowLeft.png",
+      "guid": "6811affa4da564f59a4463c5af589a8f"
+    },
+    {
+      "id": "glyph-arrowright",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_ArrowRight.png",
+      "guid": "88e01b918e6f74dc29d31ccf3e10e1b2"
+    },
+    {
+      "id": "glyph-home",
+      "path": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Home.png",
+      "guid": "3605b5e1c95b84697933a2529b57de77"
+    },
+    {
+      "id": "item-armor",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_armor_shade.png",
+      "guid": "555c3b578aa906646aac2da3546c8322"
+    },
+    {
+      "id": "item-armor-basic",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_armor_beginner_shade.png",
+      "guid": "97ced5c1f44a20844b47cb57a315189a"
+    },
+    {
+      "id": "item-boots",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_boots_shade.png",
+      "guid": "b42d4ae25b3a0514aa02c950db8992da"
+    },
+    {
+      "id": "item-boots-basic",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_boots_beginner_shade.png",
+      "guid": "eee1864475230ac4d9d572f726b42b8d"
+    },
+    {
+      "id": "item-ring",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_ring_shade.png",
+      "guid": "4d52494e84ab247419902a7e3cb12ee7"
+    },
+    {
+      "id": "item-greatsword",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_sword2_shade.png",
+      "guid": "0eb8c0dddce02e74b955d1892e38c36e"
+    },
+    {
+      "id": "item-potion-red",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_red_shade.png",
+      "guid": "6b1dc85328663af43a174955fe2bb08b"
+    },
+    {
+      "id": "item-potion-blue",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_blue_shade.png",
+      "guid": "cbf89e4105ebc5b459dc6f92272371f1"
+    },
+    {
+      "id": "item-potion-green",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_green_shade.png",
+      "guid": "b1159bd1bb5799e4d8a171d2289d6f9b"
+    },
+    {
+      "id": "item-gold",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_gold_shade.png",
+      "guid": "b7bd69f0b38883f41943b9e6d2cd11ab"
+    },
+    {
+      "id": "item-ore",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mine_shade.png",
+      "guid": "4618b0828f1b06e49939c7489ad2ea70"
+    },
+    {
+      "id": "item-gem",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_diamond.png",
+      "guid": "0611e57a58b95dc4d9078f34b163e6c3"
+    },
+    {
+      "id": "item-crystal",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/blue crystal.png",
+      "guid": "5490e0034721ff049933b583fc0f251d"
+    },
+    {
+      "id": "item-crystal-red",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/Red crystal.png",
+      "guid": "e88c91aafd42e8044a29d2e94ad3f29c"
+    },
+    {
+      "id": "item-letter",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_envelope_shade.png",
+      "guid": "f111dc548c7006c40a508241becc9ddb"
+    },
+    {
+      "id": "item-key",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_KEY_shade.png",
+      "guid": "d8ab87a2431f1ad4c9da3cba26efc9f4"
+    },
+    {
+      "id": "item-book",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Equipment/E_magic book.png",
+      "guid": "11c5dfffd184d1a4cb06ebc0750788eb"
+    },
+    {
+      "id": "item-book-blue",
+      "path": "Assets/Bamao/BamaoUIPack/Sprites/Equipment/E_magic book 2.png",
+      "guid": "c4f360a2a4ece9b4d9d9dcf2e7032e69"
+    },
+    {
+      "id": "sy-panel",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_01.png",
+      "guid": "e8445c0388d79eb4d839db85ee21f319"
+    },
+    {
+      "id": "sy-panel-plain",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_08.png",
+      "guid": "dc783e6e2c71677408e77d28fc2ac712"
+    },
+    {
+      "id": "sy-panel-detail",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_02.png",
+      "guid": "b71ee1d7918485a47b2be8561d9f6bb0"
+    },
+    {
+      "id": "sy-button",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_07_Frame.png",
+      "guid": "d6e0d4102df65134080f8d017d58e31d"
+    },
+    {
+      "id": "sy-button-subtle",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_05_Frame.png",
+      "guid": "9173fb8d3655dd04e8f922ecaed91f0f"
+    },
+    {
+      "id": "sy-button-bg",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_07_Background.png",
+      "guid": "b4f513368f672be468d0004252b6e02a"
+    },
+    {
+      "id": "sy-crest-shield",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Shield_01_Gold.png",
+      "guid": "6d59434feaa45e84694be036c8d0e5d0"
+    },
+    {
+      "id": "sy-crest-wings",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Wings_05_Gold.png",
+      "guid": "fc54cf88e5956a3418c1f17bc2913a81"
+    },
+    {
+      "id": "sy-crest-swords",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Greeble_SwordsCrossed_01.png",
+      "guid": "a62d3355f8a5f8440946e43de649f476"
+    },
+    {
+      "id": "sy-crest-dragon",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Greeble_Dragonhead_01_Gold.png",
+      "guid": "c22acfe9d6f14c243834e30c7ba66443"
+    },
+    {
+      "id": "sy-flourish",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Greeble_Curlicue_04.png",
+      "guid": "26ec0bf9cafc62940b6e3ef05af7b40b"
+    },
+    {
+      "id": "sy-divider",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Bar_07.png",
+      "guid": "de09c3367397c654685794df97e619b6"
+    },
+    {
+      "id": "sy-pattern",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/General/SPR_FantasyMenus_Background_Pattern_01.png",
+      "guid": "9654b4e40726e2a4a8cc9c68aec14c0d"
+    },
+    {
+      "id": "sy-medal",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Medal_01.png",
+      "guid": "6e5a8dd6c8d178f469d526e468a30e09"
+    },
+    {
+      "id": "sy-slot",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Frame_Box_Small_01.png",
+      "guid": "171d3165e83936e47a7a9e983ced7594"
+    },
+    {
+      "id": "sy-map-ring",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Ring_Large_02_Clean.png",
+      "guid": "deb80a3827ad1794ab0b59db0180d781"
+    },
+    {
+      "id": "sy-portrait-ring",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Ring_Large_01_Clean.png",
+      "guid": "c22958f78a144c745ba055da9c9bda34"
+    },
+    {
+      "id": "sy-map-player",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Map_Player_01_Clean.png",
+      "guid": "41fdfaaa916db3e4586fe2c50b8854f9"
+    },
+    {
+      "id": "sy-boss-frame",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Tracery_FrameDetail_07.png",
+      "guid": "1e3fa5a026c471d49848be7c9402cda7"
+    },
+    {
+      "id": "sy-gauge",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Bar_Diamond_02.png",
+      "guid": "b6444a1973c814a4096ba108fc45e8c9"
+    },
+    {
+      "id": "glyph-bag1",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Backpack_01_Clean.png",
+      "guid": "cc190becc02f8594286d94b507bafa81"
+    },
+    {
+      "id": "glyph-coin",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Currency_01_Clean.png",
+      "guid": "451ff7c11f569644da48f8434d725dc1"
+    },
+    {
+      "id": "glyph-hammer",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Crafting_01_Clean.png",
+      "guid": "a5ff00d95ee9d0e45935cd7503dac06e"
+    },
+    {
+      "id": "glyph-invchest",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Armor_01_Clean.png",
+      "guid": "9714e3567cdcc2e40b2f41f4637748ad"
+    },
+    {
+      "id": "glyph-archer",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Bows_01_Clean.png",
+      "guid": "ae2a881ff27d7c443acbbc4692748aad"
+    },
+    {
+      "id": "glyph-fire",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Elements/ICON_FantasyWarrior_Element_Fire_01_Clean.png",
+      "guid": "e9d9f46f0cf03be4782ad85a3f8a2be6"
+    },
+    {
+      "id": "glyph-attack",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Status/ICON_FantasyWarrior_Status_Attack_01_Clean.png",
+      "guid": "e15984e5de343944092ab5c2fa78fdf6"
+    },
+    {
+      "id": "glyph-book",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Book_01.png",
+      "guid": "b4fb47a3885599c4ca3e77810dfe1837"
+    },
+    {
+      "id": "glyph-award",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Medal_01.png",
+      "guid": "6e5a8dd6c8d178f469d526e468a30e09"
+    },
+    {
+      "id": "glyph-invhelmet",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Helmet_01.png",
+      "guid": "582b8eafda7d494469dac3c39e2ad780"
+    },
+    {
+      "id": "glyph-flag",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Flag_01.png",
+      "guid": "b5e47b5537b82c14e923e6a94d713907"
+    },
+    {
+      "id": "glyph-exit",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Exit_01.png",
+      "guid": "b2fba0e2a6f90d64785d5a4efd5b834e"
+    },
+    {
+      "id": "glyph-settings",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Settings_01.png",
+      "guid": "d0453998da706944fb957a21ddb812b5"
+    },
+    {
+      "id": "glyph-target",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_Settings/ICON_FantasyMenus_Settings_Controls_01_Clean.png",
+      "guid": "f63fa08ffec99254c925fc5cd8abf104"
+    },
+    {
+      "id": "world-town",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonOffset.png",
+      "guid": "41493660fe3ccd04ab37d39f21f76bc9"
+    },
+    {
+      "id": "world-dungeon",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonCentered.png",
+      "guid": "5200c0301b92b634fa4d24a26f094d95"
+    },
+    {
+      "id": "sy-destination-forest",
+      "path": "Assets/Synty/InterfaceFantasyMenus/Samples/Sprites/SPR_FantasyMenus_Example_Image_Continue_01.png",
+      "guid": "f5e4d72d35134d84e93a70308a9344df"
+    },
+    {
+      "id": "sy-destination-crystal",
+      "path": "Assets/Resources/BG/SettingBG.png",
+      "guid": "84047c1f037b8614296fb17229ce4ca0"
+    },
+    {
+      "id": "sy-destination-training",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonOffset.png",
+      "guid": "41493660fe3ccd04ab37d39f21f76bc9"
+    },
+    {
+      "id": "skill-swordsman-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_SwordAttack.png",
+      "guid": "0cd68d283806ee9409c19bdf7f799d26"
+    },
+    {
+      "id": "skill-swordsman-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HardEarthHit.png",
+      "guid": "e31ad33ec4a1a1a4cae4264f5fe50349"
+    },
+    {
+      "id": "skill-swordsman-3",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/Bonus/SkillUpdate/Standart/AttackDoubleSword_1.png",
+      "guid": "7289b6576e24cc849a3b96d1c519e069"
+    },
+    {
+      "id": "skill-sword-saint-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_SwordSplash.png",
+      "guid": "947a9865ac0fd5b4e809577727a166b9"
+    },
+    {
+      "id": "skill-sword-saint-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/Skillicons2/Skill_standart/swords_of_light.png",
+      "guid": "30fac723439551a4f991d4ff81b79681"
+    },
+    {
+      "id": "skill-berserker-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HardAxeAttack.png",
+      "guid": "f1462acb3b3f15546ae51c0bbbb76264"
+    },
+    {
+      "id": "skill-berserker-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_BattleCry.png",
+      "guid": "40b25827bb1d0dd4cb2c5718f59d51cb"
+    },
+    {
+      "id": "skill-mage-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FireBall.png",
+      "guid": "3d64d6ae1778aa144aec249df09621c3"
+    },
+    {
+      "id": "skill-mage-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FrostNova.png",
+      "guid": "197c1421886fc6248a38fde7a5b4885d"
+    },
+    {
+      "id": "skill-mage-3",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_LightningStrike.png",
+      "guid": "05377917b66ee8c41b96c2f8cb365a69"
+    },
+    {
+      "id": "skill-shaman-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_LightningUltimate.png",
+      "guid": "8d9b31295fb106041a15c6f85db4fc59"
+    },
+    {
+      "id": "skill-shaman-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_EarthShock.png",
+      "guid": "d226db74f17e0054aa3f7f451c6df7b5"
+    },
+    {
+      "id": "skill-ranger-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_StrongArrowShoot.png",
+      "guid": "0589a2deae4483042b8bbd546dccce8e"
+    },
+    {
+      "id": "skill-ranger-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/Bonus/Skill1_Standart/Big_fire_arrow.png",
+      "guid": "72cb0c66bee941547998aea126ec0d21"
+    },
+    {
+      "id": "skill-ranger-3",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_MeleeSplashCleave.png",
+      "guid": "75c70e4ddd031eb40b43557969245d90"
+    },
+    {
+      "id": "skill-sharpshooter-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FocusArrow.png",
+      "guid": "178a5e88d1ce6704dbeb8762c102d817"
+    },
+    {
+      "id": "skill-sharpshooter-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_RainOfArrows.png",
+      "guid": "3e35525049d8a1c409249edddfefeb1a"
+    },
+    {
+      "id": "skill-beastmaster-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/Bonus/SkillUpdate/Standart/SummonPet_1.png",
+      "guid": "c889f8b3d5510624a82bf0c162f77029"
+    },
+    {
+      "id": "skill-beastmaster-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HoofStomp.png",
+      "guid": "e6aa310c3c4c7fb488349b993e6fe411"
+    },
+    {
+      "id": "skill-assassin-1",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_ShadowDagger.png",
+      "guid": "83d30c5ed90248d4c9f6b237a6204d3e"
+    },
+    {
+      "id": "skill-assassin-2",
+      "path": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_WhirlwindDaggers.png",
+      "guid": "09be85fdcfb7eb0479fb5cd2993de628"
+    },
+    {
+      "id": "item-sword",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Sword_01.png",
+      "guid": "965129895f783004e928eb620f4d2820"
+    },
+    {
+      "id": "item-sword-rare",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Sword_02.png",
+      "guid": "3bf829056cb57434384863b58da1a63e"
+    },
+    {
+      "id": "item-shield",
+      "path": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Shield_01.png",
+      "guid": "739baa73cc8146d4c98ae5b4b6e79776"
+    },
+    {
+      "id": "gear-head",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/ArmorSet_Icons/Mail/Mail9_head.png",
+      "guid": "ec3f5a0b23f44804ab8149ab9f1c31cf"
+    },
+    {
+      "id": "gear-chest",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/ArmorSet_Icons/Mail/Mail9_Chest.png",
+      "guid": "c339a5498308efe4381557345e7e89a0"
+    },
+    {
+      "id": "gear-feet",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/ArmorSet_Icons/Mail/Mail9_Boots.png",
+      "guid": "5b98119836289dc4e927d8c414c40220"
+    },
+    {
+      "id": "gear-candidate",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/ArmorSet_Icons/Mail/Mail8_Chest.png",
+      "guid": "60f95b905afb4c54aa25c86d6c028758"
+    },
+    {
+      "id": "gear-ring",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/RingAndNeck_Icons/Ring_b_03.png",
+      "guid": "a2dee328ab5e00a419e117d7b2e61ebe"
+    },
+    {
+      "id": "gear-amulet",
+      "path": "Assets/6000FantasyIcons/ArmorIcons/RingAndNeck_Icons/Neck_b_03.png",
+      "guid": "934e25a692dc8a44cb27bed393b3398a"
+    },
+    {
+      "id": "gear-sword",
+      "path": "Assets/6000FantasyIcons/WeaponIcons/WeaponIconsVol1/Sword_01.png",
+      "guid": "702a80b18a8914145929cbcb1e7ffe5c"
+    },
+    {
+      "id": "gear-greatsword",
+      "path": "Assets/6000FantasyIcons/WeaponIcons/WeaponIconsVol1/Sword_05.png",
+      "guid": "5c0c0fc9be9f98a4c90a4366ac075e3f"
+    }
+  ]
+}

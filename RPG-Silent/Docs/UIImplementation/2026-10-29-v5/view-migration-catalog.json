@@ -1,0 +1,921 @@
+[
+  {
+    "path": "Assets/Scripts/UI/CharacterCreationView.cs",
+    "methods": [
+      {
+        "line": 120,
+        "method": "void RefreshAppearance()"
+      },
+      {
+        "line": 140,
+        "method": "public void ShowFailure(string message) { RefreshAppearance()"
+      },
+      {
+        "line": 147,
+        "method": "void Fit()"
+      }
+    ],
+    "lines": 154,
+    "widget_calls": 5
+  },
+  {
+    "path": "Assets/Scripts/UI/CharacterModelPreview.cs",
+    "methods": [
+      {
+        "line": 30,
+        "method": "public void Show(PlayerClassDefinition definition, PlayerGender gender)"
+      },
+      {
+        "line": 153,
+        "method": "void AddLight(string name, Vector3 position, Color color, float intensity)"
+      }
+    ],
+    "lines": 206,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/CharacterSelectionView.cs",
+    "methods": [
+      {
+        "line": 28,
+        "method": "public void Initialize(PlayerProgressService service, TMP_FontAsset font, Action<string> continueCharacter, Action create, Action back)"
+      },
+      {
+        "line": 57,
+        "method": "public void Refresh()"
+      },
+      {
+        "line": 76,
+        "method": "void RefreshCards()"
+      },
+      {
+        "line": 91,
+        "method": "void RefreshPreview()"
+      },
+      {
+        "line": 112,
+        "method": "public void ShowFailure(string message) { Refresh()"
+      },
+      {
+        "line": 114,
+        "method": "void Fit() { if (panel == null) return; var size = ((RectTransform)transform).rect.size; panel.localScale = Vector3.one * Mathf.Min(size.x / 1600, size.y / 900)"
+      }
+    ],
+    "lines": 115,
+    "widget_calls": 19
+  },
+  {
+    "path": "Assets/Scripts/UI/DungeonUI.cs",
+    "methods": [
+      {
+        "line": 31,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 85,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 93,
+        "method": "public override void OnClose() => Unbind()"
+      },
+      {
+        "line": 103,
+        "method": "void CloseAbandonPrompt()"
+      },
+      {
+        "line": 115,
+        "method": "private void Refresh()"
+      }
+    ],
+    "lines": 190,
+    "widget_calls": 20
+  },
+  {
+    "path": "Assets/Scripts/UI/DungeonUI.LongChallenges.cs",
+    "methods": [
+      {
+        "line": 11,
+        "method": "void BuildLongChallengeUI()"
+      },
+      {
+        "line": 39,
+        "method": "void CloseLongEndPrompt()"
+      },
+      {
+        "line": 45,
+        "method": "bool RefreshLongChallengeUI()"
+      }
+    ],
+    "lines": 75,
+    "widget_calls": 18
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.Consumables.cs",
+    "methods": [
+      {
+        "line": 12,
+        "method": "void RefreshConsumableDetails(ItemDefinition item, bool owned)"
+      },
+      {
+        "line": 34,
+        "method": "void RefreshConsumableCooldown(bool force = false)"
+      }
+    ],
+    "lines": 42,
+    "widget_calls": 1
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.cs",
+    "methods": [
+      {
+        "line": 29,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 99,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 113,
+        "method": "public override void OnClose()"
+      },
+      {
+        "line": 122,
+        "method": "void Fit()"
+      },
+      {
+        "line": 166,
+        "method": "void Refresh()"
+      },
+      {
+        "line": 209,
+        "method": "void RefreshPreview()"
+      },
+      {
+        "line": 232,
+        "method": "void RefreshDetails(InventoryData data)"
+      },
+      {
+        "line": 305,
+        "method": "void Show(string message) { status.text = message; Refresh()"
+      }
+    ],
+    "lines": 306,
+    "widget_calls": 41
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.Discard.cs",
+    "methods": [
+      {
+        "line": 14,
+        "method": "void BuildDiscard()"
+      },
+      {
+        "line": 45,
+        "method": "void OpenDiscard()"
+      },
+      {
+        "line": 67,
+        "method": "void RefreshDiscardQuantity()"
+      },
+      {
+        "line": 77,
+        "method": "void CloseDiscard()"
+      },
+      {
+        "line": 91,
+        "method": "void RefreshDiscard()"
+      }
+    ],
+    "lines": 101,
+    "widget_calls": 17
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.Effects.cs",
+    "methods": [
+      {
+        "line": 14,
+        "method": "void BuildEquipmentEffectDetails()"
+      },
+      {
+        "line": 27,
+        "method": "void RefreshEquipmentEffectDetails(ItemDefinition item)"
+      },
+      {
+        "line": 35,
+        "method": "void OpenEquipmentEffectDetails()"
+      },
+      {
+        "line": 41,
+        "method": "void CloseEquipmentEffectDetails()"
+      }
+    ],
+    "lines": 58,
+    "widget_calls": 10
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.Management.cs",
+    "methods": [
+      {
+        "line": 20,
+        "method": "void BuildManagement()"
+      },
+      {
+        "line": 90,
+        "method": "void RefreshManagement()"
+      },
+      {
+        "line": 145,
+        "method": "void RefreshPresets()"
+      }
+    ],
+    "lines": 178,
+    "widget_calls": 19
+  },
+  {
+    "path": "Assets/Scripts/UI/InventoryUI.Organization.cs",
+    "methods": [
+      {
+        "line": 29,
+        "method": "void BuildOrganization()"
+      },
+      {
+        "line": 130,
+        "method": "void RefreshOrganization()"
+      },
+      {
+        "line": 155,
+        "method": "void OpenBulkReview()"
+      },
+      {
+        "line": 162,
+        "method": "void CloseBulkReview()"
+      },
+      {
+        "line": 178,
+        "method": "void RefreshBulkReview()"
+      }
+    ],
+    "lines": 214,
+    "widget_calls": 27
+  },
+  {
+    "path": "Assets/Scripts/UI/LoadingUI.cs",
+    "methods": [
+      {
+        "line": 38,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 46,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 146,
+        "method": "public override void OnClose()"
+      }
+    ],
+    "lines": 170,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Adventure.cs",
+    "methods": [
+      {
+        "line": 15,
+        "method": "void BuildAdventureHud()"
+      },
+      {
+        "line": 60,
+        "method": "void RefreshAdventureHud()"
+      },
+      {
+        "line": 101,
+        "method": "void AddMapMarker(ref int index, Vector3 position, string symbol, Color color)"
+      }
+    ],
+    "lines": 110,
+    "widget_calls": 17
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Combat.cs",
+    "methods": [
+      {
+        "line": 21,
+        "method": "void BuildCombatHud()"
+      },
+      {
+        "line": 44,
+        "method": "void RefreshCombatHud()"
+      }
+    ],
+    "lines": 67,
+    "widget_calls": 8
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.cs",
+    "methods": [
+      {
+        "line": 62,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 162,
+        "method": "private void FitHudLayout()"
+      },
+      {
+        "line": 190,
+        "method": "public override void OnClose()"
+      },
+      {
+        "line": 257,
+        "method": "private void RefreshSkillSlots()"
+      },
+      {
+        "line": 299,
+        "method": "private void RefreshSaveStatus()"
+      }
+    ],
+    "lines": 338,
+    "widget_calls": 2
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.EquipmentEffects.cs",
+    "methods": [
+      {
+        "line": 10,
+        "method": "void BuildEquipmentEffectsHud()"
+      },
+      {
+        "line": 18,
+        "method": "void RefreshEquipmentEffectsHud()"
+      }
+    ],
+    "lines": 31,
+    "widget_calls": 3
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Journey.cs",
+    "methods": [
+      {
+        "line": 13,
+        "method": "void BuildJourneyHud()"
+      },
+      {
+        "line": 37,
+        "method": "void RefreshJourneyHud()"
+      },
+      {
+        "line": 64,
+        "method": "void AddTrackedMapMarker(ref int index)"
+      }
+    ],
+    "lines": 75,
+    "widget_calls": 5
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Loot.cs",
+    "methods": [
+      {
+        "line": 18,
+        "method": "void BuildLootHud()"
+      },
+      {
+        "line": 46,
+        "method": "void RefreshLootHud()"
+      }
+    ],
+    "lines": 109,
+    "widget_calls": 19
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Quests.cs",
+    "methods": [
+      {
+        "line": 11,
+        "method": "void BuildQuestHud()"
+      },
+      {
+        "line": 26,
+        "method": "void RefreshQuestHud()"
+      }
+    ],
+    "lines": 34,
+    "widget_calls": 3
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Targeting.cs",
+    "methods": [
+      {
+        "line": 17,
+        "method": "void BuildTargetHud()"
+      }
+    ],
+    "lines": 134,
+    "widget_calls": 11
+  },
+  {
+    "path": "Assets/Scripts/UI/MainUI.Tutorial.cs",
+    "methods": [
+      {
+        "line": 48,
+        "method": "void BuildTutorialHud()"
+      },
+      {
+        "line": 88,
+        "method": "void OpenTutorialReview()"
+      },
+      {
+        "line": 96,
+        "method": "void CloseTutorialReview() { reviewVisible = false; if (onboardingReview != null) onboardingReview.gameObject.SetActive(false)"
+      },
+      {
+        "line": 113,
+        "method": "void RefreshTutorialHud()"
+      },
+      {
+        "line": 137,
+        "method": "void RefreshTutorialReview()"
+      }
+    ],
+    "lines": 154,
+    "widget_calls": 27
+  },
+  {
+    "path": "Assets/Scripts/UI/PauseUI.cs",
+    "methods": [
+      {
+        "line": 26,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 35,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 44,
+        "method": "public override void OnClose()"
+      },
+      {
+        "line": 51,
+        "method": "private void RefreshSaveStatus() { if (SaveStatusText != null)"
+      }
+    ],
+    "lines": 90,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/PortalUI.cs",
+    "methods": [
+      {
+        "line": 75,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 119,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 127,
+        "method": "public override void OnClose()"
+      },
+      {
+        "line": 135,
+        "method": "private void BuildDungeonList(int portalId)"
+      },
+      {
+        "line": 248,
+        "method": "private void ShowEmptyDetail()"
+      },
+      {
+        "line": 348,
+        "method": "private void ClosePortalUI()"
+      }
+    ],
+    "lines": 409,
+    "widget_calls": 3
+  },
+  {
+    "path": "Assets/Scripts/UI/ProgressionUIWidgets.cs",
+    "methods": [],
+    "lines": 63,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/QuestJournalUI.Chapters.cs",
+    "methods": [
+      {
+        "line": 13,
+        "method": "void BuildChapterUI()"
+      },
+      {
+        "line": 30,
+        "method": "void CloseAbandonQuest() { abandonQuestShade?.gameObject.SetActive(false)"
+      },
+      {
+        "line": 36,
+        "method": "void RefreshChapterRows()"
+      }
+    ],
+    "lines": 50,
+    "widget_calls": 10
+  },
+  {
+    "path": "Assets/Scripts/UI/QuestJournalUI.Collections.cs",
+    "methods": [
+      {
+        "line": 13,
+        "method": "void BuildCollectionTabs()"
+      },
+      {
+        "line": 23,
+        "method": "void RefreshCollectionTabs()"
+      },
+      {
+        "line": 37,
+        "method": "void RefreshCollectionRows()"
+      }
+    ],
+    "lines": 65,
+    "widget_calls": 9
+  },
+  {
+    "path": "Assets/Scripts/UI/QuestJournalUI.cs",
+    "methods": [
+      {
+        "line": 20,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 45,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 51,
+        "method": "public override void OnClose() { CloseAbandonQuest(); progress.Changed -= Refresh; var previous = interaction; interaction = null; previous?.OnUiClosed()"
+      },
+      {
+        "line": 59,
+        "method": "void Refresh()"
+      }
+    ],
+    "lines": 96,
+    "widget_calls": 24
+  },
+  {
+    "path": "Assets/Scripts/UI/SettingsUI.cs",
+    "methods": [
+      {
+        "line": 30,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 57,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 69,
+        "method": "private void FitLayout()"
+      },
+      {
+        "line": 86,
+        "method": "public void ShowNotice(string text)"
+      },
+      {
+        "line": 99,
+        "method": "private void InitPages()"
+      },
+      {
+        "line": 136,
+        "method": "private void AddPageButtonListener(Button button)"
+      },
+      {
+        "line": 142,
+        "method": "private void ShowPage(Button activeButton)"
+      }
+    ],
+    "lines": 154,
+    "widget_calls": 4
+  },
+  {
+    "path": "Assets/Scripts/UI/SkillSlotUI.cs",
+    "methods": [
+      {
+        "line": 28,
+        "method": "private void Awake()"
+      }
+    ],
+    "lines": 132,
+    "widget_calls": 1
+  },
+  {
+    "path": "Assets/Scripts/UI/StartUI.cs",
+    "methods": [
+      {
+        "line": 26,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 80,
+        "method": "public void OpenCharacters()"
+      },
+      {
+        "line": 104,
+        "method": "private void RefreshSaveState()"
+      },
+      {
+        "line": 115,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 128,
+        "method": "public override void OnClose()"
+      }
+    ],
+    "lines": 145,
+    "widget_calls": 2
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.Commerce.cs",
+    "methods": [
+      {
+        "line": 32,
+        "method": "void BuildCommerce()"
+      },
+      {
+        "line": 57,
+        "method": "void OpenPurchase(string id, int count)"
+      },
+      {
+        "line": 63,
+        "method": "void OpenBuyback(BuybackRecordData record)"
+      },
+      {
+        "line": 69,
+        "method": "void CloseCommerce()"
+      },
+      {
+        "line": 74,
+        "method": "void RefreshCommerce()"
+      },
+      {
+        "line": 87,
+        "method": "void RefreshCommercePreview()"
+      },
+      {
+        "line": 116,
+        "method": "float AddBuybackRows(float y)"
+      }
+    ],
+    "lines": 132,
+    "widget_calls": 22
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.cs",
+    "methods": [
+      {
+        "line": 22,
+        "method": "protected override void OnInit()"
+      },
+      {
+        "line": 50,
+        "method": "public override void OnOpen(params object[] args)"
+      },
+      {
+        "line": 68,
+        "method": "public override void OnClose() { progress.Changed -= Refresh; CloseWarehouse(); CloseCommerce(); CloseSpecialization(); var previous = interaction; interaction = null; previous?.Close()"
+      },
+      {
+        "line": 76,
+        "method": "void Refresh()"
+      },
+      {
+        "line": 162,
+        "method": "float AddArmorRows(float y)"
+      },
+      {
+        "line": 204,
+        "method": "float AddGemRows(float y)"
+      }
+    ],
+    "lines": 254,
+    "widget_calls": 46
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.Quests.cs",
+    "methods": [
+      {
+        "line": 12,
+        "method": "void BuildQuestTabs()"
+      },
+      {
+        "line": 32,
+        "method": "void RefreshQuestTabs()"
+      },
+      {
+        "line": 46,
+        "method": "float AddQuestRows(float y)"
+      },
+      {
+        "line": 55,
+        "method": "TMP_Text AddText(string name, string text, float width, int font, float minimum)"
+      }
+    ],
+    "lines": 82,
+    "widget_calls": 14
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.Specialization.cs",
+    "methods": [
+      {
+        "line": 18,
+        "method": "void BuildSpecialization()"
+      },
+      {
+        "line": 35,
+        "method": "void CloseSpecialization()"
+      },
+      {
+        "line": 40,
+        "method": "void RefreshSpecialization()"
+      },
+      {
+        "line": 53,
+        "method": "float AddSpecializationRows(float y)"
+      },
+      {
+        "line": 81,
+        "method": "void OpenSpecialization(SpecializationDirection direction, bool reset)"
+      }
+    ],
+    "lines": 114,
+    "widget_calls": 18
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.Supplies.cs",
+    "methods": [
+      {
+        "line": 9,
+        "method": "float AddSupplyRows(float y)"
+      }
+    ],
+    "lines": 31,
+    "widget_calls": 4
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.Warehouse.cs",
+    "methods": [
+      {
+        "line": 24,
+        "method": "void BuildWarehouse()"
+      },
+      {
+        "line": 97,
+        "method": "void CloseWarehouse()"
+      },
+      {
+        "line": 120,
+        "method": "void RefreshWarehouseEntry()"
+      },
+      {
+        "line": 126,
+        "method": "void RefreshWarehouse()"
+      },
+      {
+        "line": 161,
+        "method": "void OpenWarehouseReview()"
+      },
+      {
+        "line": 167,
+        "method": "void RefreshWarehouseReview()"
+      }
+    ],
+    "lines": 184,
+    "widget_calls": 41
+  },
+  {
+    "path": "Assets/Scripts/UI/TownNpcUI.World.cs",
+    "methods": [
+      {
+        "line": 16,
+        "method": "void BuildWorldTabs()"
+      },
+      {
+        "line": 46,
+        "method": "void RefreshWorldTabs()"
+      },
+      {
+        "line": 58,
+        "method": "float AddStoryRows(float y)"
+      },
+      {
+        "line": 102,
+        "method": "float AddCraftingRows(float y)"
+      }
+    ],
+    "lines": 140,
+    "widget_calls": 35
+  },
+  {
+    "path": "Assets/Scripts/UI/UiAudioFeedback.cs",
+    "methods": [],
+    "lines": 19,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/WeaponEquipmentUI.cs",
+    "methods": [
+      {
+        "line": 16,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 75,
+        "method": "private void ShowBlocked()"
+      },
+      {
+        "line": 77,
+        "method": "private void Refresh()"
+      }
+    ],
+    "lines": 103,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/SettingPage/ControllerPage.cs",
+    "methods": [
+      {
+        "line": 85,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 113,
+        "method": "private void RefreshUI()"
+      },
+      {
+        "line": 264,
+        "method": "private void RefreshAllKeyLabels()"
+      },
+      {
+        "line": 284,
+        "method": "private void RefreshKeyLabel(Button button, InputAction action, int bindingIndex)"
+      }
+    ],
+    "lines": 336,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/SettingPage/GamePage.cs",
+    "methods": [
+      {
+        "line": 57,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 88,
+        "method": "private void RefreshUI()"
+      },
+      {
+        "line": 108,
+        "method": "private void BuildComfortOptions()"
+      },
+      {
+        "line": 162,
+        "method": "private void SetupShowHudToggle()"
+      }
+    ],
+    "lines": 250,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/SettingPage/ScreenPage.cs",
+    "methods": [
+      {
+        "line": 53,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 73,
+        "method": "private void RefreshUI()"
+      }
+    ],
+    "lines": 180,
+    "widget_calls": 0
+  },
+  {
+    "path": "Assets/Scripts/UI/SettingPage/SoundPage.cs",
+    "methods": [
+      {
+        "line": 47,
+        "method": "private void Awake()"
+      },
+      {
+        "line": 67,
+        "method": "private void RefreshUI()"
+      }
+    ],
+    "lines": 162,
+    "widget_calls": 0
+  }
+]

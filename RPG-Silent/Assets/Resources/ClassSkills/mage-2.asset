@@ -20,7 +20,7 @@ MonoBehaviour:
   MaxRank: 5
   LevelsPerRank: 2
   DamagePerRank: 0.2
-  Icon: {fileID: 21300000, guid: 0d83a6988e9672344a37009a1cb16237, type: 3}
+  Icon: {fileID: 21300000, guid: 197c1421886fc6248a38fde7a5b4885d, type: 3}
   Animation: {fileID: 11400000, guid: 24f7088c1a5fa95419f506fa2abd2274, type: 2}
   CastTime: 0
   CooldownTime: 6

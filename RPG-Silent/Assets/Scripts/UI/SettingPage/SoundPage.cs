@@ -18,6 +18,7 @@ public class SoundPage : MonoBehaviour
     {
         _soundService = soundService;
         _injected     = true;
+        if (isActiveAndEnabled) { RefreshUI(); _savedSnapshot = CloneSettings(_soundService.CurrentSettings); }
     }
 
     [Header("总音量")]
@@ -155,8 +156,7 @@ public class SoundPage : MonoBehaviour
     private void OnResetClicked()
     {
         if (_soundService == null) return;
-        _soundService.Reset();
+        _soundService.Apply(_soundService.Defaults);
         RefreshUI();
-        _savedSnapshot = CloneSettings(_soundService.CurrentSettings);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using RPGSilent.Domain;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using VContainer;
@@ -16,6 +17,7 @@ public class UIManager : MonoBehaviour, IUIService
 {
     // 全局容器（GameLifetimeScope），由 GameLifetimeScope.RegisterBuildCallback 显式传入
     private IObjectResolver _container;
+    private GameAudioService audio;
 
     // 场景级容器（SceneLifetimeScope），游戏场景加载后由 SceneLifetimeScope 传入
     // 注入 MainUI 等场景级 UI 时优先使用，因为它拥有 IPlayerStatsReader 等场景注册
@@ -39,6 +41,7 @@ public class UIManager : MonoBehaviour, IUIService
     public void SetGlobalResolver(IObjectResolver resolver)
     {
         _container = resolver;
+        resolver.TryResolve<GameAudioService>(out audio);
     }
 
     /// <summary>游戏场景加载后由 SceneLifetimeScope 调用，切换到场景级容器。</summary>
@@ -110,9 +113,22 @@ public class UIManager : MonoBehaviour, IUIService
         }
 
         if (!activeUIs.TryGetValue(uiKey, out GameObject uiObj)) return;
-
-        uiObj.GetComponent<UIBase>()?.OnClose();
         activeUIs.Remove(uiKey);
+
+        // Scene teardown can destroy the instance before its scoped service is
+        // disposed. Remove ownership before callbacks, including reentrant Close.
+        if (uiObj == null)
+        {
+            cachedUIs.Remove(uiKey);
+            initializedUIs.Remove(uiKey);
+            if (loadedHandles.TryGetValue(uiKey, out var staleHandle))
+            {
+                loadedHandles.Remove(uiKey);
+                if (staleHandle.IsValid()) Addressables.Release(staleHandle);
+            }
+            return;
+        }
+        uiObj.GetComponent<UIBase>()?.OnClose();
 
         if (cachedUIs.ContainsKey(uiKey))
         {
@@ -272,7 +288,10 @@ public class UIManager : MonoBehaviour, IUIService
     {
         if (initializedUIs.Contains(uiKey)) return;
 
-        uiObj.GetComponent<UIBase>()?.Init(uiKey);
+        var owner = uiObj.GetComponent<UIBase>();
+        if (owner != null) { owner.Audio = audio; owner.Init(uiKey); }
+        foreach (var button in uiObj.GetComponentsInChildren<Button>(true))
+            if (button.GetComponent<UiAudioFeedback>() == null) button.gameObject.AddComponent<UiAudioFeedback>();
         initializedUIs.Add(uiKey);
     }
 }
