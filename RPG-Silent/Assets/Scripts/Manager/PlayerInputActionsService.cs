@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using RPGSilent.Domain;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,7 +19,7 @@ using VContainer;
 ///   Move[4] = Right → 右移 (D)
 ///   Sprint[0] / Roll[0] / Jump[0] / Walk[0] / Attack[0] / StanceToggle[0]
 /// </summary>
-public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
+public partial class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
 {
     private const string SaveKey = "KeyBindingsJson";
 
@@ -43,6 +44,11 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     public event Action InteractTriggered;
     public event Action InventoryTriggered;
     public event Action JournalTriggered;
+    public event Action LootListTriggered;
+    public event Action LootPickupTriggered;
+    public event Action<int> LootCycleTriggered;
+    public InputAction LootList { get; private set; }
+    InputAction lootPickup, nextLoot, previousLoot;
     public event Action<int> ConsumableTriggered;
     public InputAction[] ConsumableSlots { get; private set; }
     public string GetConsumableSlotDisplay(int slotIndex) => ConsumableSlots != null && slotIndex >= 0 && slotIndex < ConsumableSlots.Length ? GetDisplayString(ConsumableSlots[slotIndex], 0) : "";
@@ -160,6 +166,11 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     {
         _currentRebind?.Cancel();
         _currentRebind?.Dispose();
+        LastRebindMessage = string.Empty;
+        if (action == Roll) action = Sprint;
+        if (action == null || action.actionMap != _map || bindingIndex < 0 || bindingIndex >= action.bindings.Count || action.bindings[bindingIndex].isComposite)
+        { LastRebindMessage = "该动作暂不能改键。"; onCancel?.Invoke(); return; }
+        bool accepted = false;
 
         suppressAttackRelease = true;
         if (action == Attack) AttackReleased?.Invoke(false);
@@ -173,16 +184,32 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
             .WithControlsExcluding("<Mouse>/scroll")
             .WithCancelingThrough("<Keyboard>/escape")
             .OnMatchWaitForAnother(0.1f)
+            .OnApplyBinding((op, path) =>
+            {
+                string conflict = FindBindingConflict(action, bindingIndex, op.selectedControl);
+                if (conflict != null)
+                { LastRebindMessage = "按键冲突：已用于「" + conflict + "」，原绑定保留。"; return; }
+                action.ApplyBindingOverride(bindingIndex, path);
+                accepted = true;
+            })
             .OnComplete(op =>
             {
                 op.Dispose();
                 _currentRebind = null;
+                if (!accepted)
+                {
+                    if (GameplayInputEnabled) action.Enable();
+                    onCancel?.Invoke();
+                    return;
+                }
 
                 // Sprint 改键后自动将同一路径镜像到 Roll
                 if (action == Sprint)
                     MirrorSprintPathToRoll();
+                SyncLootPickupBinding();
 
                 if (GameplayInputEnabled) action.Enable();
+                LastRebindMessage = "按键已更新，点击「应用」后保存。";
                 string display = GetDisplayString(action, bindingIndex);
                 onComplete?.Invoke(display);
             })
@@ -190,6 +217,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
             {
                 op.Dispose();
                 _currentRebind = null;
+                if (string.IsNullOrEmpty(LastRebindMessage)) LastRebindMessage = "已取消改键，原绑定保留。";
                 if (GameplayInputEnabled) action.Enable();
                 onCancel?.Invoke();
             })
@@ -235,6 +263,7 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
 
         // Roll 的路径始终镜像 Sprint
         MirrorSprintPathToRoll();
+        SyncLootPickupBinding();
 
         Debug.Log("[PlayerInputActions] 已恢复默认按键绑定。");
     }
@@ -252,13 +281,22 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         else         _gameplayInputBlockers.Remove(owner);
         ApplyGameplayInputState();
     }
+    public bool IsGameplayBlockedExcept(object owner) => !_gameplayInputRequested ||
+        _gameplayInputBlockers.Any(x => !ReferenceEquals(x, owner));
 
     private void ApplyGameplayInputState()
     {
         if (_map == null) return;
+        SyncLootPickupBinding();
 
         if (GameplayInputEnabled) _map.Enable();
         else                      _map.Disable();
+    }
+    void SyncLootPickupBinding()
+    {
+        if (lootPickup == null || Interact == null || Interact.bindings.Count == 0) return;
+        string path = Interact.bindings[0].effectivePath;
+        if (lootPickup.bindings[0].effectivePath != path) lootPickup.ApplyBindingOverride(0, path);
     }
 
     // ── 私有：构建 InputActionMap ─────────────────────────────────────────────────
@@ -351,6 +389,14 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         inventoryAction.performed += OnInventoryPerformed;
         journalAction = _uiMap.AddAction("Journal", InputActionType.Button, "<Keyboard>/j");
         journalAction.performed += OnJournalPerformed;
+        LootList = _uiMap.AddAction("NearbyLoot", InputActionType.Button, "<Keyboard>/l");
+        LootList.performed += OnLootList;
+        lootPickup = _uiMap.AddAction("LootPickup", InputActionType.Button);
+        lootPickup.AddBinding("<Keyboard>/e"); lootPickup.AddBinding("<Keyboard>/enter");
+        lootPickup.performed += OnLootPickup;
+        nextLoot = _uiMap.AddAction("NextLoot", InputActionType.Button, "<Keyboard>/downArrow");
+        previousLoot = _uiMap.AddAction("PreviousLoot", InputActionType.Button, "<Keyboard>/upArrow");
+        nextLoot.performed += OnNextLoot; previousLoot.performed += OnPreviousLoot;
     }
 
     // ── 私有：内部事件桥接 ────────────────────────────────────────────────────────
@@ -414,6 +460,10 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
         if (Pause != null) Pause.performed -= OnPausePerformed;
         if (inventoryAction != null) inventoryAction.performed -= OnInventoryPerformed;
         if (journalAction != null) journalAction.performed -= OnJournalPerformed;
+        if (LootList != null) LootList.performed -= OnLootList;
+        if (lootPickup != null) lootPickup.performed -= OnLootPickup;
+        if (nextLoot != null) nextLoot.performed -= OnNextLoot;
+        if (previousLoot != null) previousLoot.performed -= OnPreviousLoot;
     }
 
     private void RaiseGameplayAction(Action action)
@@ -427,17 +477,29 @@ public class PlayerInputActionsService : MonoBehaviour, IPlayerInputActions
     private void OnJumpPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(JumpTriggered);
     private void OnWalkPerformed(InputAction.CallbackContext _)        => RaiseGameplayAction(WalkStarted);
     private void OnWalkCanceled(InputAction.CallbackContext _)         => WalkEnded?.Invoke();
-    private void OnAttackPerformed(InputAction.CallbackContext _)      => RaiseGameplayAction(AttackTriggered);
-    private void OnAttackCanceled(InputAction.CallbackContext _) => AttackReleased?.Invoke(GameplayInputEnabled && !suppressAttackRelease);
+    private void OnAttackPerformed(InputAction.CallbackContext context)
+    {
+        attackStartedOnUi = IsPointerActionOverUi(context);
+        if (!attackStartedOnUi) RaiseGameplayAction(AttackTriggered);
+    }
+    private void OnAttackCanceled(InputAction.CallbackContext _)
+    {
+        if (attackStartedOnUi) { attackStartedOnUi = false; return; }
+        AttackReleased?.Invoke(GameplayInputEnabled && !suppressAttackRelease);
+    }
     private void OnStanceTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(StanceToggleTriggered);
     private void OnCursorTogglePerformed(InputAction.CallbackContext _) => RaiseGameplayAction(CursorToggleTriggered);
     private void OnPausePerformed(InputAction.CallbackContext _)       => PauseTriggered?.Invoke();
     private void OnInventoryPerformed(InputAction.CallbackContext _) => InventoryTriggered?.Invoke();
     private void OnJournalPerformed(InputAction.CallbackContext _) => JournalTriggered?.Invoke();
     private void OnInteractPerformed(InputAction.CallbackContext _) => RaiseGameplayAction(InteractTriggered);
+    void OnLootList(InputAction.CallbackContext _) => LootListTriggered?.Invoke();
+    void OnLootPickup(InputAction.CallbackContext _) => LootPickupTriggered?.Invoke();
+    void OnNextLoot(InputAction.CallbackContext _) => LootCycleTriggered?.Invoke(1);
+    void OnPreviousLoot(InputAction.CallbackContext _) => LootCycleTriggered?.Invoke(-1);
 
     void OnLockTarget(InputAction.CallbackContext _) => RaiseGameplayAction(LockTargetTriggered);
-    void OnGuardStarted(InputAction.CallbackContext _) => RaiseGameplayAction(GuardStarted);
+    void OnGuardStarted(InputAction.CallbackContext context) { if (!IsPointerActionOverUi(context)) RaiseGameplayAction(GuardStarted); }
     void OnGuardEnded(InputAction.CallbackContext _) => GuardEnded?.Invoke();
     void OnNextTarget(InputAction.CallbackContext _) { if (GameplayInputEnabled) TargetCycleTriggered?.Invoke(1); }
     void OnPreviousTarget(InputAction.CallbackContext _) { if (GameplayInputEnabled) TargetCycleTriggered?.Invoke(-1); }

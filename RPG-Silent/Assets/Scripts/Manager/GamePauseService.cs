@@ -44,6 +44,7 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     public void Toggle()
     {
+        if (_dungeonRun.IsLongChallenge && _dungeonRun.LongChallenge != null && _dungeonRun.LongChallenge.Phase != LongChallengePhase.Fighting) return;
         if (_dungeonRun.HasResult) return;
         if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_inPauseMode) Resume();
@@ -111,14 +112,58 @@ public class GamePauseService : IGamePauseService, IDisposable
 
     private void OnPauseTriggered()
     {
-        if (_uiService.IsUIOpen(PlayerQuestInteraction.UiKey)) { _uiService.CloseUI(PlayerQuestInteraction.UiKey); return; }
-        if (_uiService.IsUIOpen(PlayerInventoryInteraction.UiKey)) { _uiService.CloseUI(PlayerInventoryInteraction.UiKey); return; }
-        if (_uiService.IsUIOpen("UI/TownNpcUI")) { _uiService.CloseUI("UI/TownNpcUI"); return; }
+        foreach (var loot in PlayerLootInteraction.Active)
+            if (loot.IsListOpen) { loot.CloseList(); return; }
+        if (_dungeonRun.LeaveConfirmationPending) { _dungeonRun.CancelLeave(); return; }
+        var dungeonHud = UnityEngine.Object.FindFirstObjectByType<DungeonUI>();
+        if (dungeonHud != null && dungeonHud.HandleBack()) return;
+        var questInteraction = UnityEngine.Object.FindFirstObjectByType<PlayerQuestInteraction>();
+        if (_uiService.IsUIOpen(PlayerQuestInteraction.UiKey) || questInteraction != null && questInteraction.IsOpen)
+        {
+            var journal = UnityEngine.Object.FindFirstObjectByType<QuestJournalUI>();
+            if (journal == null || !journal.HandleBack())
+            {
+                questInteraction?.Close();
+                _uiService.CloseUI(PlayerQuestInteraction.UiKey);
+            }
+            return;
+        }
+        var inventoryInteraction = UnityEngine.Object.FindFirstObjectByType<PlayerInventoryInteraction>();
+        if (_uiService.IsUIOpen(PlayerInventoryInteraction.UiKey) || inventoryInteraction != null && inventoryInteraction.IsOpen)
+        {
+            var inventory = UnityEngine.Object.FindFirstObjectByType<InventoryUI>();
+            if (inventory == null || !inventory.HandleBack())
+            {
+                inventoryInteraction?.Close();
+                _uiService.CloseUI(PlayerInventoryInteraction.UiKey);
+            }
+            return;
+        }
+        var npcInteraction = UnityEngine.Object.FindFirstObjectByType<PlayerNpcInteraction>();
+        if (_uiService.IsUIOpen("UI/TownNpcUI") || npcInteraction != null && npcInteraction.Conversation != null)
+        {
+            var npcUi = UnityEngine.Object.FindFirstObjectByType<TownNpcUI>();
+            if (npcUi == null || !npcUi.HandleServiceBack())
+            {
+                npcInteraction?.Close();
+                _uiService.CloseUI("UI/TownNpcUI");
+            }
+            return;
+        }
+        var hud = UnityEngine.Object.FindFirstObjectByType<MainUI>();
+        if (hud != null && hud.HandleTutorialBack()) return;
         if (_dungeonRun.Succeeded && !_dungeonRun.ResultVisible) { _dungeonRun.ShowResult(); return; }
         if (_dungeonRun.HasResult) return;
         if (_uiService.IsUIOpen("UI/LoadingUI")) return;
         if (_uiService.IsUIOpen(SettingsUiKey))
         {
+            var settings = UnityEngine.Object.FindFirstObjectByType<SettingsUI>();
+            if (settings != null)
+            {
+                settings.HandleBack();
+                if (!_uiService.IsUIOpen(SettingsUiKey)) _settingsFromPause = false;
+                return;
+            }
             bool returnToPause = _settingsFromPause;
             _uiService.CloseUI(SettingsUiKey);
             _settingsFromPause = false;

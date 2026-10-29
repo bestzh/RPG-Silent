@@ -49,6 +49,7 @@ public sealed class TrainingGround : MonoBehaviour
         foreach (var skill in progress.LearnedSkills) { skillGoal = 3; break; }
         target = Instantiate(PracticePrefab, TargetPoint.position, TargetPoint.rotation, transform);
         target.ConfigureTraining(defenseMode);
+        target.ConfigurePresentation(player.Audio, player.PresentationSettings);
         Message = defenseMode ? "观察起手：右键精准格挡 / 轻按 Shift 闪避。练习目标：精准格挡与精准闪避各 3 次。"
             : "剑 / 法杖完成 3 次连段末击；弓命中 10 次。" + (skillGoal > 0 ? "再释放 3 次已学技能。" : "其他技能需在主城向职业导师学习。") + "重剑与弓可练习蓄力。";
         return true;

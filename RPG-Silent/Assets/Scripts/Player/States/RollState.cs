@@ -22,6 +22,7 @@ public class RollState : PlayerState
         }
         if (player.Defense != null && !player.Defense.BeginRoll()) { player.ReturnToLocomotion(); return; }
         player.SetIsRolling(true);
+        player.Progress?.RecordTutorialAction(RPGSilent.Domain.TutorialStep.Dodge);
         velocity = player.FacingRotation * new Vector3(input.x, 0f, input.y) * player.RollForce;
     }
 

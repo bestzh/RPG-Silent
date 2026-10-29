@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using RPGSilent.Domain;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// 屏幕设置服务，实现 IScreenSettingsService。
@@ -28,6 +29,9 @@ public class ScreenSettingsService : MonoBehaviour, IScreenSettingsService
     private const float DefaultBrightness   = 1f;
 
     public ScreenSettings CurrentSettings { get; private set; } = new ScreenSettings();
+    public ScreenSettings Defaults => GetDefaultSettings();
+    private Canvas brightnessCanvas;
+    private Image brightnessImage;
 
     private readonly List<string> _resolutionOptions  = new();
     private readonly List<int>    _resolutionRawIndex = new();
@@ -48,7 +52,14 @@ public class ScreenSettingsService : MonoBehaviour, IScreenSettingsService
 
     public void Apply(ScreenSettings settings)
     {
-        CurrentSettings = settings;
+        CurrentSettings = new ScreenSettings
+        {
+            ResolutionIndex = ClampResolutionIndex(settings.ResolutionIndex),
+            IsFullScreen = settings.IsFullScreen,
+            QualityIndex = Mathf.Clamp(settings.QualityIndex, 0, QualityLabels.Length - 1),
+            Brightness = Mathf.Clamp01(settings.Brightness)
+        };
+        settings = CurrentSettings;
 
         // 分辨率 + 全屏（ResolutionIndex 为下拉选项索引）
         if (TryResolveResolution(settings.ResolutionIndex, out Resolution r))
@@ -61,7 +72,7 @@ public class ScreenSettingsService : MonoBehaviour, IScreenSettingsService
         if (unityQuality >= 0 && unityQuality < QualitySettings.names.Length)
             QualitySettings.SetQualityLevel(unityQuality, applyExpensiveChanges: true);
 
-        // 亮度（Screen.brightness 在 PC 端不生效，此处保存值供外部后处理使用）
+        // PC 端使用不拦截输入的全屏遮罩预览亮度。
         ApplyBrightness(settings.Brightness);
     }
 
@@ -191,13 +202,32 @@ public class ScreenSettingsService : MonoBehaviour, IScreenSettingsService
         return true;
     }
 
-    private static void ApplyBrightness(float brightness)
+    public void PreviewBrightness(float brightness)
     {
-        // PC 端 Screen.brightness 无效；建议通过后处理 Volume 的 Exposure 控制。
-        // 此处仅做数值裁剪，具体实现由项目后处理方案决定。
-        brightness = Mathf.Clamp01(brightness);
-
-        // 示例：如果场景有全屏遮罩 CanvasGroup，可在这里控制其 alpha
-        // BrightnessOverlay.Instance?.SetAlpha(1f - brightness);
+        CurrentSettings.Brightness = Mathf.Clamp01(brightness);
+        ApplyBrightness(CurrentSettings.Brightness);
     }
+
+    private void ApplyBrightness(float brightness)
+    {
+        if (!Application.isPlaying) return;
+        if (brightnessCanvas == null)
+        {
+            var root = new GameObject("Screen brightness", typeof(RectTransform), typeof(Canvas), typeof(CanvasGroup));
+            DontDestroyOnLoad(root);
+            brightnessCanvas = root.GetComponent<Canvas>();
+            brightnessCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            brightnessCanvas.sortingOrder = 32760;
+            var group = root.GetComponent<CanvasGroup>(); group.interactable = group.blocksRaycasts = false;
+            var shade = new GameObject("Brightness shade", typeof(RectTransform), typeof(Image));
+            shade.transform.SetParent(root.transform, false);
+            var rect = (RectTransform)shade.transform; rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            brightnessImage = shade.GetComponent<Image>(); brightnessImage.raycastTarget = false;
+        }
+        brightnessImage.color = new Color(0, 0, 0, (1 - Mathf.Clamp01(brightness)) * .65f);
+        brightnessCanvas.gameObject.SetActive(brightness < .9999f);
+    }
+
+    private void OnDestroy() { if (brightnessCanvas != null) Destroy(brightnessCanvas.gameObject); }
 }

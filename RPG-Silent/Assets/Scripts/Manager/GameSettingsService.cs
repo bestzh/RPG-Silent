@@ -13,6 +13,8 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsService
     private const string KeyShowHud         = "Game_ShowHud";
     private const string KeyShowMiniMap     = "Game_ShowMiniMap";
     private const string KeyScreenShake     = "Game_ScreenShake";
+    private const string KeyDamageNumbers = "Game_ShowDamageNumbers";
+    private const string KeyFeedback = "Game_FeedbackIntensity";
 
     private const int   DefaultDifficulty   = 1;
     private const bool  DefaultShowHud      = true;
@@ -23,6 +25,7 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsService
     private static readonly float[]  DamageMultipliers = { 0.75f, 1f, 1.5f };
 
     public GameSettings CurrentSettings { get; private set; } = new GameSettings();
+    public GameSettings Defaults => GetDefaultSettings();
     public IReadOnlyList<string> DifficultyOptions => DifficultyLabels;
 
     public event Action<GameSettings> OnSettingsApplied;
@@ -40,7 +43,9 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsService
             DifficultyIndex      = Mathf.Clamp(settings.DifficultyIndex, 0, DifficultyLabels.Length - 1),
             ShowHud              = settings.ShowHud,
             ShowMiniMap          = settings.ShowMiniMap,
-            ScreenShakeIntensity = Mathf.Clamp01(settings.ScreenShakeIntensity)
+            ScreenShakeIntensity = Mathf.Clamp01(settings.ScreenShakeIntensity),
+            ShowDamageNumbers = settings.ShowDamageNumbers,
+            FeedbackIntensity = Mathf.Clamp01(settings.FeedbackIntensity)
         };
 
         ScreenShakeManager.SetIntensityScale(CurrentSettings.ScreenShakeIntensity);
@@ -61,6 +66,8 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsService
         PlayerPrefs.SetInt(KeyShowHud,       CurrentSettings.ShowHud ? 1 : 0);
         PlayerPrefs.SetInt(KeyShowMiniMap,   CurrentSettings.ShowMiniMap ? 1 : 0);
         PlayerPrefs.SetFloat(KeyScreenShake, CurrentSettings.ScreenShakeIntensity);
+        PlayerPrefs.SetInt(KeyDamageNumbers, CurrentSettings.ShowDamageNumbers ? 1 : 0);
+        PlayerPrefs.SetFloat(KeyFeedback, CurrentSettings.FeedbackIntensity);
         PlayerPrefs.Save();
         Debug.Log("[GameSettings] 已保存。");
     }
@@ -73,7 +80,9 @@ public class GameSettingsService : MonoBehaviour, IGameSettingsService
             DifficultyIndex      = PlayerPrefs.GetInt(KeyDifficulty,  defaults.DifficultyIndex),
             ShowHud              = PlayerPrefs.GetInt(KeyShowHud,     defaults.ShowHud ? 1 : 0) == 1,
             ShowMiniMap          = PlayerPrefs.GetInt(KeyShowMiniMap, defaults.ShowMiniMap ? 1 : 0) == 1,
-            ScreenShakeIntensity = PlayerPrefs.GetFloat(KeyScreenShake, defaults.ScreenShakeIntensity)
+            ScreenShakeIntensity = PlayerPrefs.GetFloat(KeyScreenShake, defaults.ScreenShakeIntensity),
+            ShowDamageNumbers = PlayerPrefs.GetInt(KeyDamageNumbers, 1) == 1,
+            FeedbackIntensity = PlayerPrefs.GetFloat(KeyFeedback, 1f)
         });
         Debug.Log("[GameSettings] 已加载。");
     }

@@ -8,6 +8,7 @@ public sealed class PlayerHitFeedback : MonoBehaviour
     public AudioClip ImpactSound;
     public AudioMixerGroup Mixer;
     AudioSource source;
+    PlayerController player;
     float nextSound, nextReaction, shownAt = float.NegativeInfinity;
     public int Sequence { get; private set; }
     public int Damage { get; private set; }
@@ -18,16 +19,23 @@ public sealed class PlayerHitFeedback : MonoBehaviour
     public bool CanReact => Time.time >= nextReaction;
     void Awake()
     {
-        source = gameObject.AddComponent<AudioSource>(); source.playOnAwake = false;
-        source.spatialBlend = .4f; source.outputAudioMixerGroup = Mixer;
+        player = GetComponent<PlayerController>();
     }
     public void Show(int damage, Vector3 origin, AttackImpact impact, bool periodic)
     {
         if (damage <= 0) return;
         Sequence++; Damage = damage; Impact = impact; Periodic = periodic; shownAt = Time.time;
         SourceDirection = -HitReactionRules.Away(transform.position, origin, transform.forward);
-        if (!periodic && ImpactSound != null && Time.time >= nextSound)
-        { source.PlayOneShot(ImpactSound, impact == AttackImpact.Heavy ? .5f : .3f); nextSound = Time.time + .1f; }
+        if (!periodic && Time.time >= nextSound)
+        {
+            if (player != null && player.Audio != null) player.Audio.Play(GameSound.PlayerHit, transform.position);
+            else if (ImpactSound != null)
+            {
+                if (source == null) { source = gameObject.AddComponent<AudioSource>(); source.playOnAwake = false; source.spatialBlend = .4f; source.outputAudioMixerGroup = Mixer; }
+                source.clip = ImpactSound; source.volume = impact == AttackImpact.Heavy ? .5f : .3f; source.Play();
+            }
+            nextSound = Time.time + .1f;
+        }
     }
     public void ProtectRecovery(float duration) => nextReaction = Time.time + duration + HitReactionRules.RecoveryProtection;
     public void ResetFeedback()
