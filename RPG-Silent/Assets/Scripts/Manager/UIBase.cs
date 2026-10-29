@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract class UIBase : MonoBehaviour
 {
     public string UIName { get; private set; }
+    internal GameAudioService Audio { get; set; }
 
     public void Init(string uiName)
     {

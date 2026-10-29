@@ -17,6 +17,9 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     [Inject] private PlayerStats combatStats;
     public PlayerStats CombatStats => combatStats;
     [Inject] private PlayerProgressService progress;
+    [Inject] private GameAudioService audio;
+    public GameAudioService Audio => audio;
+    public IGameSettingsService PresentationSettings => _gameSettings;
     public PlayerProgressService Progress => progress;
     public PlayerClassCombat ClassCombat { get; private set; }
     public PlayerCombatRecord CombatRecord { get; } = new();
@@ -67,6 +70,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public PlayerTargetLock TargetLock { get; private set; }
     public PlayerDefense Defense { get; private set; }
     public PlayerHitFeedback HitFeedback { get; private set; }
+    public PlayerEquipmentEffects EquipmentEffects { get; private set; }
     public bool CanReceiveCombatEffects => isActiveAndEnabled && CombatAllowed && !combatLocked && !IsDead;
     public bool CanUseConsumables => Training == null && isActiveAndEnabled && GameplayInputEnabled && !combatLocked && !IsDead && !(Weapons != null && Weapons.IsBusy);
 
@@ -125,6 +129,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         Defense = GetComponent<PlayerDefense>() ?? gameObject.AddComponent<PlayerDefense>();
         HitFeedback = GetComponent<PlayerHitFeedback>() ?? gameObject.AddComponent<PlayerHitFeedback>();
         ClassCombat = GetComponent<PlayerClassCombat>() ?? gameObject.AddComponent<PlayerClassCombat>();
+        EquipmentEffects = GetComponent<PlayerEquipmentEffects>() ?? gameObject.AddComponent<PlayerEquipmentEffects>();
         Exploration = GetComponent<PlayerExplorationInteraction>() ?? gameObject.AddComponent<PlayerExplorationInteraction>();
         rb                  = GetComponent<Rigidbody>();
         animator            = GetComponent<Animator>();
@@ -189,6 +194,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     private void Update()
     {
+        TrackTutorialMovement();
         TargetLock?.Tick();
         Defense?.Tick();
         if (TargetLock != null && TargetLock.IsLocked && !IsRolling && StateMachine.CurrentState is not HurtState)
@@ -264,8 +270,11 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
         ClearCombatInput();
         CancelHeldAttack();
         CombatAllowed = allowed;
+        if (!allowed && UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main" && progress != null && progress.Tutorial.Has(RPGSilent.Domain.TutorialStep.EnterDungeon))
+            progress.RecordTutorialAction(RPGSilent.Domain.TutorialStep.ReturnTown);
         if (!allowed)
         {
+            EquipmentEffects?.ResetCombat();
             ClassCombat?.ResetCombat();
             TargetLock?.Clear();
             Defense?.ResetDefense();
@@ -314,6 +323,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
         if (IsDead)
         {
+            EquipmentEffects?.ResetCombat();
             ClearCombatInput(); CancelHeldAttack(); skillController?.InterruptSkill(force: true);
             TargetLock?.Clear(); Defense?.ResetDefense();
             StateMachine.ChangeState(new DeadState(this));
@@ -334,6 +344,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
     public void LockForDungeonResult()
     {
         if (combatLocked) return;
+        EquipmentEffects?.ResetCombat();
         combatLocked = true;
         Weapons?.CancelTransition();
         skillController?.InterruptSkill(force: true);
@@ -354,6 +365,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void ResetForScene(Vector3 position, Quaternion rotation)
     {
+        EquipmentEffects?.ResetCombat();
         ClassCombat?.ResetCombat();
         CombatRecord.Reset();
         ClearCombatInput();
@@ -378,6 +390,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable, IRewardable
 
     public void Teleport(Vector3 position, Quaternion rotation)
     {
+        tutorialPosition = position; tutorialPositionSet = true;
         CancelHeldAttack(); HitFeedback?.ResetFeedback();
         if (IsCharging || StateMachine.CurrentState is HurtState) ReturnToLocomotion();
         TargetLock?.Clear();

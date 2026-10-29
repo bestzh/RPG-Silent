@@ -13125,20 +13125,26 @@ MonoBehaviour:
     Enemies:
     - Prefab: {fileID: 6749038994814799034, guid: 423672947fd0f2042afc8d4ab9269efc, type: 3}
       Point: {fileID: 618566146}
+      Trait: 2
     - Prefab: {fileID: 6749038994814799034, guid: 423672947fd0f2042afc8d4ab9269efc, type: 3}
       Point: {fileID: 907781682}
+      Trait: 0
     - Prefab: {fileID: 1164356587956932221, guid: 5da4ac160d0c2c5408e2eff0c84cdfdd, type: 3}
       Point: {fileID: 1373438315}
+      Trait: 3
   - Name: "\u6E05\u7406\u6C34\u6676\u5185\u6BBF"
     Enemies:
     - Prefab: {fileID: 6749038994814799034, guid: 423672947fd0f2042afc8d4ab9269efc, type: 3}
       Point: {fileID: 1426667636}
+      Trait: 0
     - Prefab: {fileID: 1164356587956932221, guid: 5da4ac160d0c2c5408e2eff0c84cdfdd, type: 3}
       Point: {fileID: 1291572631}
+      Trait: 0
   - Name: "\u51FB\u8D25\u5B88\u671B\u8005"
     Enemies:
     - Prefab: {fileID: 4127029923238784026, guid: 83106cd40059f94408bd800460751419, type: 3}
       Point: {fileID: 1958898797}
+      Trait: 0
   WaveDelay: 2.5
   GroupCombat:
     MaxAttackers: 2

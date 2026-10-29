@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RPGSilent.Domain;
 using TMPro;
 using UnityEngine;
@@ -20,86 +21,147 @@ public class GamePage : MonoBehaviour
 {
     private IGameSettingsService _gameService;
     private bool _injected;
-
     [Inject]
     public void Construct(IGameSettingsService gameService)
     {
         _gameService = gameService;
-        _injected    = true;
+        _injected = true;
+        if (isActiveAndEnabled)
+        {
+            RefreshUI();
+            _savedSnapshot = CloneSettings(_gameService.CurrentSettings);
+        }
     }
 
     [Header("游戏难度")]
-    [SerializeField] private TMP_Dropdown difficultyDropdown;
-
+    [SerializeField]
+    private TMP_Dropdown difficultyDropdown;
     [Header("显示 HUD")]
-    [SerializeField] private Toggle showHudToggle;
-
+    [SerializeField]
+    private Toggle showHudToggle;
     [Header("小地图")]
-    [SerializeField] private TMP_Dropdown showMiniMapDropdown;
-
+    [SerializeField]
+    private TMP_Dropdown showMiniMapDropdown;
     [Header("屏幕震动")]
-    [SerializeField] private Slider   screenShakeSlider;
-    [SerializeField] private TMP_Text screenShakeLabel;
-
+    [SerializeField]
+    private Slider screenShakeSlider;
+    [SerializeField]
+    private TMP_Text screenShakeLabel;
     [Header("确认 / 重置按钮")]
-    [SerializeField] private Button okButton;
-    [SerializeField] private Button resetButton;
-
-    private static readonly string[] MiniMapOptions = { "显示", "隐藏" };
-
+    [SerializeField]
+    private Button okButton;
+    [SerializeField]
+    private Button resetButton;
+    private static readonly string[] MiniMapOptions =
+    {
+        "显示",
+        "隐藏"
+    };
     private GameSettings _pendingSettings;
     private GameSettings _savedSnapshot;
-
+    private Toggle damageNumbersToggle;
+    private Slider feedbackSlider;
+    private TMP_Text feedbackLabel;
     private void Awake()
     {
         TryAutoBind();
+        BuildComfortOptions();
         okButton?.onClick.AddListener(OnOKClicked);
         resetButton?.onClick.AddListener(OnResetClicked);
     }
 
     private void OnEnable()
     {
-        if (!_injected) return;
+        if (!_injected)
+            return;
         RefreshUI();
         _savedSnapshot = CloneSettings(_gameService.CurrentSettings);
     }
 
     private void OnDisable()
     {
-        if (_gameService == null || _savedSnapshot == null) return;
+        if (_gameService == null || _savedSnapshot == null)
+            return;
         _gameService.Apply(_savedSnapshot);
     }
 
     private void TryAutoBind()
     {
-        difficultyDropdown  ??= transform.Find("Resolution/Dropdown")?.GetComponent<TMP_Dropdown>();
-        showHudToggle       ??= transform.Find("FullScreen/Toggle")?.GetComponent<Toggle>();
-        showMiniMapDropdown ??= transform.Find("Quality/Dropdown")?.GetComponent<TMP_Dropdown>();
-        screenShakeSlider   ??= transform.Find("Light/Slider")?.GetComponent<Slider>();
-        okButton            ??= transform.Find("OK")?.GetComponent<Button>();
-        resetButton         ??= transform.Find("Reset")?.GetComponent<Button>();
+        difficultyDropdown ??= UIView.Find(transform, "Resolution/Dropdown")?.GetComponent<TMP_Dropdown>();
+        showHudToggle ??= UIView.Find(transform, "FullScreen/Toggle")?.GetComponent<Toggle>();
+        showMiniMapDropdown ??= UIView.Find(transform, "Quality/Dropdown")?.GetComponent<TMP_Dropdown>();
+        screenShakeSlider ??= UIView.Find(transform, "Light/Slider")?.GetComponent<Slider>();
+        okButton ??= UIView.Find(transform, "OK")?.GetComponent<Button>();
+        resetButton ??= UIView.Find(transform, "Reset")?.GetComponent<Button>();
     }
 
     private void RefreshUI()
     {
-        if (_gameService == null) return;
-
+        if (_gameService == null)
+            return;
         _pendingSettings = CloneSettings(_gameService.CurrentSettings);
         SetupDifficultyDropdown();
         SetupShowHudToggle();
         SetupMiniMapDropdown();
         SetupScreenShakeSlider();
+        SetupComfortOptions();
+    }
+
+    private Transform Row(Component control)
+    {
+        if (control == null)
+            return null;
+        var row = control.transform;
+        while (row.parent != transform)
+            row = row.parent;
+        return row;
+    }
+
+    private void BuildComfortOptions()
+    {
+        var damageRow = UIView.Find(transform, "DamageNumbers");
+        damageNumbersToggle = damageRow.GetComponentInChildren<Toggle>(true);
+        var feedbackRow = UIView.Find(transform, "FeedbackIntensity");
+        feedbackSlider = feedbackRow.GetComponentInChildren<Slider>(true);
+        feedbackLabel = feedbackRow.GetComponentsInChildren<TMP_Text>(true).FirstOrDefault(t => screenShakeLabel != null && t.name == screenShakeLabel.name);
+    }
+
+    private void SetupComfortOptions()
+    {
+        if (damageNumbersToggle != null)
+        {
+            damageNumbersToggle.SetIsOnWithoutNotify(_pendingSettings.ShowDamageNumbers);
+            damageNumbersToggle.onValueChanged.RemoveAllListeners();
+            damageNumbersToggle.onValueChanged.AddListener(value =>
+            {
+                _pendingSettings.ShowDamageNumbers = value;
+                PreviewPendingSettings();
+            });
+        }
+
+        if (feedbackSlider == null)
+            return;
+        feedbackSlider.minValue = 0;
+        feedbackSlider.maxValue = 1;
+        feedbackSlider.SetValueWithoutNotify(_pendingSettings.FeedbackIntensity);
+        UpdatePercentLabel(feedbackLabel, _pendingSettings.FeedbackIntensity);
+        feedbackSlider.onValueChanged.RemoveAllListeners();
+        feedbackSlider.onValueChanged.AddListener(value =>
+        {
+            _pendingSettings.FeedbackIntensity = value;
+            UpdatePercentLabel(feedbackLabel, value);
+            PreviewPendingSettings();
+        });
     }
 
     private void SetupDifficultyDropdown()
     {
-        if (difficultyDropdown == null) return;
-
+        if (difficultyDropdown == null)
+            return;
         difficultyDropdown.ClearOptions();
         difficultyDropdown.AddOptions(new List<string>(_gameService.DifficultyOptions));
         difficultyDropdown.SetValueWithoutNotify(_pendingSettings.DifficultyIndex);
         difficultyDropdown.RefreshShownValue();
-
         difficultyDropdown.onValueChanged.RemoveAllListeners();
         difficultyDropdown.onValueChanged.AddListener(index =>
         {
@@ -110,10 +172,9 @@ public class GamePage : MonoBehaviour
 
     private void SetupShowHudToggle()
     {
-        if (showHudToggle == null) return;
-
+        if (showHudToggle == null)
+            return;
         showHudToggle.SetIsOnWithoutNotify(_pendingSettings.ShowHud);
-
         showHudToggle.onValueChanged.RemoveAllListeners();
         showHudToggle.onValueChanged.AddListener(value =>
         {
@@ -124,13 +185,12 @@ public class GamePage : MonoBehaviour
 
     private void SetupMiniMapDropdown()
     {
-        if (showMiniMapDropdown == null) return;
-
+        if (showMiniMapDropdown == null)
+            return;
         showMiniMapDropdown.ClearOptions();
         showMiniMapDropdown.AddOptions(new List<string>(MiniMapOptions));
         showMiniMapDropdown.SetValueWithoutNotify(_pendingSettings.ShowMiniMap ? 0 : 1);
         showMiniMapDropdown.RefreshShownValue();
-
         showMiniMapDropdown.onValueChanged.RemoveAllListeners();
         showMiniMapDropdown.onValueChanged.AddListener(index =>
         {
@@ -141,13 +201,12 @@ public class GamePage : MonoBehaviour
 
     private void SetupScreenShakeSlider()
     {
-        if (screenShakeSlider == null) return;
-
+        if (screenShakeSlider == null)
+            return;
         screenShakeSlider.minValue = 0f;
         screenShakeSlider.maxValue = 1f;
         screenShakeSlider.SetValueWithoutNotify(_pendingSettings.ScreenShakeIntensity);
         UpdatePercentLabel(screenShakeLabel, _pendingSettings.ScreenShakeIntensity);
-
         screenShakeSlider.onValueChanged.RemoveAllListeners();
         screenShakeSlider.onValueChanged.AddListener(value =>
         {
@@ -159,14 +218,15 @@ public class GamePage : MonoBehaviour
 
     private void PreviewPendingSettings()
     {
-        if (_gameService == null || _pendingSettings == null) return;
+        if (_gameService == null || _pendingSettings == null)
+            return;
         _gameService.Apply(_pendingSettings);
     }
 
     private void OnOKClicked()
     {
-        if (_gameService == null || _pendingSettings == null) return;
-
+        if (_gameService == null || _pendingSettings == null)
+            return;
         _gameService.Apply(_pendingSettings);
         _gameService.Save();
         _savedSnapshot = CloneSettings(_pendingSettings);
@@ -175,23 +235,25 @@ public class GamePage : MonoBehaviour
 
     private void OnResetClicked()
     {
-        if (_gameService == null) return;
-        _gameService.Reset();
+        if (_gameService == null)
+            return;
+        _gameService.Apply(_gameService.Defaults);
         RefreshUI();
-        _savedSnapshot = CloneSettings(_gameService.CurrentSettings);
     }
 
     private static GameSettings CloneSettings(GameSettings source) => new GameSettings
     {
-        DifficultyIndex      = source.DifficultyIndex,
-        ShowHud              = source.ShowHud,
-        ShowMiniMap          = source.ShowMiniMap,
-        ScreenShakeIntensity = source.ScreenShakeIntensity
+        DifficultyIndex = source.DifficultyIndex,
+        ShowHud = source.ShowHud,
+        ShowMiniMap = source.ShowMiniMap,
+        ScreenShakeIntensity = source.ScreenShakeIntensity,
+        ShowDamageNumbers = source.ShowDamageNumbers,
+        FeedbackIntensity = source.FeedbackIntensity
     };
-
     private static void UpdatePercentLabel(TMP_Text label, float value)
     {
-        if (label == null) return;
+        if (label == null)
+            return;
         label.text = $"{Mathf.RoundToInt(value * 100f)}%";
     }
 }

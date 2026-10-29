@@ -30,12 +30,20 @@ public class SoundSettingsService : MonoBehaviour, ISoundSettingsService
     [SerializeField] private AudioMixer mixer;
 
     public SoundSettings CurrentSettings { get; private set; } = new SoundSettings();
+    public SoundSettings Defaults => GetDefaultSettings();
+    private float previousListenerVolume;
+    private bool capturedListener;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
+        previousListenerVolume = AudioListener.volume;
+        capturedListener = true;
         Load();
     }
+
+    private void Start() => Apply(CurrentSettings);
+    private void OnDestroy() { if (capturedListener) AudioListener.volume = previousListenerVolume; }
 
     public void Apply(SoundSettings settings)
     {
@@ -47,19 +55,19 @@ public class SoundSettingsService : MonoBehaviour, ISoundSettingsService
             IsMuted      = settings.IsMuted
         };
 
+        float masterLinear = CurrentSettings.IsMuted ? 0f : CurrentSettings.MasterVolume;
+        AudioListener.volume = masterLinear;
         if (mixer == null)
         {
             Debug.LogWarning("[SoundSettings] 未绑定 AudioMixer，仅保存设置值。");
             return;
         }
 
-        float masterLinear = CurrentSettings.IsMuted ? 0f : CurrentSettings.MasterVolume;
-        SetMixerVolume(ParamMaster, masterLinear);
+        // Apply master once for routed and unrouted sources; category gains stay in the mixer.
+        SetMixerVolume(ParamMaster, 1f);
         SetMixerVolume(ParamMusic,  CurrentSettings.MusicVolume);
         SetMixerVolume(ParamSFX,    CurrentSettings.SFXVolume);
 
-        // 兜底：未接入 Mixer 的 AudioSource 仍受全局音量影响
-        AudioListener.volume = masterLinear;
     }
 
     public void Save()

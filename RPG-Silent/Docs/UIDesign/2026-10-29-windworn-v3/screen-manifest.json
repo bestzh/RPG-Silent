@@ -1,0 +1,381 @@
+{
+  "date": "2026-10-29",
+  "version": "Windworn V3",
+  "artboard": [
+    1920,
+    1080
+  ],
+  "game_page_state_count": 40,
+  "reference_sheet_count": 2,
+  "screens": [
+    {
+      "id": "start",
+      "title": "开始菜单",
+      "group": "启程与角色",
+      "description": "保留完整城堡视野；主操作与角色存档入口形成清晰层级。",
+      "source": "StartUI · BG.png · Fantasy UI 面板与按钮",
+      "number": 1,
+      "file": "01-start.png"
+    },
+    {
+      "id": "creation",
+      "title": "角色创建",
+      "group": "启程与角色",
+      "description": "职业选择、真实模型与职业说明分三栏；性别和最终确认集中在底部。",
+      "source": "CharacterCreationView · 三职业男女模型 · BG3.png",
+      "number": 2,
+      "file": "02-creation.png"
+    },
+    {
+      "id": "characters",
+      "title": "角色选择",
+      "group": "启程与角色",
+      "description": "保留每页六个角色、装备外观预览、创建和继续入口；不增加改名或删除功能。",
+      "source": "CharacterSelectionView · 三职业男女模型",
+      "number": 3,
+      "file": "03-characters.png"
+    },
+    {
+      "id": "hud-town",
+      "title": "主城 HUD",
+      "group": "游玩与战斗",
+      "description": "状态收拢左上，任务与地图置右，技能与药品分区，保留画面中央视野。",
+      "source": "MainUI · 既有主城截图 · Fantasy/Bamao 图标",
+      "number": 4,
+      "file": "04-hud-town.png"
+    },
+    {
+      "id": "hud-dungeon",
+      "title": "副本与 Boss HUD",
+      "group": "游玩与战斗",
+      "description": "Boss 名称、阶段和血量整合为一组，预警与格挡反馈各有固定位置。",
+      "source": "MainUI + DungeonUI · 既有水晶洞窟截图",
+      "number": 5,
+      "file": "05-hud-dungeon.png"
+    },
+    {
+      "id": "training",
+      "title": "训练场",
+      "group": "游玩与战斗",
+      "description": "训练数据收在左侧小面板，重置与回城直接可见。",
+      "source": "MainUI.Adventure · 既有场景截图",
+      "number": 6,
+      "file": "06-training.png"
+    },
+    {
+      "id": "tutorial",
+      "title": "操作与职业教学",
+      "group": "游玩与战斗",
+      "description": "教学采用双列短句与键帽，避免长文本压住常驻 HUD。",
+      "source": "MainUI.Adventure · Fantasy UI 符号",
+      "number": 7,
+      "file": "07-tutorial.png"
+    },
+    {
+      "id": "inventory",
+      "title": "背包与装备",
+      "group": "行囊与装备",
+      "description": "左侧角色与穿戴，中间24格背包，右侧详情与对比；沿用24格容量。",
+      "source": "InventoryUI · Bamao 物品图标 · 项目模型",
+      "number": 8,
+      "file": "08-inventory.png"
+    },
+    {
+      "id": "inventory-batch",
+      "title": "批量分解",
+      "group": "行囊与装备",
+      "description": "进入批量模式后使用勾选、件数与收益摘要；二次确认保留在固定操作区。",
+      "source": "InventoryUI.Management · 现有图标",
+      "number": 9,
+      "file": "09-inventory-batch.png"
+    },
+    {
+      "id": "inventory-overflow",
+      "title": "待领取物品",
+      "group": "行囊与装备",
+      "description": "待领取作为独立分类；明确可用空间，避免误以为物品已经进入背包。",
+      "source": "InventoryUI · Overflow 数据状态",
+      "number": 10,
+      "file": "10-inventory-overflow.png"
+    },
+    {
+      "id": "inventory-consumable",
+      "title": "药品与快捷栏配置",
+      "group": "行囊与装备",
+      "description": "详情区呈现用途、共享冷却和 Q/R/F 绑定，沿用现有三槽逻辑。",
+      "source": "InventoryUI.Consumables · Bamao 药品图标",
+      "number": 11,
+      "file": "11-inventory-consumable.png"
+    },
+    {
+      "id": "loadouts",
+      "title": "配装方案",
+      "group": "行囊与装备",
+      "description": "三套方案以五防具两武器可视化展示；试穿、应用与覆盖操作分开。",
+      "source": "InventoryUI.Management · 三方案上限",
+      "number": 12,
+      "file": "12-loadouts.png"
+    },
+    {
+      "id": "discard",
+      "title": "丢弃数量确认",
+      "group": "行囊与装备",
+      "description": "物品名称、数量和离场消失提示集中；取消与确认保持足够间距。",
+      "source": "InventoryUI.Discard · 原有数量确认功能",
+      "number": 13,
+      "file": "13-discard.png"
+    },
+    {
+      "id": "journal",
+      "title": "任务手札",
+      "group": "冒险手札",
+      "description": "左侧任务索引，右侧羊皮纸正文；类别、状态、目标、奖励和导航分层。",
+      "source": "QuestJournalUI · Fantasy UI 羊皮纸 · 现有任务文本",
+      "number": 14,
+      "file": "14-journal.png"
+    },
+    {
+      "id": "achievements",
+      "title": "成就奖励",
+      "group": "冒险手札",
+      "description": "完成进度与领奖状态一眼可辨；已领取、可领取和未达成分开呈现。",
+      "source": "QuestJournalUI.Collections · 现有成就系统",
+      "number": 15,
+      "file": "15-achievements.png"
+    },
+    {
+      "id": "codex",
+      "title": "冒险图鉴",
+      "group": "冒险手札",
+      "description": "四类图鉴沿用现有分类；怪物展示复用项目模型，未解锁内容降低可见度。",
+      "source": "QuestJournalUI.Collections · 模型预览复用方案",
+      "number": 16,
+      "file": "16-codex.png"
+    },
+    {
+      "id": "mentor",
+      "title": "导师技能服务",
+      "group": "城镇与成长",
+      "description": "左侧统一 NPC 服务导航；技能信息、学习升级与槽位装配放在同一工作区。",
+      "source": "TownNpcUI · 三职业课程及十个技能槽",
+      "number": 17,
+      "file": "17-mentor.png"
+    },
+    {
+      "id": "advancement",
+      "title": "转职确认",
+      "group": "城镇与成长",
+      "description": "左右对照职业分支，并单独呈现永久选择的确认状态。",
+      "source": "TownNpcUI · 剑圣/狂战士分支 · 原有再次确认流程",
+      "number": 18,
+      "file": "18-advancement.png"
+    },
+    {
+      "id": "forge-weapon",
+      "title": "武器强化",
+      "group": "城镇与成长",
+      "description": "以单件装备为中心，清楚对照强化前后数值、金币消耗与目标武器槽。",
+      "source": "TownNpcUI · 武器强化上限+5",
+      "number": 19,
+      "file": "19-forge-weapon.png"
+    },
+    {
+      "id": "forge-armor",
+      "title": "防具饰品强化",
+      "group": "城镇与成长",
+      "description": "沿用具体实例选择；前后属性、碎片余额与已穿戴状态同时可见。",
+      "source": "TownNpcUI · 防具饰品实例强化",
+      "number": 20,
+      "file": "20-forge-armor.png"
+    },
+    {
+      "id": "forge-gems",
+      "title": "宝石制作",
+      "group": "城镇与成长",
+      "description": "四种宝石平铺，收益、持有量与制作消耗统一排版。",
+      "source": "TownNpcUI · 四种现有宝石 · Bamao 晶石图标",
+      "number": 21,
+      "file": "21-forge-gems.png"
+    },
+    {
+      "id": "gem-socket",
+      "title": "宝石镶嵌与拆卸",
+      "group": "城镇与成长",
+      "description": "先固定目标装备，再选择宝石；替换返还与拆卸费用就近说明。",
+      "source": "TownNpcUI · 原有单孔镶嵌逻辑",
+      "number": 22,
+      "file": "22-gem-socket.png"
+    },
+    {
+      "id": "npc-quests",
+      "title": "NPC 任务委托",
+      "group": "城镇与成长",
+      "description": "接取/提交按钮跟随所选任务详情，状态与材料交付条件明确。",
+      "source": "TownNpcUI.Quests · 现有任务系统",
+      "number": 23,
+      "file": "23-npc-quests.png"
+    },
+    {
+      "id": "npc-story",
+      "title": "剧情交谈与选择",
+      "group": "城镇与成长",
+      "description": "人物与对话分栏；分支结果预览和确认按钮紧邻，保留重新考虑。",
+      "source": "TownNpcUI.World · 多段故事与互斥分支",
+      "number": 24,
+      "file": "24-npc-story.png"
+    },
+    {
+      "id": "supplies",
+      "title": "战斗补给商店",
+      "group": "城镇与成长",
+      "description": "四种现有药品各用一行，保留购买1瓶/5瓶、持有量与快捷栏引导。",
+      "source": "TownNpcUI.Supplies · Bamao 药品图标",
+      "number": 25,
+      "file": "25-supplies.png"
+    },
+    {
+      "id": "crafting",
+      "title": "装备配方锻造",
+      "group": "城镇与成长",
+      "description": "解锁条件、成品、材料与锻造按钮同卡片展示；未解锁配方可读。",
+      "source": "TownNpcUI.World · 现有配方与任务解锁",
+      "number": 26,
+      "file": "26-crafting.png"
+    },
+    {
+      "id": "reforge",
+      "title": "词条重铸确认",
+      "group": "城镇与成长",
+      "description": "保留随机性说明和现有词条；明确金币、碎片、晶核的消耗。",
+      "source": "TownNpcUI.World · 词条重铸确认",
+      "number": 27,
+      "file": "27-reforge.png"
+    },
+    {
+      "id": "portal-forest",
+      "title": "传送 · 迷影森林",
+      "group": "远行与结算",
+      "description": "地点选择、场景预览、难度与挑战模式分别组织，主按钮固定在右下。",
+      "source": "PortalUI · 项目背景与已有场景截图",
+      "number": 28,
+      "file": "28-portal-forest.png"
+    },
+    {
+      "id": "portal-crystal",
+      "title": "传送 · 水晶洞窟",
+      "group": "远行与结算",
+      "description": "蓝晶场景使用实际验证截图，保留普通/困难/噩梦与三种挑战模式。",
+      "source": "PortalUI · 水晶洞窟截图 · 原有副本数据",
+      "number": 29,
+      "file": "29-portal-crystal.png"
+    },
+    {
+      "id": "portal-training",
+      "title": "传送 · 训练场",
+      "group": "远行与结算",
+      "description": "独立说明连段与防御训练、不发放奖励；使用单一进入按钮。",
+      "source": "PortalUI · 原有训练场配置",
+      "number": 30,
+      "file": "30-portal-training.png"
+    },
+    {
+      "id": "victory",
+      "title": "通关结算",
+      "group": "远行与结算",
+      "description": "通关表现、已拾取收益和剩余掉落分组；继续拾取为主操作。",
+      "source": "DungeonUI · 原有通关/继续拾取流程",
+      "number": 31,
+      "file": "31-victory.png"
+    },
+    {
+      "id": "defeat",
+      "title": "死亡与失败结算",
+      "group": "远行与结算",
+      "description": "突出失败原因和已拾取物保留规则，复活重试与回城各自清楚。",
+      "source": "DungeonUI · 原有单机死亡恢复流程",
+      "number": 32,
+      "file": "32-defeat.png"
+    },
+    {
+      "id": "pause",
+      "title": "暂停菜单",
+      "group": "设置与系统",
+      "description": "窄幅居中面板，继续游戏优先；保存反馈与离开操作分隔。",
+      "source": "PauseUI · 背景取当前场景参考",
+      "number": 33,
+      "file": "33-pause.png"
+    },
+    {
+      "id": "settings-screen",
+      "title": "设置 · 屏幕",
+      "group": "设置与系统",
+      "description": "四分页共享固定布局，分辨率/全屏/画质/亮度按行对齐。",
+      "source": "SettingsUI / ScreenPage · SettingBG.png",
+      "number": 34,
+      "file": "34-settings-screen.png"
+    },
+    {
+      "id": "settings-sound",
+      "title": "设置 · 声音",
+      "group": "设置与系统",
+      "description": "总音量/音乐/音效分别调整，百分比与滑轨对齐，保留静音。",
+      "source": "SettingsUI / SoundPage · 现有音量设置",
+      "number": 35,
+      "file": "35-settings-sound.png"
+    },
+    {
+      "id": "settings-controls",
+      "title": "设置 · 控制",
+      "group": "设置与系统",
+      "description": "14项改键双列排列，下方集中灵敏度、冲刺判定与Y轴反转。",
+      "source": "SettingsUI / ControllerPage · 原有改键范围",
+      "number": 36,
+      "file": "36-settings-controls.png"
+    },
+    {
+      "id": "settings-game",
+      "title": "设置 · 游戏",
+      "group": "设置与系统",
+      "description": "沿用全局难度、HUD、小地图、震动强度；与副本难度选择分开表述。",
+      "source": "SettingsUI / GamePage · 原有游戏设置",
+      "number": 37,
+      "file": "37-settings-game.png"
+    },
+    {
+      "id": "loading",
+      "title": "场景加载",
+      "group": "设置与系统",
+      "description": "以现有环境背景承托目的地、进度与一条操作提示。",
+      "source": "LoadingUI · Loding.png · 现有进度条",
+      "number": 38,
+      "file": "38-loading.png"
+    },
+    {
+      "id": "loading-error",
+      "title": "加载失败",
+      "group": "设置与系统",
+      "description": "在加载页面上叠加明确错误卡片，重试与返回都保持可见。",
+      "source": "LoadingUI · 原有失败恢复状态",
+      "number": 39,
+      "file": "39-loading-error.png"
+    },
+    {
+      "id": "world-feedback",
+      "title": "世界标签与即时反馈",
+      "group": "游玩与战斗",
+      "description": "统一NPC任务标记、探索标签、掉落名称、伤害数值和交互提示。",
+      "source": "TownNpcNameplate / WorldLootPickup / EnemyHitFeedback",
+      "number": 40,
+      "file": "40-world-feedback.png"
+    },
+    {
+      "id": "skills-visual-guide",
+      "number": 41,
+      "title": "全职业技能图标规范",
+      "group": "设计附录",
+      "description": "21 个现有技能与新图标的完整对照；仅为视觉设计建议。",
+      "source": "Assets/Resources/ClassSkills + PONETI 6000 Fantasy Icons",
+      "file": "41-skills-visual-guide.png"
+    }
+  ]
+}

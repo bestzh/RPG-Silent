@@ -17,12 +17,18 @@ MonoBehaviour:
   Description: "\u7531\u5192\u9669\u8005\u4E0E\u68EE\u6797\u5B88\u536B\u4F7F\u7528\u7684\u5B9E\u7528\u88C5\u5907\u3002"
   Kind: 0
   Rarity: 0
+  SpecialEffect: 0
   Slot: 2
-  Icon: {fileID: 21300000, guid: 3b5b486ddcd4043e2b0a4e5f3a5120b5, type: 3}
+  Icon: {fileID: 21300000, guid: 5b98119836289dc4e927d8c414c40220, type: 3}
   Weapon: {fileID: 0}
   Appearance: {fileID: 11400000, guid: 96d4a8a42cef2d2468fa0a2cfebfb817, type: 2}
   Set: {fileID: 11400000, guid: dd4f31b3f217df648a5dbd8a6ab452f3, type: 2}
   IsGem: 0
+  UseEffect: 0
+  UseAmount: 0
+  BuyPrice: 25
+  UseStatus: {fileID: 0}
+  UseVfx: {fileID: 0}
   RequiredLevel: 1
   Health: 6
   Energy: 0

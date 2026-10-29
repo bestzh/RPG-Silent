@@ -22,7 +22,12 @@ public sealed class PlayerInventoryInteraction : MonoBehaviour
     bool OtherModal => ui.IsUIOpen("UI/LoadingUI") || ui.IsUIOpen("UI/PortalUI") || ui.IsUIOpen("UI/TownNpcUI") || ui.IsUIOpen("UI/PauseUI") || ui.IsUIOpen("UI/SettingsUI") || ui.IsUIOpen(PlayerQuestInteraction.UiKey);
     public void Toggle()
     {
-        if (opened) { Close(); return; }
+        if (opened)
+        {
+            var selected = UnityEngine.EventSystems.EventSystem.current?.currentSelectedGameObject;
+            if (selected != null && selected.GetComponentInParent<TMPro.TMP_InputField>() is { isFocused: true }) return;
+            Close(); return;
+        }
         if (input == null || !input.GameplayInputEnabled || OtherModal || !weapons.CanChangeEquipment) return;
         opened = true; openedAt = Time.unscaledTime;
         input.SetGameplayInputBlocked(this, true); cursor.EnterUICursor();

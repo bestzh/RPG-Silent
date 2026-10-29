@@ -12,7 +12,7 @@ public sealed class EnemyMotor
     float EffectiveSpeed => Speed * (statuses != null ? statuses.State.MovementMultiplier : 1f);
     private Vector3 direction;
     private float nextPathUpdate;
-    private float stuckTime;
+    private float lastProgressTime;
     private Vector3 lastPosition;
     private readonly NavMeshPath retreatPath = new();
     private readonly NavMeshPath tacticalPath = new();
@@ -39,6 +39,7 @@ public sealed class EnemyMotor
     public void Initialize()
     {
         Home = lastPosition = transform.position;
+        lastProgressTime = Time.time;
         if (agent != null)
         {
             agent.speed = Speed;
@@ -57,6 +58,7 @@ public sealed class EnemyMotor
 
     public bool MoveTo(Vector3 point, float stopDistance)
     {
+        if (useAgent && agent != null && !CanNavigate) { direction = Vector3.zero; return false; }
         Vector3 offset = point - transform.position;
         offset.y = 0f;
         direction = offset.normalized;
@@ -70,13 +72,12 @@ public sealed class EnemyMotor
                 nextPathUpdate = Time.time + 0.2f;
                 if (!agent.SetDestination(point)) return false;
             }
-            if (!agent.pathPending && agent.pathStatus == NavMeshPathStatus.PathInvalid) return false;
+            if (!agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) return false;
         }
         else Face(offset);
-        if (Vector3.Distance(lastPosition, transform.position) < 0.02f && offset.magnitude > stopDistance + 0.4f)
-            stuckTime += 0.15f;
-        else { stuckTime = 0f; lastPosition = transform.position; }
-        return stuckTime < 4f;
+        if (Vector3.Distance(lastPosition, transform.position) >= 0.05f || offset.magnitude <= stopDistance + 0.4f)
+        { lastProgressTime = Time.time; lastPosition = transform.position; }
+        return Time.time - lastProgressTime < 4f;
     }
 
     public bool Retreat(Vector3 target, float distance)
@@ -115,7 +116,7 @@ public sealed class EnemyMotor
     public void Stop()
     {
         direction = Vector3.zero;
-        stuckTime = 0f;
+        lastProgressTime = Time.time; lastPosition = transform.position;
         if (CanNavigate) { agent.ResetPath(); agent.isStopped = true; }
         if (body != null && !body.isKinematic)
             body.linearVelocity = new Vector3(0f, body.linearVelocity.y, 0f);
@@ -158,7 +159,8 @@ public sealed class EnemyMotor
         if (CanNavigate)
         {
             var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
-            if (NavMesh.SamplePosition(destination, out var hit, distance, filter)) agent.Warp(hit.position);
+            if (NavMesh.SamplePosition(destination, out var hit, distance, filter) &&
+                !NavMesh.Raycast(transform.position, hit.position, out _, filter)) agent.Warp(hit.position);
         }
         else if (body != null && !body.isKinematic) body.MovePosition(destination);
     }

@@ -7,6 +7,7 @@ namespace RPGSilent.Domain
     {
         /// <summary>当前正在生效的设置。</summary>
         SoundSettings CurrentSettings { get; }
+        SoundSettings Defaults { get; }
 
         /// <summary>立即应用指定设置到 AudioMixer。</summary>
         void Apply(SoundSettings settings);

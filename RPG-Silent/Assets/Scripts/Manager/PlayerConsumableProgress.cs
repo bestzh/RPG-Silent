@@ -29,11 +29,7 @@ public sealed partial class PlayerProgressService
         if (!CanManageInventory || player == null || player.CombatAllowed || npc == null || !npc.isActiveAndEnabled || npc.Role != TownNpcRole.Blacksmith ||
             npc.gameObject.scene != SceneManager.GetActiveScene() || Vector3.Distance(player.transform.position, npc.transform.position) > npc.InteractionRadius ||
             item?.Kind != ItemKind.Consumable || count < 1 || count > 99) return false;
-        int cost = item.BuyPrice * count;
-        if (stats.Gold < cost) { message = $"金币不足，需要 {cost} 金币。"; return false; }
-        var data = Capture();
-        if (!data.inventory.AddRewards(new[] { new ItemStackData { itemId = id, count = count } })) { message = "背包和待领取空间不足，请先整理。"; return false; }
-        return CommitPurchase(data, cost, $"已购买 {item.DisplayName} ×{count}。满包药品在待领取页。", out message);
+        return TryShopPurchase(id, count, ShopQuote(id, count), npc, out message);
     }
     public bool TryUseConsumableSlot(int slot, out string message)
     {

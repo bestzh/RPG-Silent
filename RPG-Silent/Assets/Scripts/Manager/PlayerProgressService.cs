@@ -31,6 +31,8 @@ public sealed partial class PlayerProgressService : IDisposable
     public int Gold => stats.Gold;
     public int Level => stats.Level;
     public event Action Changed;
+    public event Action<bool> WorldLootCollected;
+    public event Action QuestCompleted;
 
     public PlayerProgressService(PlayerStats stats, ProgressSaveStore store)
     {
@@ -62,11 +64,14 @@ public sealed partial class PlayerProgressService : IDisposable
             EquipmentInstances.Migrate(d, FindItem);
             ProgressSaveStore.Validate(d);
             if (!ValidInventoryContent(d.inventory)) throw new InvalidDataException();
-            if (!ValidQuestContent(d.quests, d.classId)) throw new InvalidDataException();
+            if (!d.warehouse.items.All(ValidInventoryEntry)) throw new InvalidDataException();
+            if (!d.commerce.buyback.All(x => ValidInventoryEntry(x.item))) throw new InvalidDataException();
+            if (!ValidQuestContent(d.quests, d.classId, d.world)) throw new InvalidDataException();
             if (!ValidConsumableContent(d.consumables)) throw new InvalidDataException();
-            if (!ValidWorldContent(d.world)) throw new InvalidDataException();
+            if (!ValidWorldContent(d.world, d.quests, d.totalExp)) throw new InvalidDataException();
+            if (!ValidSpecializationContent(d)) throw new InvalidDataException();
             if (d.quests.entries.Any(e => e.lastTurnInRun > d.world.completedRuns ||
-                FindQuest(e.questId).RequiredStoryId.Length > 0 && d.world.Choice(FindQuest(e.questId).RequiredStoryId) != FindQuest(e.questId).RequiredChoiceId)) throw new InvalidDataException();
+                FindQuest(e.questId).RequiredChoiceId.Length > 0 && d.world.Choice(FindQuest(e.questId).RequiredStoryId) != FindQuest(e.questId).RequiredChoiceId)) throw new InvalidDataException();
         }
         catch (InvalidDataException) { return new ProgressLoadResult { Status = ProgressLoadStatus.Unsupported, Message = "装备、任务、药品记录或对应资源不可用，原文件已保留。" }; }
         return result;
@@ -130,7 +135,7 @@ public sealed partial class PlayerProgressService : IDisposable
     }
     public int GetSkillRank(SkillData s) => s != null && learned.TryGetValue(s.PersistentId, out int rank) ? rank : 0;
     public int GetWeaponLevel(WeaponDefinition w) => GetInstanceLevel(ResolveWeaponKey(w));
-    public float SkillDamageMultiplier(SkillData s) => (1f + Mathf.Max(0, GetSkillRank(s) - 1) * s.DamagePerRank) * (CurrentClass?.DamageMultiplier ?? 1f) * EquipmentDamageMultiplier;
+    public float SkillDamageMultiplier(SkillData s) => (1f + Mathf.Max(0, GetSkillRank(s) - 1) * s.DamagePerRank) * (CurrentClass?.DamageMultiplier ?? 1f) * EquipmentDamageMultiplier * SpecializationRules.SkillDamage(SpecializationRank(SpecializationDirection.Skill));
     public float WeaponDamageMultiplier(WeaponDefinition w) => (1f + GetWeaponLevel(w) * 0.1f) * (CurrentClass?.DamageMultiplier ?? 1f) * EquipmentDamageMultiplier * (w != null ? w.DamageMultiplier : 1f);
     public IEnumerable<SkillData> AvailableLessons => CurrentClass == null ? Enumerable.Empty<SkillData>() :
         (CurrentClass.IsAdvanced ? CurrentClass.BaseClass.Lessons : Array.Empty<SkillData>()).Concat(CurrentClass.Lessons).Where(s => s != null).Distinct();
@@ -152,6 +157,7 @@ public sealed partial class PlayerProgressService : IDisposable
         var d = Capture();
         d.learnedSkills = d.learnedSkills.Where(e => e.skillId != s.PersistentId).Append(new SkillProgressData { skillId = s.PersistentId, rank = next }).ToArray();
         if (rank == 0) { int empty = Array.IndexOf(d.skillIds, string.Empty); if (empty >= 0) d.skillIds[empty] = s.PersistentId; }
+        d.tutorial.Record(TutorialStep.LearnSkill);
         return CommitPurchase(d, s.CostForRank(next), $"{s.SkillName} 已提升至 {next} 级。", out message);
     }
     public bool TryEquipLearnedSkill(SkillData s, int slot, out string message)
@@ -179,6 +185,7 @@ public sealed partial class PlayerProgressService : IDisposable
         if (level >= MaxWeaponLevel) { message = "武器已达到强化上限。"; return false; }
         var d = Capture();
         d.inventory.Find(key).upgradeLevel = level + 1;
+        d.tutorial.Record(TutorialStep.Enhance);
         return CommitPurchase(d, WeaponUpgradeCost(level + 1), $"{item.DisplayName} 强化至 +{level + 1}。", out message);
     }
     public bool TryAdvanceClass(PlayerClassDefinition target, out string message)
@@ -190,19 +197,21 @@ public sealed partial class PlayerProgressService : IDisposable
         var d = Capture(); d.classId = target.Id;
         return CommitPurchase(d, target.AdvancementCost, $"已转职为{target.DisplayName}，开放专属技能和 5 级技能上限。", out message);
     }
-    bool CommitPurchase(PlayerProgressData d, int cost, string success, out string message)
+    bool CommitPurchase(PlayerProgressData d, int cost, string success, out string message, int refund = 0)
     {
         message = "请在主城导师或铁匠处操作。";
-        if (!attached || skills.GetComponent<PlayerController>().CombatAllowed || stats.IsDead || cost < 0) return false;
+        if (!attached || skills.GetComponent<PlayerController>().CombatAllowed || stats.IsDead || cost < 0 || refund < 0) return false;
         if (stats.Gold < cost) { message = $"金币不足，需要 {cost} 金币。"; return false; }
-        d.gold = stats.Gold - cost;
+        long resultingGold = (long)stats.Gold - cost + refund;
+        if (resultingGold > int.MaxValue) { message = "返还后金币超出上限，请先减少持有金币。"; return false; }
+        d.gold = (int)resultingGold;
         CollectInventoryDiscoveries(d);
         if (!store.TrySave(d, newProfile, out message)) { StatusMessage = message; HasUnsavedChanges = true; Changed?.Invoke(); return false; }
         applying = true;
         try
         {
             bool changedClass = classId != d.classId;
-            ApplyRecords(d); stats.TrySpendGold(cost);
+            ApplyRecords(d); stats.TrySpendGold(cost); stats.AddGold(refund);
             for (int i = 0; i < d.skillIds.Length; i++)
                 if ((skills.GetEquippedSkill(i)?.PersistentId ?? string.Empty) != d.skillIds[i])
                     skills.EquipSkill(i, d.skillIds[i].Length == 0 ? null : catalog[d.skillIds[i]]);
@@ -221,6 +230,10 @@ public sealed partial class PlayerProgressService : IDisposable
         classId = d.classId; CurrentGender = (PlayerGender)d.gender; learned.Clear();
         foreach (var e in d.learnedSkills) learned.Add(e.skillId, e.rank);
         inventory = d.inventory.Copy();
+        warehouse = d.warehouse.Copy();
+        commerce = d.commerce.Copy();
+        tutorial = d.tutorial.Copy();
+        specialization = d.specialization.Copy();
         journal = d.quests.Copy();
         consumables = d.consumables.Copy();
         world = d.world.Copy();
@@ -233,7 +246,7 @@ public sealed partial class PlayerProgressService : IDisposable
             skillIds = new string[PlayerSkillController.MaxSlots], weaponIds = new string[PlayerWeaponEquipment.SlotCount],
             learnedSkills = learned.OrderBy(p => p.Key).Select(p => new SkillProgressData { skillId = p.Key, rank = p.Value }).ToArray(),
             weaponUpgrades = Array.Empty<WeaponUpgradeData>(), equipmentVersion = 1, quests = journal.Copy(), consumables = consumables.Copy(), world = world.Copy(),
-            weaponInstanceIds = Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetInstanceId).ToArray(), inventory = inventory.Copy() };
+            weaponInstanceIds = Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Select(weapons.GetInstanceId).ToArray(), inventory = inventory.Copy(), warehouse = warehouse.Copy(), commerce = commerce.Copy(), tutorial = tutorial.Copy(), specialization = specialization.Copy() };
         for (int i = 0; i < d.weaponIds.Length; i++)
         {
             var w = weapons.GetWeapon(i); d.weaponIds[i] = w?.PersistentId ?? string.Empty;

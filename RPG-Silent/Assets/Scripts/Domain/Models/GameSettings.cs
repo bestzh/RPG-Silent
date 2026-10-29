@@ -11,5 +11,7 @@ namespace RPGSilent.Domain
 
         /// <summary>屏幕震动强度，0~1。</summary>
         public float ScreenShakeIntensity;
+        public bool ShowDamageNumbers = true;
+        public float FeedbackIntensity = 1f;
     }
 }

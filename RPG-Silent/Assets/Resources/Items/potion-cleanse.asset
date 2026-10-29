@@ -17,8 +17,9 @@ MonoBehaviour:
   Description: "\u6E05\u9664\u707C\u70E7\u4E0E\u8FDF\u7F13\u3002\u6CA1\u6709\u5F02\u5E38\u72B6\u6001\u65F6\u4E0D\u6D88\u8017\u3002"
   Kind: 3
   Rarity: 0
+  SpecialEffect: 0
   Slot: 0
-  Icon: {fileID: 21300000, guid: 20440c456e08b284c80b99da6921edc9, type: 3}
+  Icon: {fileID: 21300000, guid: b1159bd1bb5799e4d8a171d2289d6f9b, type: 3}
   Weapon: {fileID: 0}
   Appearance: {fileID: 0}
   Set: {fileID: 0}

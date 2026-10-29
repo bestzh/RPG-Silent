@@ -27,6 +27,7 @@ public sealed class WorldLootPickup : MonoBehaviour
     const float AttractionRadius = 12f;
     ItemStackData payload;
     public ItemStackData Payload => payload?.Copy();
+    public void SetLabelVisible(bool visible) { if (label != null) label.gameObject.SetActive(visible); }
 
     void OnEnable() => active.Add(this);
     void OnDisable() => active.Remove(this);
@@ -117,7 +118,7 @@ public sealed class WorldLootPickup : MonoBehaviour
         var text = new GameObject("Loot label").AddComponent<TextMeshPro>(); label = text.transform; label.SetParent(transform, false);
         label.localPosition = Vector3.up * 1.35f; text.font = presentation.Font; text.fontSize = 2.2f;
         text.alignment = TextAlignmentOptions.Center; text.rectTransform.sizeDelta = new Vector2(4.5f, .5f);
-        text.text = Item != null && Item.Kind != ItemKind.Weapon ? Item.RarityLabel + " · " + DisplayName : DisplayName; text.color = QualityColor;
+        text.text = Item != null && !DisplayName.StartsWith(Item.RarityLabel, StringComparison.Ordinal) ? Item.RarityLabel + " · " + DisplayName : DisplayName; text.color = QualityColor;
     }
     void LateUpdate()
     {

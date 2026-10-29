@@ -7,6 +7,7 @@ namespace RPGSilent.Domain
     public interface IGameSettingsService
     {
         GameSettings CurrentSettings { get; }
+        GameSettings Defaults { get; }
 
         /// <summary>难度选项（简单 / 普通 / 困难）。</summary>
         IReadOnlyList<string> DifficultyOptions { get; }

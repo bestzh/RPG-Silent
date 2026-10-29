@@ -1,0 +1,902 @@
+{
+  "date": "2026-10-29T11:37:41+08:00",
+  "runtime_files": 246,
+  "runtime_lines": 22645,
+  "ui_files": 43,
+  "ui_lines": 6049,
+  "pages": 84,
+  "references": 2,
+  "configuration_counts": {
+    "LIVE_ITEMS": 64,
+    "LIVE_SETS": 6,
+    "LIVE_QUESTS": 48,
+    "LIVE_ACHIEVEMENTS": 10,
+    "LIVE_STORIES": 5,
+    "LIVE_RECIPES": 13,
+    "LIVE_LESSONS": 21,
+    "LIVE_TUTORIAL_TITLES": 14
+  },
+  "features": [
+    {
+      "feature": "启程与角色",
+      "rules": "新建只选择基础职业与性别；进阶分支在导师处开放。角色记录独立，删除与无法继续读取各自说明后果。",
+      "flow": "进入角色页 → 选择记录 → 继续；新建使用当前职业模型。",
+      "pages": [
+        "start",
+        "creation",
+        "characters",
+        "save-menu-failed"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/CharacterCreationView.cs",
+        "Assets/Scripts/UI/CharacterModelPreview.cs",
+        "Assets/Scripts/UI/CharacterSelectionView.cs",
+        "Assets/Scripts/UI/StartUI.cs"
+      ]
+    },
+    {
+      "feature": "游玩状态与战斗",
+      "rules": "生命、能量、冷却、职业机制、目标与 Boss 阶段分别固定位置；主城禁战，训练不发奖；危险预警与操作反馈不占任务列表。",
+      "flow": "战斗中保留视野，技能/药品用现有快捷键；需要鼠标时显示光标。",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/MainUI.Adventure.cs",
+        "Assets/Scripts/UI/MainUI.Combat.cs",
+        "Assets/Scripts/UI/MainUI.cs",
+        "Assets/Scripts/UI/MainUI.EquipmentEffects.cs",
+        "Assets/Scripts/UI/MainUI.Journey.cs",
+        "Assets/Scripts/UI/MainUI.Targeting.cs",
+        "Assets/Scripts/UI/SkillSlotUI.cs",
+        "Assets/Scripts/UI/WeaponEquipmentUI.cs"
+      ]
+    },
+    {
+      "feature": "拾取与离场",
+      "rules": "L 附近列表、6 种品质显示筛选、每页 8 项；方向键选择，E/Enter 仅拾取可达物品。满包或保存失败仍留地面，金币经验吸附；离场有未拾取金红物品先确认。",
+      "flow": "选择掉落 → 拾取；品质筛选不改变掉落。",
+      "pages": [
+        "nearby-loot",
+        "loot-leave",
+        "world-feedback"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/MainUI.Loot.cs"
+      ]
+    },
+    {
+      "feature": "当前穿戴与试穿",
+      "rules": "5 个防具饰品槽与 2 个武器槽持续显示名称、强化、空槽和当前/备用。查看、试穿、实际穿戴分开；低等级可预览，确认需满足等级与角色状态。",
+      "flow": "防具：选中 → 对比全身变化 → 确认穿戴；武器：选中 → 指定槽 1/2。",
+      "pages": [
+        "inventory",
+        "inventory-tryon",
+        "inventory-weapon",
+        "inventory-low-level",
+        "inventory-save-failed",
+        "inventory-empty-slot"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/InventoryUI.cs"
+      ]
+    },
+    {
+      "feature": "背包整理与药品",
+      "rules": "24 格背包、待领取上限 256 项；7 类直接选择，名称搜索，品质/等级/类型/获得排序双向。新物品与锁定可见；药品设 Q/R/F，共享冷却。输入 B 不关闭，Esc 分层取消。",
+      "flow": "常用整理留在页面，批量选择后一次核对数量与结果。",
+      "pages": [
+        "inventory-search",
+        "inventory-consumable",
+        "inventory-overflow",
+        "inventory-bulk-sell",
+        "inventory-bulk-discard",
+        "inventory-bulk-review"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/InventoryUI.Consumables.cs",
+        "Assets/Scripts/UI/InventoryUI.Organization.cs"
+      ]
+    },
+    {
+      "feature": "整套方案、分解与丢弃",
+      "rules": "3 个方案保存 5 防具、2 武器与当前槽。多件试穿逐部位组合，确认整套前不变；涉及武器的整套调整回主城。出售/分解保护穿戴、两武器槽、锁定、宝石；分解仅防具饰品。丢弃可回收，离场消失。",
+      "flow": "复杂整理作为次要入口；单件穿戴不要求先建方案。",
+      "pages": [
+        "inventory-outfit",
+        "loadouts",
+        "inventory-batch",
+        "discard"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/InventoryUI.Discard.cs",
+        "Assets/Scripts/UI/InventoryUI.Management.cs"
+      ]
+    },
+    {
+      "feature": "装备特殊效果",
+      "rules": "仅传说/神话对应固有效果；I/II 两级，同类取最高，当前武器与已穿戴防具饰品才生效。试穿不触发，不靠换装刷新本场冷却。",
+      "flow": "物品详情就地打开规则，说明触发、效果、冷却和生效来源。",
+      "pages": [
+        "equipment-effects"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/InventoryUI.Effects.cs"
+      ]
+    },
+    {
+      "feature": "任务、章节、收藏",
+      "rules": "当前 48 项任务、7 章主线、10 成就。NPC 接取/交付；手札追踪/取消追踪/放弃。章节门槛含等级、前置、故事、好感；职业考验需同一趟有效正式通关。放弃不撤回历史奖励或故事决定。",
+      "flow": "任务详情保留目标、进度、奖励、交付对象与追踪操作；成就达成后手动领取。",
+      "pages": [
+        "journal",
+        "journal-chapters",
+        "journal-abandon",
+        "achievements",
+        "codex"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/MainUI.Quests.cs",
+        "Assets/Scripts/UI/QuestJournalUI.Chapters.cs",
+        "Assets/Scripts/UI/QuestJournalUI.Collections.cs",
+        "Assets/Scripts/UI/QuestJournalUI.cs"
+      ]
+    },
+    {
+      "feature": "NPC 服务、故事与成长",
+      "rules": "按 NPC 显示已实现服务。21 项技能：基础职业最高 3、进阶最高 5，学习后首个空槽自动装配。转职 Lv.10/300 金币且不可改分支。武器/防具强化最高 +5；宝石、13 配方、重铸均明确费用。5 段故事保留真实选择和好感。",
+      "flow": "技能直接选择十个位置；费用与结果同屏；故事先选择再确认。",
+      "pages": [
+        "mentor",
+        "skill-assign",
+        "advancement",
+        "forge-weapon",
+        "forge-armor",
+        "forge-gems",
+        "gem-socket",
+        "crafting",
+        "reforge",
+        "reforge-review",
+        "npc-quests",
+        "npc-story",
+        "story-confirm"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/TownNpcUI.cs",
+        "Assets/Scripts/UI/TownNpcUI.Quests.cs",
+        "Assets/Scripts/UI/TownNpcUI.World.cs"
+      ]
+    },
+    {
+      "feature": "互斥专精",
+      "rules": "4 个方向互斥、各 3 级；Lv.6/12/18，150/300/450 金币与 2/4/6 碎片。重置付 100，返已投金币 80%，材料不返。驭灵限御兽师已学召唤。",
+      "flow": "当前方向、下级变化、投入与重置返还同时可读。",
+      "pages": [
+        "specialization",
+        "specialization-confirm",
+        "specialization-reset"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/TownNpcUI.Specialization.cs"
+      ]
+    },
+    {
+      "feature": "仓库存取",
+      "rules": "每角色 96 格，保留实例、强化、宝石和锁定。锁定可存取，穿戴及方案引用不可存，待领取须先入包。批量数量每页 8 项核对；满容量/保存失败整笔不变。",
+      "flow": "先选存入/取出方向，再选物品、核对清单和两侧容量。",
+      "pages": [
+        "warehouse-deposit",
+        "warehouse-withdraw",
+        "warehouse-review"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/TownNpcUI.Warehouse.cs"
+      ]
+    },
+    {
+      "feature": "补给与误售回购",
+      "rules": "购买 1–99，总价与容量明确；满包新堆叠转待领取。晶核碎片由委托或好感 20 开放，好感 40/70 分别 10%/15% 优惠并向上取整。回购 48 小时/最近 24 项，整条原记录、原实例、原价；需直接放入背包。",
+      "flow": "商店两页直接选购买/回购；购买数量和回购原记录分别确认。",
+      "pages": [
+        "supplies",
+        "shop-purchase",
+        "shop-buyback",
+        "shop-buyback-review"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/TownNpcUI.Commerce.cs",
+        "Assets/Scripts/UI/TownNpcUI.Supplies.cs"
+      ]
+    },
+    {
+      "feature": "传送、远征与训练",
+      "rules": "2 张正式地图与独立训练场，地图各自难度。6 种模式：探索、限时、首领试炼、远征、首领连战、千层。远征种子决定阵型/精英/事件/可选节点，重试和读档沿用组合，场景进度重置；组合事件奖仅一次。",
+      "flow": "地点、难度与模式各自选择，六个模式一眼可点；出发前显示规则。",
+      "pages": [
+        "portal-forest",
+        "portal-crystal",
+        "portal-training",
+        "portal-timed",
+        "portal-trial",
+        "portal-expedition",
+        "portal-rush",
+        "portal-gauntlet",
+        "event-abandon"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/PortalUI.cs"
+      ]
+    },
+    {
+      "feature": "结算与长期挑战",
+      "rules": "常规结算与长期挑战分开。首领连战 6 轮、千层最高 1000，每 5 层首领，每轮 10 分钟；提交奖励纪录后恢复四分之一生命能量。待保存阻止继续/离场，失败重开第 1 轮。",
+      "flow": "成功先看奖励，再拾取/重试/回城；长期挑战休整时直接继续或结束。",
+      "pages": [
+        "victory",
+        "defeat",
+        "reward-save-failed",
+        "long-rest",
+        "long-pending",
+        "long-end-confirm",
+        "long-result"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/DungeonUI.cs",
+        "Assets/Scripts/UI/DungeonUI.LongChallenges.cs"
+      ]
+    },
+    {
+      "feature": "新手引导",
+      "rules": "14 步来自当前 TutorialTitles，保存角色进度，可跳过、回看、退出续接；按实际动作计数。",
+      "flow": "仅提示当前一步；完整步骤放入可翻页回看。",
+      "pages": [
+        "tutorial",
+        "tutorial-current",
+        "tutorial-review"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/MainUI.Tutorial.cs"
+      ]
+    },
+    {
+      "feature": "设置、暂停与加载",
+      "rules": "4 页设置：屏幕、声音、14 项改键/控制、6 项游戏选项。新增伤害数字与反馈强度已对齐。应用保存、关闭撤销未应用修改、恢复默认仅预览；重复/保留键拒绝，冲刺/翻滚共享。加载失败可重试或按上下文返回；保存失败不继续离场。",
+      "flow": "同页操作后应用；Esc 先关展开项或取消改键，返回目的地明确。",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "ui_files": [
+        "Assets/Scripts/UI/LoadingUI.cs",
+        "Assets/Scripts/UI/PauseUI.cs",
+        "Assets/Scripts/UI/SettingPage/ControllerPage.cs",
+        "Assets/Scripts/UI/SettingPage/GamePage.cs",
+        "Assets/Scripts/UI/SettingPage/ScreenPage.cs",
+        "Assets/Scripts/UI/SettingPage/SoundPage.cs",
+        "Assets/Scripts/UI/SettingsUI.cs"
+      ]
+    },
+    {
+      "feature": "共用布局与音效",
+      "rules": "共用按钮、字体、遮罩与可视反馈支撑上述页面；已实现按钮音效与音乐/音效设置联动，没有新增独立音效业务页。",
+      "flow": "同类状态与按钮保持一致。",
+      "pages": [],
+      "ui_files": [
+        "Assets/Scripts/UI/ProgressionUIWidgets.cs",
+        "Assets/Scripts/UI/UiAudioFeedback.cs"
+      ]
+    }
+  ],
+  "ui_coverage": [
+    {
+      "path": "Assets/Scripts/UI/CharacterCreationView.cs",
+      "feature": "启程与角色",
+      "pages": [
+        "start",
+        "creation",
+        "characters",
+        "save-menu-failed"
+      ],
+      "sha256": "4e0e39fcb1bc05dd7dcc4de5001f90a6c7f8582ce0362f5590edff212afb8422",
+      "lines": 154
+    },
+    {
+      "path": "Assets/Scripts/UI/CharacterModelPreview.cs",
+      "feature": "启程与角色",
+      "pages": [
+        "start",
+        "creation",
+        "characters",
+        "save-menu-failed"
+      ],
+      "sha256": "919572d4f6f9f0e5e207ff9774a7e6c048af0c74a03bd40b5e185b435f2fc7f9",
+      "lines": 206
+    },
+    {
+      "path": "Assets/Scripts/UI/CharacterSelectionView.cs",
+      "feature": "启程与角色",
+      "pages": [
+        "start",
+        "creation",
+        "characters",
+        "save-menu-failed"
+      ],
+      "sha256": "fa70b9c77078fa434cdc3a8bcc01ccbc6106406f46b0cb6629847c487e3fa29b",
+      "lines": 115
+    },
+    {
+      "path": "Assets/Scripts/UI/StartUI.cs",
+      "feature": "启程与角色",
+      "pages": [
+        "start",
+        "creation",
+        "characters",
+        "save-menu-failed"
+      ],
+      "sha256": "060307b0246ee5a72b45667e866c0cb24a1ca7412eb97edc2dafa1593c40e29e",
+      "lines": 145
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Adventure.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "b2b493980baee450a72f238861264582a1e11dbc24f8b979fef12cab4dfbaf84",
+      "lines": 110
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Combat.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "deaa8c6efd894badd80ecd7579ea02c4bf46736ca2cba8df3fd510442bdb0daf",
+      "lines": 67
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "e7d5dc446afb018a9ebed994d66a3b86bed07d30ca28b541076572be0772413f",
+      "lines": 335
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.EquipmentEffects.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "09bec0b182a21e97681d763f84c7fb8bb0ca7969789e1b1aa80d1525561d8e8a",
+      "lines": 31
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Journey.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "b0016ed761dad10f1b45ae7c0594740a8bf84528ea7e6abe844f5da149f35fff",
+      "lines": 75
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Targeting.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "b4d5b3bcc4189c18f3157b11eb4514776d397aaf9bc828ba4f276ead261f49ab",
+      "lines": 134
+    },
+    {
+      "path": "Assets/Scripts/UI/SkillSlotUI.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "a4c4bf868d65d5316a6682917f84d09e6e8e6f9fce50cfd370f30e08c212f924",
+      "lines": 132
+    },
+    {
+      "path": "Assets/Scripts/UI/WeaponEquipmentUI.cs",
+      "feature": "游玩状态与战斗",
+      "pages": [
+        "hud-town",
+        "hud-dungeon",
+        "world-feedback",
+        "hud-expedition",
+        "hud-long",
+        "training"
+      ],
+      "sha256": "f4e5a10769d0365500b2c6b65c9bf7a38f49a2f800cfca6e90b5355f5f5a6e84",
+      "lines": 103
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Loot.cs",
+      "feature": "拾取与离场",
+      "pages": [
+        "nearby-loot",
+        "loot-leave",
+        "world-feedback"
+      ],
+      "sha256": "fef07ece6c115bbae4d64f8c96e21a9c3adacaa2755a6c34cc4f1e73799ef9b9",
+      "lines": 109
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.cs",
+      "feature": "当前穿戴与试穿",
+      "pages": [
+        "inventory",
+        "inventory-tryon",
+        "inventory-weapon",
+        "inventory-low-level",
+        "inventory-save-failed",
+        "inventory-empty-slot"
+      ],
+      "sha256": "dee04a9f46e3729c4220eb24e6733ac95c3e50480832e815ee5dc37e57489a2e",
+      "lines": 306
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.Consumables.cs",
+      "feature": "背包整理与药品",
+      "pages": [
+        "inventory-search",
+        "inventory-consumable",
+        "inventory-overflow",
+        "inventory-bulk-sell",
+        "inventory-bulk-discard",
+        "inventory-bulk-review"
+      ],
+      "sha256": "6c18aee08b37ac7edde4f8f10cfc676d44dbb547965b5b6214cd2a8f50bb40c5",
+      "lines": 42
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.Organization.cs",
+      "feature": "背包整理与药品",
+      "pages": [
+        "inventory-search",
+        "inventory-consumable",
+        "inventory-overflow",
+        "inventory-bulk-sell",
+        "inventory-bulk-discard",
+        "inventory-bulk-review"
+      ],
+      "sha256": "a78643f34f6d3f789a1cb66555ea46f4a90812d242ac98ea53d03cf2ac2ba587",
+      "lines": 214
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.Discard.cs",
+      "feature": "整套方案、分解与丢弃",
+      "pages": [
+        "inventory-outfit",
+        "loadouts",
+        "inventory-batch",
+        "discard"
+      ],
+      "sha256": "089c67664b13709a633098ccc193d5eeec28625ebc9dff598852f594bedbdae0",
+      "lines": 101
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.Management.cs",
+      "feature": "整套方案、分解与丢弃",
+      "pages": [
+        "inventory-outfit",
+        "loadouts",
+        "inventory-batch",
+        "discard"
+      ],
+      "sha256": "581d8913b433179c7f779e421395e1b4a978c055fa900ee44d899f2f63d94d76",
+      "lines": 178
+    },
+    {
+      "path": "Assets/Scripts/UI/InventoryUI.Effects.cs",
+      "feature": "装备特殊效果",
+      "pages": [
+        "equipment-effects"
+      ],
+      "sha256": "99c96e53ad7a7a715c89d47f9ee1e7351980ddf06fe61bba44203a05592a1f41",
+      "lines": 58
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Quests.cs",
+      "feature": "任务、章节、收藏",
+      "pages": [
+        "journal",
+        "journal-chapters",
+        "journal-abandon",
+        "achievements",
+        "codex"
+      ],
+      "sha256": "4da0778a92988aecc20c91279e9db28672ea235587bedd5a4a42a3db068f8e39",
+      "lines": 34
+    },
+    {
+      "path": "Assets/Scripts/UI/QuestJournalUI.Chapters.cs",
+      "feature": "任务、章节、收藏",
+      "pages": [
+        "journal",
+        "journal-chapters",
+        "journal-abandon",
+        "achievements",
+        "codex"
+      ],
+      "sha256": "6239c296b447c3157598b5fa9c7e026733f0eac50a3f7c3335ec3bb56559e7b5",
+      "lines": 50
+    },
+    {
+      "path": "Assets/Scripts/UI/QuestJournalUI.Collections.cs",
+      "feature": "任务、章节、收藏",
+      "pages": [
+        "journal",
+        "journal-chapters",
+        "journal-abandon",
+        "achievements",
+        "codex"
+      ],
+      "sha256": "c1695b57d33849cd11b7a7a4bdd473cabc6afc956b973869a3dedbcf554ffeef",
+      "lines": 65
+    },
+    {
+      "path": "Assets/Scripts/UI/QuestJournalUI.cs",
+      "feature": "任务、章节、收藏",
+      "pages": [
+        "journal",
+        "journal-chapters",
+        "journal-abandon",
+        "achievements",
+        "codex"
+      ],
+      "sha256": "0574dd432d907160809c7cdd62a268ad7f80c7e2675c38560aa2487dc2d7e59c",
+      "lines": 96
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.cs",
+      "feature": "NPC 服务、故事与成长",
+      "pages": [
+        "mentor",
+        "skill-assign",
+        "advancement",
+        "forge-weapon",
+        "forge-armor",
+        "forge-gems",
+        "gem-socket",
+        "crafting",
+        "reforge",
+        "reforge-review",
+        "npc-quests",
+        "npc-story",
+        "story-confirm"
+      ],
+      "sha256": "6980f9458b79bf11a42e2b7fe7475d8e6feade4719b82992f6fb487c34e5b0ed",
+      "lines": 254
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.Quests.cs",
+      "feature": "NPC 服务、故事与成长",
+      "pages": [
+        "mentor",
+        "skill-assign",
+        "advancement",
+        "forge-weapon",
+        "forge-armor",
+        "forge-gems",
+        "gem-socket",
+        "crafting",
+        "reforge",
+        "reforge-review",
+        "npc-quests",
+        "npc-story",
+        "story-confirm"
+      ],
+      "sha256": "41a7dbf3f77a298b501be391efde3601e5dcfff13aa2a5cf6f3a9887d7dc30c8",
+      "lines": 82
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.World.cs",
+      "feature": "NPC 服务、故事与成长",
+      "pages": [
+        "mentor",
+        "skill-assign",
+        "advancement",
+        "forge-weapon",
+        "forge-armor",
+        "forge-gems",
+        "gem-socket",
+        "crafting",
+        "reforge",
+        "reforge-review",
+        "npc-quests",
+        "npc-story",
+        "story-confirm"
+      ],
+      "sha256": "15c782a635f2b8cf804657a02ac85ae1ce6ad13a100bdad4b8d48be253c2287b",
+      "lines": 140
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.Specialization.cs",
+      "feature": "互斥专精",
+      "pages": [
+        "specialization",
+        "specialization-confirm",
+        "specialization-reset"
+      ],
+      "sha256": "ac04c53df1ab99d8a27eccaafc0f008012959375d233b8a0f27ef42f50ec312b",
+      "lines": 114
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.Warehouse.cs",
+      "feature": "仓库存取",
+      "pages": [
+        "warehouse-deposit",
+        "warehouse-withdraw",
+        "warehouse-review"
+      ],
+      "sha256": "a4aec8e3f8db89207c36d04a93496a963e121cf73db401a391540f1567b87c86",
+      "lines": 184
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.Commerce.cs",
+      "feature": "补给与误售回购",
+      "pages": [
+        "supplies",
+        "shop-purchase",
+        "shop-buyback",
+        "shop-buyback-review"
+      ],
+      "sha256": "85e1564c476d323c7e911ad2d86520f21a05e55b9232c17cc8ab3a2eb3d4c898",
+      "lines": 132
+    },
+    {
+      "path": "Assets/Scripts/UI/TownNpcUI.Supplies.cs",
+      "feature": "补给与误售回购",
+      "pages": [
+        "supplies",
+        "shop-purchase",
+        "shop-buyback",
+        "shop-buyback-review"
+      ],
+      "sha256": "2ce84035ff8bc188143f9b34b2fefa9564c4c499f932c22cf13efde171bdacc9",
+      "lines": 31
+    },
+    {
+      "path": "Assets/Scripts/UI/PortalUI.cs",
+      "feature": "传送、远征与训练",
+      "pages": [
+        "portal-forest",
+        "portal-crystal",
+        "portal-training",
+        "portal-timed",
+        "portal-trial",
+        "portal-expedition",
+        "portal-rush",
+        "portal-gauntlet",
+        "event-abandon"
+      ],
+      "sha256": "5a94a727e1ebec0f34a3581411d4df21fa25ad8600879db6dab527251651248c",
+      "lines": 409
+    },
+    {
+      "path": "Assets/Scripts/UI/DungeonUI.cs",
+      "feature": "结算与长期挑战",
+      "pages": [
+        "victory",
+        "defeat",
+        "reward-save-failed",
+        "long-rest",
+        "long-pending",
+        "long-end-confirm",
+        "long-result"
+      ],
+      "sha256": "2ac5b62cff765524a8802531ca736a0274e5c03df5aaf94d096fff536d4f0c12",
+      "lines": 190
+    },
+    {
+      "path": "Assets/Scripts/UI/DungeonUI.LongChallenges.cs",
+      "feature": "结算与长期挑战",
+      "pages": [
+        "victory",
+        "defeat",
+        "reward-save-failed",
+        "long-rest",
+        "long-pending",
+        "long-end-confirm",
+        "long-result"
+      ],
+      "sha256": "7d221b8ef46e66e89b8e33893372ab7e7893444d8446dd48fd6a659336ee35be",
+      "lines": 75
+    },
+    {
+      "path": "Assets/Scripts/UI/MainUI.Tutorial.cs",
+      "feature": "新手引导",
+      "pages": [
+        "tutorial",
+        "tutorial-current",
+        "tutorial-review"
+      ],
+      "sha256": "8a324021c4171354e542baa1d45462387f8cac4c626467166e5a044d0b0c9401",
+      "lines": 154
+    },
+    {
+      "path": "Assets/Scripts/UI/LoadingUI.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "41a40783a6abb5a55857cebe39b8825e6d03cc15abfccebd38226949a1f46443",
+      "lines": 170
+    },
+    {
+      "path": "Assets/Scripts/UI/PauseUI.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "366a4102bc7c30cb48b7af85eff1a0fb3aa5d014b6c8331e30a1dcb62fc27270",
+      "lines": 90
+    },
+    {
+      "path": "Assets/Scripts/UI/SettingPage/ControllerPage.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "bf9e619e571ed268d655e3cefc5cb84dda16e0b8b90263779665f6dc9f95f842",
+      "lines": 336
+    },
+    {
+      "path": "Assets/Scripts/UI/SettingPage/GamePage.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "3d0ccd8f3bd437b5ce51654656f4d956df69f6d44679e30cd47e4d21b92e51e1",
+      "lines": 250
+    },
+    {
+      "path": "Assets/Scripts/UI/SettingPage/ScreenPage.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "8a83c359a12ddea809d37b740cf9b47f43d51c7e68c045a89a2a0ca8992e6bfb",
+      "lines": 180
+    },
+    {
+      "path": "Assets/Scripts/UI/SettingPage/SoundPage.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "d384dffa3b0823b15e3012cbb684ee6d3e4a105a5f5320b4470a5271c5c8eada",
+      "lines": 162
+    },
+    {
+      "path": "Assets/Scripts/UI/SettingsUI.cs",
+      "feature": "设置、暂停与加载",
+      "pages": [
+        "settings-screen",
+        "settings-sound",
+        "settings-controls",
+        "settings-game",
+        "rebind-active",
+        "pause",
+        "loading",
+        "loading-error",
+        "save-menu-failed"
+      ],
+      "sha256": "a3d5fff5031eba71dc18d2a227b845ff7821eaa4de97e24e911fd6c27790b5c3",
+      "lines": 154
+    },
+    {
+      "path": "Assets/Scripts/UI/ProgressionUIWidgets.cs",
+      "feature": "共用布局与音效",
+      "pages": [],
+      "sha256": "2f27a40ef8b199ef0d599071ef5d04e1fb98a7258a608df5d2bffabed641b919",
+      "lines": 63
+    },
+    {
+      "path": "Assets/Scripts/UI/UiAudioFeedback.cs",
+      "feature": "共用布局与音效",
+      "pages": [],
+      "sha256": "b82d825595d524fce9958c9d0179598c2708f20ec451bebd289d87a3a43dc9a5",
+      "lines": 19
+    }
+  ]
+}

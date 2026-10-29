@@ -505,6 +505,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   virtualCamera: {fileID: 6058772346759316302}
   rotationSpeed: 1
+  viewHeight: 1.4
 --- !u!1 &6843493055394645545
 GameObject:
   m_ObjectHideFlags: 0

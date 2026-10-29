@@ -25720,14 +25720,18 @@ MonoBehaviour:
     Enemies:
     - Prefab: {fileID: 3767586558431366248, guid: e2fb5fc70c995d74aa8367d7c717e5ce, type: 3}
       Point: {fileID: 2057106401}
+      Trait: 1
     - Prefab: {fileID: 3767586558431366248, guid: e2fb5fc70c995d74aa8367d7c717e5ce, type: 3}
       Point: {fileID: 1819362309}
+      Trait: 0
     - Prefab: {fileID: 2581805239856536586, guid: 92d178c83b543764db7a441a07c949f9, type: 3}
       Point: {fileID: 1918763290}
+      Trait: 3
   - Name: "\u524D\u5F80\u5317\u4FA7\u5E73\u53F0\uFF0C\u51FB\u8D25\u66AE\u5F71\u9886\u4E3B"
     Enemies:
     - Prefab: {fileID: 4691586716535488853, guid: d936367dc7eb085438daffd8baf701c7, type: 3}
       Point: {fileID: 1496346067}
+      Trait: 0
   WaveDelay: 2.5
   GroupCombat:
     MaxAttackers: 2
@@ -34172,13 +34176,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 857874309}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.458105, y: 0.554924, z: -45.559723}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.1999998, y: 0, z: -2.9000015}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1125877428}
-  m_Father: {fileID: 1154439806}
+  m_Father: {fileID: 1178815889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &857874311
 NavMeshObstacle:
@@ -46617,15 +46621,14 @@ Transform:
   - {fileID: 427955012}
   - {fileID: 447661072}
   - {fileID: 1369000866}
-  - {fileID: 857874310}
   - {fileID: 74509283}
-  - {fileID: 1437846005}
   - {fileID: 2026066764}
   - {fileID: 1709851113}
   - {fileID: 1115393850}
   - {fileID: 1332027787}
   - {fileID: 1732171740}
   - {fileID: 1732937905}
+  - {fileID: 1178815889}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1155373769
@@ -47876,6 +47879,39 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3106593677614146600, guid: bb09e0a9e0093674fa6b6dd8b5c870f4, type: 3}
   m_PrefabInstance: {fileID: 1178805549}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1178815888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1178815889}
+  m_Layer: 0
+  m_Name: Hidden passage exit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1178815889
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178815888}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.258105, y: 0.554924, z: -42.65972}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1437846005}
+  - {fileID: 857874310}
+  m_Father: {fileID: 1154439806}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1180673085
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -59046,13 +59082,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1437846004}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.258105, y: 0.554924, z: -42.65972}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 538625226}
-  m_Father: {fileID: 1154439806}
+  m_Father: {fileID: 1178815889}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &1437846006
 NavMeshObstacle:
@@ -69806,7 +69842,7 @@ MonoBehaviour:
   DisplayName: "\u68C0\u67E5\u9690\u853D\u77F3\u7891"
   PersistentId: forest-hidden
   Hidden: 1
-  MovingGate: {fileID: 1437846005}
+  MovingGate: {fileID: 1178815889}
   ChestLid: {fileID: 0}
   RevealRoot: {fileID: 1115393849}
   ElitePrefab: {fileID: 0}

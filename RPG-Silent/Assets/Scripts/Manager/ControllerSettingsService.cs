@@ -17,6 +17,12 @@ public class ControllerSettingsService : MonoBehaviour, IControllerSettingsServi
     private const bool  DefaultInvertY          = false;
 
     public ControllerSettings CurrentSettings { get; private set; } = new ControllerSettings();
+    public ControllerSettings Defaults => new ControllerSettings
+    {
+        MouseSensitivity = DefaultMouseSensitivity,
+        SprintHoldTime = DefaultSprintHoldTime,
+        InvertY = DefaultInvertY
+    };
 
     public event Action<ControllerSettings> OnSettingsApplied;
 

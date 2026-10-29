@@ -21,6 +21,8 @@ namespace RPGSilent.Domain
         public CollectionRecord[] collection = Array.Empty<CollectionRecord>();
         public string[] claimedAchievements = Array.Empty<string>();
         public int completedRuns;
+        public ExpeditionData expedition = new();
+        public ChallengeCareerData challenges = new();
         public float townHour = 8;
         public int townDay = 1;
         public WorldProgressData Copy() => new()
@@ -28,7 +30,7 @@ namespace RPGSilent.Domain
             choices = choices.Select(x => new StoryChoiceData { storyId = x.storyId, choiceId = x.choiceId }).ToArray(),
             affinities = affinities.Select(x => new NpcAffinityData { role = x.role, value = x.value }).ToArray(),
             collection = collection.Select(x => x.Copy()).ToArray(), claimedAchievements = (string[])claimedAchievements.Clone(),
-            completedRuns = completedRuns, townHour = townHour, townDay = townDay
+            completedRuns = completedRuns, townHour = townHour, townDay = townDay, expedition = expedition.Copy(), challenges = challenges.Copy()
         };
         public string Choice(string story) => choices.FirstOrDefault(x => x.storyId == story)?.choiceId ?? "";
         public int Affinity(int role) => affinities.FirstOrDefault(x => x.role == role)?.value ?? 0;
@@ -54,6 +56,8 @@ namespace RPGSilent.Domain
                 d.choices.Length > 64 || d.affinities.Length > 5 || d.collection.Length > 512 || d.claimedAchievements.Length > 128 ||
                 d.completedRuns < 0 || d.completedRuns > 1000000 || float.IsNaN(d.townHour) || d.townHour < 0 || d.townHour >= 24 || d.townDay < 1 || d.townDay > 1000000)
                 throw new InvalidDataException("冒险记录不完整或超出范围。");
+            ExpeditionData.Validate(d.expedition);
+            ChallengeCareerData.Validate(d.challenges);
             if (d.choices.Any(x => x == null || !Id(x.storyId) || !Id(x.choiceId)) || d.choices.Select(x => x.storyId).Distinct().Count() != d.choices.Length ||
                 d.affinities.Any(x => x == null || x.role < 0 || x.role > 4 || x.value < 0 || x.value > 100) || d.affinities.Select(x => x.role).Distinct().Count() != d.affinities.Length ||
                 d.collection.Any(x => x == null || !Enum.IsDefined(typeof(CollectionKind), x.kind) || !Id(x.id) || x.count < 1 || x.count > 1000000) ||

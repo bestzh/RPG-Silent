@@ -11,35 +11,49 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
   m_Name: main-crystal
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: main-crystal
   Title: "\u6C34\u6676\u6DF1\u5904"
   Description: "\u68EE\u6797\u5371\u673A\u5DF2\u7ECF\u89E3\u9664\uFF0C\u5F02\u5E38\u6676\u6838\u7684\u6765\u6E90\u5374\u4ECD\u672A\u67E5\u660E\u3002\u8FDB\u5165\u6C34\u6676\u6D1E\u7A9F\uFF0C\u7A81\u7834\u4E09\u6CE2\u5B88\u536B\u5E76\u51FB\u8D25\u6676\u6838\u5B88\u671B\u8005\uFF0C\u56DE\u5230\u5BFC\u5E08\u5904\u6C47\u62A5\u3002"
   Category: 0
   Giver: 0
-  FamilyId: 
+  FamilyId:
+  RequiredClassId:
+  Chapter: "\u7B2C\u4E8C\u7AE0 \xB7 \u6C34\u6676\u6DF1\u5904"
   PrerequisiteId: main-forest
   RequiredLevel: 3
   Order: 20
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
   Objectives:
   - Kind: 0
     Label: "\u6C34\u6676\u6D1E\u7A9F \xB7 \u51FB\u8D25\u654C\u4EBA"
     DungeonId: 1002
-    ItemId: 
+    ItemId:
+    NpcRole: 0
     Required: 6
+    Trial: 0
+    TrialRequired: 1
   - Kind: 1
     Label: "\u901A\u5173\u6C34\u6676\u6D1E\u7A9F"
     DungeonId: 1002
-    ItemId: 
+    ItemId:
+    NpcRole: 0
     Required: 1
+    Trial: 0
+    TrialRequired: 1
   RewardGold: 600
   RewardExp: 1000
   Rewards:
   - itemId: crystal-shard
     count: 4
-    instanceId: 
+    instanceId:
     upgradeLevel: 0
-    gemId: 
+    gemId:
     isLocked: 0
+    acquiredUtcTicks: 0
+    isNew: 0
     affixes: []
     legacyReserve: 0

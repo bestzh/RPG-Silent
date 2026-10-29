@@ -24,6 +24,7 @@ namespace RPGSilent.Domain
         InputAction StanceToggle { get; }
         InputAction Pause        { get; }
         InputAction Interact     { get; }
+        InputAction LootList { get; }
 
         // ── 离散动作事件（PlayerController 订阅）────────────────────────────────
         event Action SprintStarted;
@@ -43,6 +44,9 @@ namespace RPGSilent.Domain
         event Action InteractTriggered;
         event Action InventoryTriggered;
         event Action JournalTriggered;
+        event Action LootListTriggered;
+        event Action LootPickupTriggered;
+        event Action<int> LootCycleTriggered;
         event Action<int> ConsumableTriggered;
         string GetConsumableSlotDisplay(int slotIndex);
         event Action CursorToggleTriggered;
@@ -54,6 +58,7 @@ namespace RPGSilent.Domain
         Vector2 MoveInput { get; }
         Vector2 LookInput { get; }
         bool GameplayInputEnabled { get; }
+        string LastRebindMessage { get; }
 
         // ── 改键 API（ControllerPage 使用）──────────────────────────────────────
 
@@ -86,5 +91,6 @@ namespace RPGSilent.Domain
 
         /// <summary>菜单独立持有输入阻挡；关闭一个菜单不会解除其他菜单的阻挡。</summary>
         void SetGameplayInputBlocked(object owner, bool blocked);
+        bool IsGameplayBlockedExcept(object owner);
     }
 }

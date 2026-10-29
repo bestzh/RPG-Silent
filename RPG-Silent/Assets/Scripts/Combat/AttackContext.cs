@@ -16,10 +16,20 @@ namespace RPGSilent.Combat
         public long Id { get; } = Interlocked.Increment(ref nextId);
         public AttackProfile Profile { get; }
         public AttackExecutor Owner { get; }
-        public int Damage { get; }
+        public int Damage { get; private set; }
         public CombatElement Element { get; internal set; }
         public bool IsSkill { get; internal set; }
         public int Combo { get; internal set; }
+        public bool IsHeavyAttack { get; internal set; }
+        public bool IsEquipmentProc { get; internal set; }
+        public string SourceWeaponKey { get; }
+        internal Vector3? EnemyOrigin { get; private set; }
+        internal Quaternion EnemyRotation { get; private set; }
+        internal Vector3 EnemyLaunchOrigin { get; private set; }
+        internal void LockEnemyGeometry(Vector3 origin, Quaternion rotation, Vector3 launchOrigin)
+        { EnemyOrigin = origin; EnemyRotation = rotation; EnemyLaunchOrigin = launchOrigin; }
+        internal bool EquipmentProcUsed { get; set; }
+        internal void SetEquipmentProcDamage(int damage) { Damage = System.Math.Max(0, damage); IsEquipmentProc = true; }
         public Vector3? AimPoint { get; }
         public Vector3? AreaPoint { get; }
         public float StaggerMultiplier { get; }
@@ -37,6 +47,7 @@ namespace RPGSilent.Combat
         {
             Profile = profile;
             Owner = owner;
+            SourceWeaponKey = owner.EquipmentWeaponKey;
             Damage = Mathf.Max(0, Mathf.RoundToInt(profile.Damage * Mathf.Max(0f, damageMultiplier)));
             AimPoint = aimPoint;
             AreaPoint = areaPoint;

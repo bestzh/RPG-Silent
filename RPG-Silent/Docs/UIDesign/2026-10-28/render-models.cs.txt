@@ -1,0 +1,77 @@
+var outputs = new System.Collections.Generic.List<object>();
+var outFolder = "E:/project/RPG-Silent/Docs/UIDesign/2026-10-28/assets/models";
+System.IO.Directory.CreateDirectory(outFolder);
+foreach (var id in new [] { "swordsman", "mage", "ranger" })
+{
+    var definition = UnityEditor.AssetDatabase.LoadAssetAtPath<PlayerClassDefinition>("Assets/Resources/Classes/" + id + ".asset");
+    foreach (var gender in new [] { PlayerGender.Male, PlayerGender.Female })
+    {
+        var preview = new UnityEditor.PreviewRenderUtility(true);
+        UnityEngine.Texture2D pixels = null;
+        try
+        {
+            var model = UnityEngine.Object.Instantiate(definition.GetModel(gender));
+            model.name = "UI design preview only";
+            preview.AddSingleGO(model);
+            model.transform.position = UnityEngine.Vector3.zero;
+            var animator = model.GetComponent<UnityEngine.Animator>();
+            animator.runtimeAnimatorController = null;
+            animator.applyRootMotion = false;
+            animator.fireEvents = false;
+            animator.Rebind();
+            if (definition.PreviewIdle != null) definition.PreviewIdle.SampleAnimation(model, .3f);
+            var weapon = definition.StartingWeapon;
+            var profile = model.GetComponent<CharacterRigProfile>();
+            if (weapon != null && weapon.ModelPrefab != null && animator.isHuman)
+            {
+                var bone = animator.GetBoneTransform(weapon.HandBone);
+                var prop = UnityEngine.Object.Instantiate(weapon.ModelPrefab, bone);
+                prop.transform.localPosition = profile != null ? profile.MountPosition(weapon, true) : weapon.HandPosition;
+                prop.transform.localRotation = profile != null ? profile.MountRotation(weapon, true) : UnityEngine.Quaternion.Euler(weapon.HandRotation);
+                prop.transform.localScale = profile != null ? profile.Scale(weapon.ModelScale) : weapon.ModelScale;
+            }
+            model.transform.rotation = UnityEngine.Quaternion.Euler(0, 165, 0);
+            var renderers = model.GetComponentsInChildren<UnityEngine.Renderer>().Where(r => r.enabled && r.gameObject.activeInHierarchy).ToArray();
+            var bounds = renderers[0].bounds;
+            foreach (var renderer in renderers) bounds.Encapsulate(renderer.bounds);
+            var camera = preview.camera;
+            camera.clearFlags = UnityEngine.CameraClearFlags.SolidColor;
+            camera.backgroundColor = new UnityEngine.Color(0, 0, 0, 0);
+            camera.fieldOfView = 30;
+            camera.nearClipPlane = .05f;
+            camera.farClipPlane = 30;
+            camera.allowHDR = false;
+            camera.allowMSAA = true;
+            var center = bounds.center;
+            float distance = UnityEngine.Mathf.Max(bounds.size.y * 2.05f, bounds.size.x * 2.6f);
+            camera.transform.position = center + new UnityEngine.Vector3(0, .08f, -distance);
+            camera.transform.LookAt(center);
+            preview.lights[0].intensity = 1.6f;
+            preview.lights[0].color = new UnityEngine.Color(1, .88f, .73f);
+            preview.lights[0].transform.rotation = UnityEngine.Quaternion.Euler(35, 35, 0);
+            preview.lights[1].intensity = 1.25f;
+            preview.lights[1].color = new UnityEngine.Color(.65f, .81f, 1);
+            preview.lights[1].transform.rotation = UnityEngine.Quaternion.Euler(320, 210, 0);
+            preview.ambientColor = new UnityEngine.Color(.42f, .44f, .49f);
+            preview.BeginPreview(new UnityEngine.Rect(0, 0, 720, 960), UnityEngine.GUIStyle.none);
+            preview.Render(true, true);
+            var rendered = preview.EndPreview();
+            var rt = UnityEngine.RenderTexture.GetTemporary(720, 960, 0, UnityEngine.RenderTextureFormat.ARGB32);
+            var previous = UnityEngine.RenderTexture.active;
+            try
+            {
+                UnityEngine.Graphics.Blit(rendered, rt);
+                UnityEngine.RenderTexture.active = rt;
+                pixels = new UnityEngine.Texture2D(720, 960, UnityEngine.TextureFormat.RGBA32, false);
+                pixels.ReadPixels(new UnityEngine.Rect(0, 0, 720, 960), 0, 0);
+                pixels.Apply();
+                var filename = id + "-" + gender.ToString().ToLowerInvariant() + ".png";
+                System.IO.File.WriteAllBytes(outFolder + "/" + filename, pixels.EncodeToPNG());
+                outputs.Add(new { file = filename, model = UnityEditor.AssetDatabase.GetAssetPath(definition.GetModel(gender)), width = 720, height = 960, bounds = bounds.ToString() });
+            }
+            finally { UnityEngine.RenderTexture.active = previous; UnityEngine.RenderTexture.ReleaseTemporary(rt); }
+        }
+        finally { if (pixels != null) UnityEngine.Object.DestroyImmediate(pixels); preview.Cleanup(); }
+    }
+}
+return outputs;

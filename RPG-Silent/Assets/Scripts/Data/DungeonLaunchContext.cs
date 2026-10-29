@@ -9,11 +9,17 @@ public static class DungeonLaunchContext
     public static int DungeonId { get; private set; }
     public static DungeonDifficulty Difficulty { get; private set; }
     public static DungeonChallenge Challenge { get; private set; }
+    public static string ExpeditionId { get; private set; } = "";
+    public static string LongChallengeId { get; private set; } = "";
+    public static void SetLongChallenge(string id) => LongChallengeId = id ?? "";
+    public static void SetExpedition(string id) => ExpeditionId = id ?? "";
     public static void SetChallenge(DungeonChallenge mode) => Challenge = mode;
 
     public static void Set(int dungeonId, DungeonDifficulty difficulty)
     {
         Challenge = DungeonChallenge.Exploration;
+        ExpeditionId = "";
+        LongChallengeId = "";
         DungeonId  = dungeonId;
         Difficulty = difficulty;
         HasValue   = true;
@@ -21,6 +27,8 @@ public static class DungeonLaunchContext
 
     public static void Clear()
     {
+        LongChallengeId = "";
+        ExpeditionId = "";
         Challenge = DungeonChallenge.Exploration;
         DungeonId  = 0;
         Difficulty = default;

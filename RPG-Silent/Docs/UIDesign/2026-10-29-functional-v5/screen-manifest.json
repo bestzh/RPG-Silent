@@ -1,0 +1,775 @@
+{
+  "version": "Functional V5",
+  "artboard": [
+    1920,
+    1080
+  ],
+  "game_page_state_count": 84,
+  "screens": [
+    {
+      "id": "start",
+      "title": "开始菜单",
+      "group": "启程与角色",
+      "description": "保留完整城堡视野；主操作与角色存档入口形成清晰层级。",
+      "source": "StartUI.cs；CharacterCreationView.cs；CharacterSelectionView.cs",
+      "number": 1,
+      "file": "01-start.png"
+    },
+    {
+      "id": "creation",
+      "title": "角色创建",
+      "group": "启程与角色",
+      "description": "职业选择、真实模型与职业说明分三栏；性别和最终确认集中在底部。",
+      "source": "StartUI.cs；CharacterCreationView.cs；CharacterSelectionView.cs",
+      "number": 2,
+      "file": "02-creation.png"
+    },
+    {
+      "id": "characters",
+      "title": "角色选择",
+      "group": "启程与角色",
+      "description": "保留每页六个角色、装备外观预览、创建和继续入口；不增加改名或删除功能。",
+      "source": "StartUI.cs；CharacterCreationView.cs；CharacterSelectionView.cs",
+      "number": 3,
+      "file": "03-characters.png"
+    },
+    {
+      "id": "hud-town",
+      "title": "主城 HUD",
+      "group": "游玩与战斗",
+      "description": "状态收拢左上，任务与地图置右，技能与药品分区，保留画面中央视野。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 4,
+      "file": "04-hud-town.png"
+    },
+    {
+      "id": "hud-dungeon",
+      "title": "副本与 Boss HUD",
+      "group": "游玩与战斗",
+      "description": "Boss 名称、阶段和血量整合为一组，预警与格挡反馈各有固定位置。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 5,
+      "file": "05-hud-dungeon.png"
+    },
+    {
+      "id": "training",
+      "title": "训练场",
+      "group": "游玩与战斗",
+      "description": "训练数据收在左侧小面板，重置与回城直接可见。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 6,
+      "file": "06-training.png"
+    },
+    {
+      "id": "tutorial",
+      "title": "操作与职业教学",
+      "group": "游玩与战斗",
+      "description": "教学采用双列短句与键帽，避免长文本压住常驻 HUD。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 7,
+      "file": "07-tutorial.png"
+    },
+    {
+      "id": "inventory",
+      "title": "背包与装备",
+      "group": "行囊与装备",
+      "description": "当前穿戴清单、实际装备属性与两武器槽始终可见。选择背包装备只试穿，确认后才穿戴。 背包默认先看清自己穿了什么，不依赖人物外观或图标猜测。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 8,
+      "file": "08-inventory.png"
+    },
+    {
+      "id": "inventory-batch",
+      "title": "批量分解",
+      "group": "行囊与装备",
+      "description": "进入批量模式后使用勾选、件数与收益摘要；二次确认保留在固定操作区。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 9,
+      "file": "09-inventory-batch.png"
+    },
+    {
+      "id": "inventory-overflow",
+      "title": "待领取物品",
+      "group": "行囊与装备",
+      "description": "待领取作为独立分类；明确可用空间，避免误以为物品已经进入背包。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 10,
+      "file": "10-inventory-overflow.png"
+    },
+    {
+      "id": "inventory-consumable",
+      "title": "药品与快捷栏配置",
+      "group": "行囊与装备",
+      "description": "详情区呈现用途、共享冷却和 Q/R/F 绑定，沿用现有三槽逻辑。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 11,
+      "file": "11-inventory-consumable.png"
+    },
+    {
+      "id": "loadouts",
+      "title": "配装方案",
+      "group": "行囊与装备",
+      "description": "三套方案以五防具两武器可视化展示；试穿、应用与覆盖操作分开。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 12,
+      "file": "12-loadouts.png"
+    },
+    {
+      "id": "discard",
+      "title": "丢弃数量确认",
+      "group": "行囊与装备",
+      "description": "物品名称、数量和离场消失提示集中；取消与确认保持足够间距。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 13,
+      "file": "13-discard.png"
+    },
+    {
+      "id": "journal",
+      "title": "任务手札",
+      "group": "冒险手札",
+      "description": "左侧任务索引，右侧羊皮纸正文；类别、状态、目标、奖励和导航分层。",
+      "source": "QuestJournalUI.cs + Chapters / Collections；PlayerQuestProgress.cs",
+      "number": 14,
+      "file": "14-journal.png"
+    },
+    {
+      "id": "achievements",
+      "title": "成就奖励",
+      "group": "冒险手札",
+      "description": "完成进度与领奖状态一眼可辨；已领取、可领取和未达成分开呈现。",
+      "source": "QuestJournalUI.cs + Chapters / Collections；PlayerQuestProgress.cs",
+      "number": 15,
+      "file": "15-achievements.png"
+    },
+    {
+      "id": "codex",
+      "title": "冒险图鉴",
+      "group": "冒险手札",
+      "description": "四类图鉴沿用现有分类；怪物展示复用项目模型，未解锁内容降低可见度。",
+      "source": "QuestJournalUI.cs + Chapters / Collections；PlayerQuestProgress.cs",
+      "number": 16,
+      "file": "16-codex.png"
+    },
+    {
+      "id": "mentor",
+      "title": "导师技能服务",
+      "group": "城镇与成长",
+      "description": "技能学习/升级与装配分开，基础职业最高 3 级，转职后最高 5 级。 学习自动放入首个空槽；手动装配可直接选择十个位置。",
+      "source": "TownNpcUI.cs；PlayerProgressService.cs；PlayerSkillAccess.cs",
+      "number": 17,
+      "file": "17-mentor.png"
+    },
+    {
+      "id": "advancement",
+      "title": "转职确认",
+      "group": "城镇与成长",
+      "description": "左右对照职业分支，并单独呈现永久选择的确认状态。",
+      "source": "TownNpcUI.cs；PlayerProgressService.cs；PlayerSkillAccess.cs",
+      "number": 18,
+      "file": "18-advancement.png"
+    },
+    {
+      "id": "forge-weapon",
+      "title": "武器强化",
+      "group": "城镇与成长",
+      "description": "以单件装备为中心，清楚对照强化前后数值、金币消耗与目标武器槽。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 19,
+      "file": "19-forge-weapon.png"
+    },
+    {
+      "id": "forge-armor",
+      "title": "防具饰品强化",
+      "group": "城镇与成长",
+      "description": "沿用具体实例选择；前后属性、碎片余额与已穿戴状态同时可见。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 20,
+      "file": "20-forge-armor.png"
+    },
+    {
+      "id": "forge-gems",
+      "title": "宝石制作",
+      "group": "城镇与成长",
+      "description": "四种宝石平铺，收益、持有量与制作消耗统一排版。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 21,
+      "file": "21-forge-gems.png"
+    },
+    {
+      "id": "gem-socket",
+      "title": "宝石镶嵌与拆卸",
+      "group": "城镇与成长",
+      "description": "先固定目标装备，再选择宝石；替换返还与拆卸费用就近说明。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 22,
+      "file": "22-gem-socket.png"
+    },
+    {
+      "id": "npc-quests",
+      "title": "NPC 任务委托",
+      "group": "城镇与成长",
+      "description": "接取/提交按钮跟随所选任务详情，状态与材料交付条件明确。",
+      "source": "TownNpcUI.Quests.cs + World；PlayerQuestProgress.cs",
+      "number": 23,
+      "file": "23-npc-quests.png"
+    },
+    {
+      "id": "npc-story",
+      "title": "剧情交谈与选择",
+      "group": "城镇与成长",
+      "description": "人物与对话分栏；分支结果预览和确认按钮紧邻，保留重新考虑。",
+      "source": "TownNpcUI.Quests.cs + World；PlayerQuestProgress.cs",
+      "number": 24,
+      "file": "24-npc-story.png"
+    },
+    {
+      "id": "supplies",
+      "title": "战斗补给商店",
+      "group": "城镇与成长",
+      "description": "四种现有药品各用一行，保留购买1瓶/5瓶、持有量与快捷栏引导。",
+      "source": "TownNpcUI.Commerce.cs + Supplies；PlayerCommerceProgress.cs",
+      "number": 25,
+      "file": "25-supplies.png"
+    },
+    {
+      "id": "crafting",
+      "title": "装备配方锻造",
+      "group": "城镇与成长",
+      "description": "解锁条件、成品、材料与锻造按钮同卡片展示；未解锁配方可读。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 26,
+      "file": "26-crafting.png"
+    },
+    {
+      "id": "reforge",
+      "title": "词条重铸确认",
+      "group": "城镇与成长",
+      "description": "保留随机性说明和现有词条；明确金币、碎片、晶核的消耗。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 27,
+      "file": "27-reforge.png"
+    },
+    {
+      "id": "portal-forest",
+      "title": "传送 · 迷影森林",
+      "group": "远行与结算",
+      "description": "地点选择、场景预览、难度与挑战模式分别组织，主按钮固定在右下。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 28,
+      "file": "28-portal-forest.png"
+    },
+    {
+      "id": "portal-crystal",
+      "title": "传送 · 水晶洞窟",
+      "group": "远行与结算",
+      "description": "蓝晶场景使用实际验证截图，保留普通/困难/噩梦与三种挑战模式。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 29,
+      "file": "29-portal-crystal.png"
+    },
+    {
+      "id": "portal-training",
+      "title": "传送 · 训练场",
+      "group": "远行与结算",
+      "description": "独立说明连段与防御训练、不发放奖励；使用单一进入按钮。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 30,
+      "file": "30-portal-training.png"
+    },
+    {
+      "id": "victory",
+      "title": "通关结算",
+      "group": "远行与结算",
+      "description": "通关表现、已拾取收益和剩余掉落分组；继续拾取为主操作。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 31,
+      "file": "31-victory.png"
+    },
+    {
+      "id": "defeat",
+      "title": "死亡与失败结算",
+      "group": "远行与结算",
+      "description": "突出失败原因和已拾取物保留规则，复活重试与回城各自清楚。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 32,
+      "file": "32-defeat.png"
+    },
+    {
+      "id": "pause",
+      "title": "暂停菜单",
+      "group": "设置与系统",
+      "description": "窄幅居中面板，继续游戏优先；保存反馈与离开操作分隔。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 33,
+      "file": "33-pause.png"
+    },
+    {
+      "id": "settings-screen",
+      "title": "设置 · 屏幕",
+      "group": "设置与系统",
+      "description": "四分页共享固定布局，分辨率/全屏/画质/亮度按行对齐。",
+      "source": "SettingsUI.cs；SettingPage/*.cs",
+      "number": 34,
+      "file": "34-settings-screen.png"
+    },
+    {
+      "id": "settings-sound",
+      "title": "设置 · 声音",
+      "group": "设置与系统",
+      "description": "总音量/音乐/音效分别调整，百分比与滑轨对齐，保留静音。",
+      "source": "SettingsUI.cs；SettingPage/*.cs",
+      "number": 35,
+      "file": "35-settings-sound.png"
+    },
+    {
+      "id": "settings-controls",
+      "title": "设置 · 控制",
+      "group": "设置与系统",
+      "description": "14项改键双列排列，下方集中灵敏度、冲刺判定与Y轴反转。",
+      "source": "SettingsUI.cs；SettingPage/*.cs",
+      "number": 36,
+      "file": "36-settings-controls.png"
+    },
+    {
+      "id": "settings-game",
+      "title": "设置 · 游戏",
+      "group": "设置与系统",
+      "description": "全局难度、HUD、小地图、屏幕震动、伤害数字、反馈强度六项；应用保存、关闭撤销未应用修改。",
+      "source": "SettingsUI.cs；SettingPage/*.cs",
+      "number": 37,
+      "file": "37-settings-game.png"
+    },
+    {
+      "id": "loading",
+      "title": "场景加载",
+      "group": "设置与系统",
+      "description": "以现有环境背景承托目的地、进度与一条操作提示。",
+      "source": "LoadingUI.cs；SceneLoaderManager.cs",
+      "number": 38,
+      "file": "38-loading.png"
+    },
+    {
+      "id": "loading-error",
+      "title": "加载失败",
+      "group": "设置与系统",
+      "description": "在加载页面上叠加明确错误卡片，重试与返回都保持可见。",
+      "source": "LoadingUI.cs；SceneLoaderManager.cs",
+      "number": 39,
+      "file": "39-loading-error.png"
+    },
+    {
+      "id": "world-feedback",
+      "title": "世界标签与即时反馈",
+      "group": "游玩与战斗",
+      "description": "统一NPC任务标记、探索标签、掉落名称、伤害数值和交互提示。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 40,
+      "file": "40-world-feedback.png"
+    },
+    {
+      "id": "inventory-tryon",
+      "title": "背包 · 比较与试穿",
+      "group": "行囊与装备",
+      "description": "当前穿戴与试穿同时出现；全身变化计入套装效果，当前清单在确认前不变。 选择守望护甲 +1：生命 +16、减伤 +3%，但晶辉 4 件效果失去，能量 −15。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 41,
+      "file": "41-inventory-tryon.png"
+    },
+    {
+      "id": "inventory-weapon",
+      "title": "背包 · 两个武器槽",
+      "group": "行囊与装备",
+      "description": "两个武器槽分别显示名称、强化和当前/备用状态，确认时明确装入哪一个槽。 不把查看、试穿和当前使用武器混为同一状态。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 42,
+      "file": "42-inventory-weapon.png"
+    },
+    {
+      "id": "inventory-search",
+      "title": "背包 · 搜索与排序",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 43,
+      "file": "43-inventory-search.png"
+    },
+    {
+      "id": "inventory-outfit",
+      "title": "背包 · 多件试穿",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 44,
+      "file": "44-inventory-outfit.png"
+    },
+    {
+      "id": "inventory-low-level",
+      "title": "背包 · 等级不足",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 45,
+      "file": "45-inventory-low-level.png"
+    },
+    {
+      "id": "inventory-save-failed",
+      "title": "背包 · 保存失败",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 46,
+      "file": "46-inventory-save-failed.png"
+    },
+    {
+      "id": "inventory-empty-slot",
+      "title": "背包 · 未穿戴",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 47,
+      "file": "47-inventory-empty-slot.png"
+    },
+    {
+      "id": "inventory-bulk-sell",
+      "title": "背包 · 批量出售",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 48,
+      "file": "48-inventory-bulk-sell.png"
+    },
+    {
+      "id": "inventory-bulk-discard",
+      "title": "背包 · 批量丢弃",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 49,
+      "file": "49-inventory-bulk-discard.png"
+    },
+    {
+      "id": "inventory-bulk-review",
+      "title": "背包 · 核对清单",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 50,
+      "file": "50-inventory-bulk-review.png"
+    },
+    {
+      "id": "equipment-effects",
+      "title": "装备特殊效果说明",
+      "group": "行囊与装备",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "InventoryUI.cs + Organization / Management / Consumables / Effects；PlayerInventoryProgress / EquipmentGrowth",
+      "number": 51,
+      "file": "51-equipment-effects.png"
+    },
+    {
+      "id": "warehouse-deposit",
+      "title": "仓库 · 存入",
+      "group": "城镇与成长",
+      "description": "显示背包到仓库的方向、96格容量、选中清单与保护原因。 锁定装备可以存取；已装备和被方案引用的装备不可存入。",
+      "source": "TownNpcUI.Warehouse.cs；PlayerWarehouseProgress.cs；WarehouseData.cs",
+      "number": 52,
+      "file": "52-warehouse-deposit.png"
+    },
+    {
+      "id": "warehouse-withdraw",
+      "title": "仓库 · 取出",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Warehouse.cs；PlayerWarehouseProgress.cs；WarehouseData.cs",
+      "number": 53,
+      "file": "53-warehouse-withdraw.png"
+    },
+    {
+      "id": "warehouse-review",
+      "title": "仓库 · 核对存取",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Warehouse.cs；PlayerWarehouseProgress.cs；WarehouseData.cs",
+      "number": 54,
+      "file": "54-warehouse-review.png"
+    },
+    {
+      "id": "journal-chapters",
+      "title": "主线七章与接取条件",
+      "group": "手札与收藏",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "QuestJournalUI.cs + Chapters / Collections；PlayerQuestProgress.cs",
+      "number": 55,
+      "file": "55-journal-chapters.png"
+    },
+    {
+      "id": "journal-abandon",
+      "title": "放弃任务确认",
+      "group": "手札与收藏",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "QuestJournalUI.cs + Chapters / Collections；PlayerQuestProgress.cs",
+      "number": 56,
+      "file": "56-journal-abandon.png"
+    },
+    {
+      "id": "specialization",
+      "title": "职业专精 · 互斥方向",
+      "group": "城镇与成长",
+      "description": "四个方向互斥，投入、当前效果和下一等级变化一并可见。 驭灵只在御兽师已向导师学会召唤后开放。",
+      "source": "TownNpcUI.Specialization.cs；SpecializationData.cs",
+      "number": 57,
+      "file": "57-specialization.png"
+    },
+    {
+      "id": "specialization-confirm",
+      "title": "专精投入确认",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Specialization.cs；SpecializationData.cs",
+      "number": 58,
+      "file": "58-specialization-confirm.png"
+    },
+    {
+      "id": "specialization-reset",
+      "title": "专精重置与返还",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Specialization.cs；SpecializationData.cs",
+      "number": 59,
+      "file": "59-specialization-reset.png"
+    },
+    {
+      "id": "skill-assign",
+      "title": "技能装配 · 十个位置",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.cs；PlayerProgressService.cs；PlayerSkillAccess.cs",
+      "number": 60,
+      "file": "60-skill-assign.png"
+    },
+    {
+      "id": "shop-buyback",
+      "title": "误售物品回购",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Commerce.cs + Supplies；PlayerCommerceProgress.cs",
+      "number": 61,
+      "file": "61-shop-buyback.png"
+    },
+    {
+      "id": "shop-purchase",
+      "title": "购买数量与总价",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Commerce.cs + Supplies；PlayerCommerceProgress.cs",
+      "number": 62,
+      "file": "62-shop-purchase.png"
+    },
+    {
+      "id": "shop-buyback-review",
+      "title": "回购原记录确认",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Commerce.cs + Supplies；PlayerCommerceProgress.cs",
+      "number": 63,
+      "file": "63-shop-buyback-review.png"
+    },
+    {
+      "id": "portal-expedition",
+      "title": "传送 · 随机远征",
+      "group": "远行与结算",
+      "description": "保留固定种子、阵型、精英、事件规则、一次性奖励与更换组合入口。 六种模式直接点选，避免连续轮换五次才能找到模式。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 64,
+      "file": "64-portal-expedition.png"
+    },
+    {
+      "id": "portal-rush",
+      "title": "传送 · 首领连战",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 65,
+      "file": "65-portal-rush.png"
+    },
+    {
+      "id": "portal-gauntlet",
+      "title": "传送 · 千层试炼",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 66,
+      "file": "66-portal-gauntlet.png"
+    },
+    {
+      "id": "long-rest",
+      "title": "长期挑战 · 轮间休整",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "DungeonUI.LongChallenges.cs；PlayerLongChallengeProgress.cs",
+      "number": 67,
+      "file": "67-long-rest.png"
+    },
+    {
+      "id": "long-pending",
+      "title": "长期挑战 · 保存待重试",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "DungeonUI.LongChallenges.cs；PlayerLongChallengeProgress.cs",
+      "number": 68,
+      "file": "68-long-pending.png"
+    },
+    {
+      "id": "long-end-confirm",
+      "title": "长期挑战 · 主动结束",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "DungeonUI.LongChallenges.cs；PlayerLongChallengeProgress.cs",
+      "number": 69,
+      "file": "69-long-end-confirm.png"
+    },
+    {
+      "id": "long-result",
+      "title": "长期挑战 · 最终结算",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "DungeonUI.LongChallenges.cs；PlayerLongChallengeProgress.cs",
+      "number": 70,
+      "file": "70-long-result.png"
+    },
+    {
+      "id": "nearby-loot",
+      "title": "附近掉落 · 选择拾取",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 71,
+      "file": "71-nearby-loot.png"
+    },
+    {
+      "id": "loot-leave",
+      "title": "离场前高品质掉落确认",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 72,
+      "file": "72-loot-leave.png"
+    },
+    {
+      "id": "hud-expedition",
+      "title": "随机远征 · 事件与反馈",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 73,
+      "file": "73-hud-expedition.png"
+    },
+    {
+      "id": "hud-long",
+      "title": "长期挑战 · 战斗 HUD",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 74,
+      "file": "74-hud-long.png"
+    },
+    {
+      "id": "tutorial-current",
+      "title": "新手引导 · 当前步骤",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 75,
+      "file": "75-tutorial-current.png"
+    },
+    {
+      "id": "tutorial-review",
+      "title": "新手引导 · 十四步回看",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 76,
+      "file": "76-tutorial-review.png"
+    },
+    {
+      "id": "story-confirm",
+      "title": "故事决定确认",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.Quests.cs + World；PlayerQuestProgress.cs",
+      "number": 77,
+      "file": "77-story-confirm.png"
+    },
+    {
+      "id": "reforge-review",
+      "title": "重铸消耗与限制",
+      "group": "城镇与成长",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "TownNpcUI.cs + World；PlayerEquipmentGrowth.cs；PlayerWorldProgress.cs",
+      "number": 78,
+      "file": "78-reforge-review.png"
+    },
+    {
+      "id": "reward-save-failed",
+      "title": "副本奖励 · 保存重试",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 79,
+      "file": "79-reward-save-failed.png"
+    },
+    {
+      "id": "rebind-active",
+      "title": "改键 · 等待输入与取消",
+      "group": "设置与系统",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "SettingsUI.cs；SettingPage/*.cs",
+      "number": 80,
+      "file": "80-rebind-active.png"
+    },
+    {
+      "id": "save-menu-failed",
+      "title": "菜单 · 存档无法继续",
+      "group": "启程与角色",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "StartUI.cs；CharacterCreationView.cs；CharacterSelectionView.cs",
+      "number": 81,
+      "file": "81-save-menu-failed.png"
+    },
+    {
+      "id": "portal-timed",
+      "title": "传送 · 限时挑战",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 82,
+      "file": "82-portal-timed.png"
+    },
+    {
+      "id": "portal-trial",
+      "title": "传送 · 首领试炼",
+      "group": "远行与结算",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "PortalUI.cs；ExpeditionData.cs；ChallengeCareerData.cs",
+      "number": 83,
+      "file": "83-portal-trial.png"
+    },
+    {
+      "id": "event-abandon",
+      "title": "远征 · 放弃事件确认",
+      "group": "游玩与战斗",
+      "description": "按当前功能的入口、限制与结果状态绘制。设计按钮不连接游戏或存档。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "number": 84,
+      "file": "84-event-abandon.png"
+    },
+    {
+      "id": "skills-visual-guide",
+      "number": 85,
+      "title": "全职业技能图标规范",
+      "group": "设计附录",
+      "description": "21 个现有技能与新图标的完整对照；仅为视觉设计建议。",
+      "source": "MainUI.cs 及对应分部；DungeonUI.cs；玩家交互与输入服务",
+      "file": "85-skills-visual-guide.png"
+    }
+  ]
+}

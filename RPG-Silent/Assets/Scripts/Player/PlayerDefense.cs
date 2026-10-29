@@ -24,6 +24,7 @@ public sealed class PlayerDefense : MonoBehaviour
     public bool CounterReady => CanDefend && Time.time < counterUntil;
     public string Feedback => Time.time < feedbackUntil ? feedback : "";
     public DefenseOutcome LastOutcome { get; private set; }
+    public float ParryWindow => .18f + (player?.Progress?.SpecializationParryBonus ?? 0f);
     bool CanDefend => player != null && player.isActiveAndEnabled && player.CanReceiveCombatEffects;
     public bool CanAffordRoll => !player.CombatAllowed || player.CombatStats != null && player.CombatStats.CurrentEnergy >= DefenseRules.RollCost;
     public string GuardMotion => player.CurrentStance switch
@@ -36,9 +37,6 @@ public sealed class PlayerDefense : MonoBehaviour
     void Awake()
     {
         player = GetComponent<PlayerController>(); skills = GetComponent<PlayerSkillController>();
-        audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.playOnAwake = false; audioSource.spatialBlend = .5f;
-        audioSource.outputAudioMixerGroup = Mixer;
     }
     public void PressGuard()
     {
@@ -59,6 +57,7 @@ public sealed class PlayerDefense : MonoBehaviour
         if (skills != null && !skills.TryFinishForLink()) return;
         player.ClearCombatInput();
         player.StateMachine.ChangeState(new GuardState(player));
+        player.Progress?.RecordTutorialAction(RPGSilent.Domain.TutorialStep.Guard);
     }
     public bool BeginRoll()
     {
@@ -102,17 +101,19 @@ public sealed class PlayerDefense : MonoBehaviour
         }
         if (!IsGuarding || attack == null || !DefenseRules.CanBlock(attack.Profile.DeliveryType)
             || !DefenseRules.IsFrontal(player.FacingRotation * Vector3.forward, source - transform.position)) return LastOutcome;
-        if (DefenseRules.CanParry(attack.Profile.DeliveryType) && DefenseRules.IsParryWindow(Time.time - guardStarted))
+        float guardElapsed = Time.time - guardStarted;
+        if (DefenseRules.CanParry(attack.Profile.DeliveryType) && guardElapsed >= 0f && guardElapsed <= ParryWindow)
         {
             guardStarted = float.NegativeInfinity; // one perfect impact per press
             LastOutcome = DefenseOutcome.Parried;
             player.CombatRecord.Defend(LastOutcome);
             player.CombatStats?.RecoverEnergy(8f);
+            player.EquipmentEffects?.OnPerfectParry();
             attack.Owner?.GetComponent<EnemyController>()?.ReceiveParry();
             GrantCounter("精准格挡 · 反击就绪"); PlayImpact();
             return LastOutcome;
         }
-        float cost = DefenseRules.BlockCost(damage);
+        float cost = DefenseRules.BlockCost(damage) * (player.Progress?.SpecializationBlockEnergy ?? 1f);
         if (player.CombatStats == null || !player.CombatStats.TrySpendEnergy(cost))
         {
             if (player.CombatStats != null) player.CombatStats.TrySpendEnergy(player.CombatStats.CurrentEnergy);
@@ -128,7 +129,12 @@ public sealed class PlayerDefense : MonoBehaviour
     {
         player.animator.CrossFadeInFixedTime(GuardMotion + "Hit", .04f, 0, 0);
         reactionUntil = Time.time + .25f;
-        if (GuardSound != null) audioSource.PlayOneShot(GuardSound, .6f);
+        if (player.Audio != null) player.Audio.Play(GameSound.Guard, transform.position);
+        else if (GuardSound != null)
+        {
+            if (audioSource == null) { audioSource = gameObject.AddComponent<AudioSource>(); audioSource.playOnAwake = false; audioSource.spatialBlend = .5f; audioSource.outputAudioMixerGroup = Mixer; }
+            audioSource.clip = GuardSound; audioSource.volume = .6f; audioSource.Play();
+        }
     }
     void GrantCounter(string message) { counterUntil = Time.time + DefenseRules.CounterDuration; Show(message, 1.1f); }
     void Show(string message, float duration) { feedback = message; feedbackUntil = Time.time + duration; }

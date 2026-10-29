@@ -14,6 +14,9 @@ namespace RPGSilent.Domain
         public int upgradeLevel;
         public string gemId = string.Empty;
         public bool isLocked;
+        // Zero is an unknown acquisition time from an older save; never invent a date.
+        public long acquiredUtcTicks;
+        public bool isNew;
         public ItemAffixData[] affixes = Array.Empty<ItemAffixData>();
         // Only migrated stacks may remain packed in overflow, until there is bag space.
         public bool legacyReserve;
@@ -22,6 +25,7 @@ namespace RPGSilent.Domain
         public int Bonus(ItemAffixStat stat) => affixes?.Where(a => a.stat == stat).Sum(a => a.value) ?? 0;
         public ItemStackData Copy() => new() { itemId = itemId, count = count, instanceId = instanceId,
             upgradeLevel = upgradeLevel, gemId = gemId, isLocked = isLocked, legacyReserve = legacyReserve,
+            acquiredUtcTicks = acquiredUtcTicks, isNew = isNew,
             affixes = affixes?.Select(a => new ItemAffixData { stat = a.stat, value = a.value }).ToArray() };
     }
 
@@ -49,12 +53,16 @@ namespace RPGSilent.Domain
         public ItemStackData Find(string key) => bag.FirstOrDefault(x => x.Key == key);
 
         // Rewards overflow into a durable collection; never evict or silently truncate items.
-        public bool AddRewards(IEnumerable<ItemStackData> rewards)
+        public bool AddRewards(IEnumerable<ItemStackData> rewards) => AddItems(rewards, true);
+        bool AddItems(IEnumerable<ItemStackData> rewards, bool acquired)
         {
             var next = Copy();
-            foreach (var reward in rewards)
+            long now = acquired ? DateTime.UtcNow.Ticks : 0;
+            foreach (var source in rewards)
             {
-                if (!ValidItem(reward) || reward.legacyReserve) return false;
+                if (!ValidItem(source) || source.legacyReserve) return false;
+                var reward = source.Copy();
+                if (acquired) { reward.acquiredUtcTicks = now; reward.isNew = true; }
                 if (reward.IsInstance && next.bag.Concat(next.overflow).Any(x => x.Key == reward.Key)) return false;
                 var list = next.bag.ToList();
                 var stack = reward.IsInstance ? null : list.FirstOrDefault(x => !x.IsInstance && x.itemId == reward.itemId);
@@ -62,24 +70,27 @@ namespace RPGSilent.Domain
                 if (stack != null)
                 {
                     int added = Math.Min(MaxCount - stack.count, remainder); stack.count += added; remainder -= added;
+                    if (added > 0) MergeAcquisition(stack, reward);
                 }
                 else if (list.Count < Capacity) { list.Add(reward.Copy()); remainder = 0; }
                 next.bag = list.ToArray();
                 if (remainder == 0) continue;
                 var pending = next.overflow.ToList();
                 var stored = reward.IsInstance ? null : pending.FirstOrDefault(x => !x.IsInstance && x.itemId == reward.itemId);
-                if (stored != null) { if (stored.count > MaxCount - remainder) return false; stored.count += remainder; }
+                if (stored != null) { if (stored.count > MaxCount - remainder) return false; stored.count += remainder; MergeAcquisition(stored, reward); }
                 else { if (pending.Count >= OverflowCapacity) return false; var copy = reward.Copy(); copy.count = remainder; pending.Add(copy); }
                 next.overflow = pending.ToArray();
             }
             bag = next.bag; overflow = next.overflow; return true;
         }
+        static void MergeAcquisition(ItemStackData target, ItemStackData incoming)
+        { target.acquiredUtcTicks = Math.Max(target.acquiredUtcTicks, incoming.acquiredUtcTicks); target.isNew |= incoming.isNew; }
         public bool CollectOverflow()
         {
             var next = Copy(); var rewards = next.overflow; next.overflow = Array.Empty<ItemStackData>();
             foreach (var reward in rewards)
             {
-                if (!reward.legacyReserve) { if (!next.AddRewards(new[] { reward })) return false; continue; }
+                if (!reward.legacyReserve) { if (!next.AddItems(new[] { reward }, false)) return false; continue; }
                 while (reward.count > 0 && next.bag.Length < Capacity)
                 {
                     var single = reward.Copy(); single.count = 1; single.legacyReserve = false;
@@ -138,7 +149,8 @@ namespace RPGSilent.Domain
         public static bool ValidItem(ItemStackData item)
         {
             if (item == null || string.IsNullOrEmpty(item.itemId) || item.itemId.Length > 128 || item.count < 1 || item.count > MaxCount ||
-                item.upgradeLevel < 0 || item.upgradeLevel > 5 || item.affixes == null || item.affixes.Length > 4 || item.gemId == null || item.gemId.Length > 128) return false;
+                item.upgradeLevel < 0 || item.upgradeLevel > 5 || item.affixes == null || item.affixes.Length > 4 || item.gemId == null || item.gemId.Length > 128 ||
+                item.acquiredUtcTicks < 0 || item.acquiredUtcTicks > DateTime.MaxValue.Ticks || item.isNew && item.acquiredUtcTicks == 0) return false;
             if (item.IsInstance ? !Guid.TryParseExact(item.instanceId, "N", out _) || (!item.legacyReserve && item.count != 1) :
                 item.upgradeLevel != 0 || item.affixes.Length != 0 || item.legacyReserve || item.gemId.Length != 0 || item.isLocked) return false;
             if (item.legacyReserve && (item.gemId.Length != 0 || item.isLocked)) return false;

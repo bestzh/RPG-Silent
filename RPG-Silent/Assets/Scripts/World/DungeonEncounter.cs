@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>由副本服务显式启动，波次结束不等于整个副本结束。</summary>
 public sealed class DungeonEncounter : MonoBehaviour
 {
-    [Serializable] public sealed class Spawn { public EnemyController Prefab; public Transform Point; }
+    [Serializable] public sealed class Spawn { public EnemyController Prefab; public Transform Point; public EnemyEliteTrait Trait; }
     [Serializable] public sealed class Wave { public string Name; public Spawn[] Enemies; }
     public Wave[] Waves;
     public float WaveDelay = 2.5f;
@@ -34,7 +34,9 @@ public sealed class DungeonEncounter : MonoBehaviour
         {
             if (wave.Enemies == null || wave.Enemies.Length == 0) { Failed?.Invoke("关卡存在空波次。"); return; }
             foreach (var spawn in wave.Enemies)
-                if (spawn.Prefab == null || spawn.Point == null) { Failed?.Invoke("关卡敌人或出生点配置缺失。"); return; }
+                if (spawn.Prefab == null || spawn.Point == null || !Enum.IsDefined(typeof(EnemyEliteTrait), spawn.Trait) ||
+                    spawn.Trait != EnemyEliteTrait.None && spawn.Prefab.GetComponent<BossPhaseController>() != null)
+                { Failed?.Invoke("关卡敌人、出生点或精英特性配置无效。"); return; }
         }
         if (DungeonLaunchContext.Challenge == DungeonChallenge.BossTrial)
         {
@@ -59,6 +61,7 @@ public sealed class DungeonEncounter : MonoBehaviour
         foreach (var spawn in wave.Enemies)
         {
             var enemy = Instantiate(spawn.Prefab, spawn.Point.position, spawn.Point.rotation, transform);
+            if (spawn.Trait != EnemyEliteTrait.None) enemy.TryConfigureEliteTrait(spawn.Trait);
             if (!enemy.IsBoss) enemy.BindCombatGroup(CombatGroup);
             alive.Add(enemy);
             enemy.Died += OnEnemyDied;

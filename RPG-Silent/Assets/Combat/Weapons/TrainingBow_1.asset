@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TrainingBow_1
   m_EditorClassIdentifier: 
   DeliveryType: 2
-  Damage: 20
+  Damage: 24
   TargetLayers:
     serializedVersion: 2
     m_Bits: 4294967295

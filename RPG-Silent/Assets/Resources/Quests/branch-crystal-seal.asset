@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: branch-crystal-seal
+  m_EditorClassIdentifier:
+  Id: branch-crystal-seal
+  Title: "\u88C2\u9699\u7684\u8FB9\u754C"
+  Description: "\u4F60\u9009\u62E9\u5148\u52A0\u56FA\u88C2\u7F1D\u3002\u6536\u96C6\u6676\u6838\u788E\u7247\u5E76\u5411\u94C1\u5320\u786E\u8BA4\u5C01\u8FB9\u65B9\u6848\u3002\u6B64\u9009\u62E9\u4E0E\u2018\u6700\u540E\u7684\u5171\u9E23\u2019\u4E92\u65A5\uFF0C\u653E\u5F03\u4E0D\u4F1A\u64A4\u56DE\u5DF2\u4FDD\u5B58\u7684\u51B3\u5B9A\u3002"
+  Category: 1
+  Giver: 2
+  FamilyId:
+  RequiredClassId:
+  Chapter:
+  PrerequisiteId: main-forest-afterglow
+  RequiredLevel: 12
+  Order: 420
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId: crystal-aftertone
+  RequiredChoiceId: seal
+  Objectives:
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u5C01\u8FB9\u6240\u9700\u6676\u6838"
+    DungeonId: 0
+    ItemId: crystal-shard
+    NpcRole: 0
+    Required: 4
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 6
+    Label: "\u786E\u8BA4\u88C2\u9699\u5C01\u8FB9\u65B9\u6848"
+    DungeonId: 0
+    ItemId:
+    NpcRole: 1
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 500
+  RewardExp: 700
+  Rewards: []

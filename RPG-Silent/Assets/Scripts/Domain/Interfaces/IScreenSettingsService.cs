@@ -9,6 +9,8 @@ namespace RPGSilent.Domain
     {
         /// <summary>当前正在生效的设置。</summary>
         ScreenSettings CurrentSettings { get; }
+        ScreenSettings Defaults { get; }
+        void PreviewBrightness(float brightness);
 
         /// <summary>所有可用分辨率字符串列表（如 "1920×1080"）。</summary>
         IReadOnlyList<string> ResolutionOptions { get; }

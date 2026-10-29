@@ -1,0 +1,26 @@
+{
+  "version": "Windworn V3",
+  "generated_at": "2026-10-29T00:37:56.275775+00:00",
+  "art_direction": "风痕手札：苔绿皮革、手写注记、纸页与旧黄铜，错落构图和职业差异。",
+  "game_page_state_count": 40,
+  "reference_sheet_count": 2,
+  "png_count": 42,
+  "artboard": [
+    1920,
+    1080
+  ],
+  "overview_board_count": 8,
+  "layout_checks_passed": true,
+  "gallery_checks_passed": true,
+  "source_asset_copies": 114,
+  "previous_version_preserved": true,
+  "game_code_modified": false,
+  "unity_assets_modified": false,
+  "import_evidence": "沿用 2026-10-29 已核实的导入记录；本版未重新导入资源。",
+  "limitations": [
+    "部分 Synty 示例场景图仅作 UI 排版参照，非实际游戏关卡、人物或 Boss。",
+    "部分图鉴缩略图为项目职业模型占位。",
+    "中文正文使用系统 Microsoft YaHei 预览，未分发该字体。",
+    "按钮功能与数值为设计预览，非 Unity 功能测试。"
+  ]
+}

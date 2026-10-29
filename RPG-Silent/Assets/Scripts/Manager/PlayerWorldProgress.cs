@@ -25,7 +25,14 @@ public sealed partial class PlayerProgressService
     public string TownTimeLabel => $"第 {world.townDay} 天  {(int)world.townHour:00}:{(int)(world.townHour % 1 * 60):00}";
     public string StoryChoice(string id) => world.Choice(id);
     public int NpcAffinity(TownNpcRole role) => world.Affinity((int)role);
-    public TownDialogueDefinition DialogueFor(TownNpc npc) => npc == null ? null : stories.Values.FirstOrDefault(x => x.Role == npc.Role);
+    public IEnumerable<TownDialogueDefinition> DialoguesFor(TownNpc npc) => stories.Values.Where(x => npc != null && x.Role == npc.Role).OrderBy(x => x.Order).ThenBy(x => x.Id);
+    public TownDialogueDefinition DialogueFor(TownNpc npc) => DialoguesFor(npc).FirstOrDefault();
+    public bool StoryUnlocked(TownDialogueDefinition story) => story != null && stories.TryGetValue(story.Id, out var known) && known == story &&
+        stats.Level >= story.RequiredLevel && NpcAffinity(story.Role) >= story.RequiredAffinity &&
+        (story.RequiredQuestId.Length == 0 || QuestWasCompleted(story.RequiredQuestId));
+    public string StoryRequirementText(TownDialogueDefinition story) => story == null ? "" : $"交谈等级 Lv.{story.RequiredLevel}" +
+        (story.RequiredQuestId.Length == 0 ? "" : " · 先提交「" + FindQuest(story.RequiredQuestId)?.Title + "」") +
+        (story.RequiredAffinity == 0 ? "" : $" · 好感 {NpcAffinity(story.Role)}/{story.RequiredAffinity}");
     public bool QuestWasCompleted(string id) => journal.entries.Any(x => x.questId == id && (x.rewarded || x.completedCount > 0));
     public string TakeNotice() => notices.Count > 0 ? notices.Dequeue() : null;
     void Notify(string text) { if (notices.Count >= 12) notices.Dequeue(); notices.Enqueue(text); }
@@ -36,7 +43,8 @@ public sealed partial class PlayerProgressService
             if (string.IsNullOrEmpty(s.Id) || !stories.TryAdd(s.Id, s) || s.Pages == null || s.Pages.Length < 2 || s.Pages.Any(string.IsNullOrEmpty) ||
                 s.Choices == null || s.Choices.Length < 2 || !Enum.IsDefined(typeof(TownNpcRole), s.Role) ||
                 s.Choices.Any(x => x == null || string.IsNullOrEmpty(x.Id) || string.IsNullOrEmpty(x.Label) || string.IsNullOrEmpty(x.Outcome) || x.Gold < 0 || x.Experience < 0 || x.Affinity < 0 || x.Affinity > 100) ||
-                s.Choices.Select(x => x.Id).Distinct().Count() != s.Choices.Length) throw new InvalidOperationException("剧情配置无效：" + s.name);
+                s.RequiredQuestId == null || s.RequiredQuestId.Length > 0 && FindQuest(s.RequiredQuestId) == null || s.RequiredLevel < 1 || s.RequiredLevel > PlayerStats.LevelCap ||
+                s.RequiredAffinity < 0 || s.RequiredAffinity > 100 || s.Choices.Select(x => x.Id).Distinct().Count() != s.Choices.Length) throw new InvalidOperationException("剧情配置无效：" + s.name);
         }
         foreach (var r in Resources.LoadAll<EquipmentRecipe>("Adventure"))
             if (string.IsNullOrEmpty(r.Id) || !recipes.TryAdd(r.Id, r) || r.Result == null || r.Result.IsStackable || FindItem(r.Result.Id) != r.Result ||
@@ -48,15 +56,18 @@ public sealed partial class PlayerProgressService
         codex = Resources.Load<AdventureCatalog>("Adventure/Codex");
         foreach (var q in questCatalog.Values)
             if (q.RequiredStoryId == null || q.RequiredChoiceId == null || (q.RequiredStoryId.Length == 0 ? q.RequiredChoiceId.Length > 0 :
-                !stories.TryGetValue(q.RequiredStoryId, out var s) || !s.Choices.Any(x => x.Id == q.RequiredChoiceId)))
+                !stories.TryGetValue(q.RequiredStoryId, out var s) || q.RequiredChoiceId.Length > 0 && !s.Choices.Any(x => x.Id == q.RequiredChoiceId)))
                 throw new InvalidOperationException("任务剧情前置无效：" + q.name);
+        ValidateNarrativeDependencies();
     }
-    bool ValidWorldContent(WorldProgressData d) => d.choices.All(x => stories.TryGetValue(x.storyId, out var s) && s.Choices.Any(c => c.Id == x.choiceId)) &&
+    bool ValidWorldContent(WorldProgressData d, QuestJournalData savedJournal, int totalExp) => d.choices.All(x => stories.TryGetValue(x.storyId, out var s) && s.Choices.Any(c => c.Id == x.choiceId) &&
+        totalExp >= PlayerStats.ExpAtLevel(s.RequiredLevel) && d.Affinity((int)s.Role) >= s.RequiredAffinity &&
+        (s.RequiredQuestId.Length == 0 || savedJournal.entries.Any(e => e.questId == s.RequiredQuestId && (e.rewarded || e.completedCount > 0)))) &&
         d.claimedAchievements.All(achievements.ContainsKey);
     void SeedWorldFeedback()
     {
         notices.Clear(); observedObjectives.Clear(); observedReady.Clear(); observedAchievements.Clear();
-        foreach (var e in journal.entries.Where(x => !x.rewarded)) observedObjectives[e.questId] = ObjectiveCounts(e.questId);
+        foreach (var e in journal.entries.Where(x => !x.rewarded && !x.abandoned)) observedObjectives[e.questId] = ObjectiveCounts(e.questId);
         foreach (var q in Quests) if (GetQuestStatus(q.Id) == QuestStatus.Ready) observedReady.Add(q.Id);
         foreach (var a in Achievements) if (AchievementReady(a.Id)) observedAchievements.Add(a.Id);
     }
@@ -68,7 +79,7 @@ public sealed partial class PlayerProgressService
     void ObserveWorldFeedback()
     {
         if (!attached) return;
-        foreach (var e in journal.entries.Where(x => !x.rewarded))
+        foreach (var e in journal.entries.Where(x => !x.rewarded && !x.abandoned))
         {
             var q = FindQuest(e.questId); var now = ObjectiveCounts(q.Id);
             if (observedObjectives.TryGetValue(q.Id, out var before))
@@ -98,6 +109,7 @@ public sealed partial class PlayerProgressService
     {
         message = "请在对应 NPC 面前交谈。";
         if (!stories.TryGetValue(storyId ?? "", out var story) || !AtTownNpc(npc, story.Role)) return false;
+        if (!StoryUnlocked(story)) { message = StoryRequirementText(story); return false; }
         var choice = story.Choices.FirstOrDefault(x => x.Id == choiceId);
         if (choice == null || world.Choice(storyId).Length > 0) { message = "这段故事已有决定，可以回顾但不能重复领取。"; return false; }
         var data = Capture();

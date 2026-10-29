@@ -1,0 +1,1672 @@
+{
+  "date": "2026-10-29",
+  "source_root": "E:\\project\\RPG-Silent",
+  "source_inventory_counts": {
+    "Assets/Fantasy UI/PNG": 19,
+    "Assets/Fantasy UI/Resource Icons": 6,
+    "Assets/Fantasy UI/Simple Vector Icons/128px": 320,
+    "Assets/Bamao/BamaoUIPack/Sprites": 1182,
+    "Assets/Prefabs/PlayerAppearances": 18
+  },
+  "files": [
+    {
+      "source": "Assets/Resources/BG/BG.png",
+      "design_file": "assets/bg-castle.png",
+      "role": "原项目背景，直接复用",
+      "sha256": "3d190ca62ae7906c28be23fcd203cb9655ad4f4a72cdc6c6b40c89c33e1e6302",
+      "size": [
+        1672,
+        941
+      ],
+      "guid": "327ad631296486c42819b93a05c847c7"
+    },
+    {
+      "source": "Assets/Resources/BG/BG2.png",
+      "design_file": "assets/bg-hall.png",
+      "role": "原项目背景，直接复用",
+      "sha256": "6cace4df3c21d76c6e5f373aafca571f852c8b1f758abd18e030554145a11ad6",
+      "size": [
+        1672,
+        941
+      ],
+      "guid": "8861fd55b02109f4a8339265049ad04e"
+    },
+    {
+      "source": "Assets/Resources/BG/BG3.png",
+      "design_file": "assets/bg-workshop.png",
+      "role": "原项目背景，直接复用",
+      "sha256": "54c2c0ec92f7175a0cb3c9049f9f1a4aaf23cbb2bb9c236529b3d183887e8950",
+      "size": [
+        1672,
+        941
+      ],
+      "guid": "6bd452d9361441d4ea7e491dbef89bb1"
+    },
+    {
+      "source": "Assets/Resources/BG/SettingBG.png",
+      "design_file": "assets/bg-portal.png",
+      "role": "原项目背景，直接复用",
+      "sha256": "9ad4e8c5baa53b340adfa4575ddcf6dab62dfd1c49313ed993ee55b4ee966400",
+      "size": [
+        1672,
+        941
+      ],
+      "guid": "84047c1f037b8614296fb17229ce4ca0"
+    },
+    {
+      "source": "Assets/Resources/BG/Loding.png",
+      "design_file": "assets/bg-loading.png",
+      "role": "原项目背景，直接复用",
+      "sha256": "ef4f9dd47a7d86eaf29419590a93e2de0a56080e132cdf20538eda2d7a065120",
+      "size": [
+        1672,
+        941
+      ],
+      "guid": "d2e99973b7b66db4a87509fcd35f387d"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Panel_Window_Blank.png",
+      "design_file": "assets/panel.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "d61bc0036b3e90e887ec0ce0e978a8b615cd9e3c29cf365397e337017b59e1a7",
+      "size": [
+        64,
+        64
+      ],
+      "guid": "1430e41db55d0410eae9ca1f4cfd6554"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Panel_Paper.png",
+      "design_file": "assets/paper.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "91f1ac7bbeddf1a46a90e37a7012d7203a3e757c88851a74a89a5e1d01a54c05",
+      "size": [
+        63,
+        64
+      ],
+      "guid": "0d6731c5aad4f4e03bea1c341e977c59"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Panel_Paper_Inset.png",
+      "design_file": "assets/paper-inset.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "e213c5091f94e0356c54018d6f781ab05ecaf1bdda8abbfe593602a84f5dc3d3",
+      "size": [
+        37,
+        37
+      ],
+      "guid": "b476dd01c25bd4bf7a1e8bd355d305ba"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Button_Grey.png",
+      "design_file": "assets/button-grey.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "d875954c6b49810496723335f68e58a0f4f83311cf2cc28cceeea02efef82e92",
+      "size": [
+        64,
+        64
+      ],
+      "guid": "d4c0d50c6039f4b89b1cd08c9d1b4c53"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Button_Orange.png",
+      "design_file": "assets/button-gold.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "20a0480fe0150434b4425c5fdc76200ce44d731caf8facba6f3b04b0f3ba6cdb",
+      "size": [
+        64,
+        64
+      ],
+      "guid": "3e5224fe88e144f68b198fdee4a58b2d"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Bar.png",
+      "design_file": "assets/bar-frame.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "783282b1ab7c6c89050903a77740e49948da6b7a413b6e17a819bf7ba941dd34",
+      "size": [
+        62,
+        63
+      ],
+      "guid": "36c9a8aa03d904d5f8dbb471d4d496d2"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Red.png",
+      "design_file": "assets/bar-red.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "bc643d2f205f4c93c12b10829c16529def0bf4149ce08b176f81408c9b15e74a",
+      "size": [
+        52,
+        52
+      ],
+      "guid": "b1d03668ea891406e9cd884f85a0252f"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Blue.png",
+      "design_file": "assets/bar-blue.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "00a46e4c03d0f8da1daeebec865a53ebedb0e07aeb818a68a51897db99433c95",
+      "size": [
+        52,
+        52
+      ],
+      "guid": "b6a18a999eb8a4fb8814bdcf49b03a72"
+    },
+    {
+      "source": "Assets/Fantasy UI/PNG/UI_Bar_Fill_Orange.png",
+      "design_file": "assets/bar-gold.png",
+      "role": "Fantasy UI 九宫格面板、按钮或进度条",
+      "sha256": "67aa7f9690a04635730fd82a2003540d0eb32c1f174a8cd3bc7e1c2e94f3eefb",
+      "size": [
+        52,
+        52
+      ],
+      "guid": "6179b742a99dd43e3967b14e2b9bef7c"
+    },
+    {
+      "source": "Assets/Resources/UI/ui-divider.png",
+      "design_file": "assets/divider.png",
+      "role": "原项目装饰分割线",
+      "sha256": "9036230fd6ba398e2d87f26d04ebdd79eba0523a60296140dcfc5830447d9519",
+      "size": [
+        1024,
+        1024
+      ],
+      "guid": "827ebc2705bc0a748bf8c51324f94bab"
+    },
+    {
+      "source": "Assets/Fonts/LongCang-Regular.ttf",
+      "design_file": "assets/longcang.ttf",
+      "role": "项目中文标题字体",
+      "sha256": "a1236ac99a5b1b05304ada83d5d9a1ba716510e763bda89c892c37cbe44ea9ba",
+      "guid": "830596b9d6e11204d9305d26e588c2f5"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/paper button.png",
+      "design_file": "assets/button-paper.png",
+      "role": "Bamao 现有纸质按钮",
+      "sha256": "11b02bc236eb24a7f7c5c82cf205657c4bc0466847056ca439e65810b9a4c88d",
+      "size": [
+        246,
+        74
+      ],
+      "guid": "9615de458a253744886f10966dc4058b"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Map.png",
+      "design_file": "assets/glyph-map.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "6e76ce2d3e1201894d17d80df8f8ca1be621c7157b12d17373540f5dc12e23ea",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "b2ddc58e35f914ef4847b001edbfdab4"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Energy.png",
+      "design_file": "assets/glyph-energy.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "0564ab267c3fbbc4c453f9e29093f22ed7f909ec10e0fba47caf1b52c59ccf7a",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "2fd9b6411a9f54fa096bcb9b5082d81f"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Heart.png",
+      "design_file": "assets/glyph-heart.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "455dcdcf839ce4979f51a29588c37fee44bd380954bf6297e833b8d0d5fbf336",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "08ba2b0c2636a4d70b6010def026ae13"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Skull.png",
+      "design_file": "assets/glyph-skull.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "9f4d93d0a62feb9b87e0ac6e3348ed78d5f2f5315bfd9ed631ba1780a6d8f6c6",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "ffa80a5081ce64b3fa134439d447fdc6"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvBoots.png",
+      "design_file": "assets/glyph-invboots.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "bec352655e9a84e14ef02ceeef05922cc9ce0e5f0db11a7f6ed0826f0c41ac79",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "3b5b486ddcd4043e2b0a4e5f3a5120b5"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvRing.png",
+      "design_file": "assets/glyph-invring.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "359a80b2e6e9b8eb5a35fa351a2d07a6c47b0e05dcc5a6e0db8f6843a80ae649",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "2917ca411b9e94173a81b626cde3ec17"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Gem.png",
+      "design_file": "assets/glyph-gem.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "61cbd8afbc9cef22acbb31a39ac58b4effb4b826fe40c612a6ad9a95c4f1fd58",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "ae478d0ec651f45f6ac962b9647d2091"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Star.png",
+      "design_file": "assets/glyph-star.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "9f694844a62805156503af5181a8f8977690968a0b5e1dbdb9103719d3f1f687",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "0de15fbdba6a54c37bdb631584579502"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Question.png",
+      "design_file": "assets/glyph-question.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "410b5681fb90201576df4473af0f2cdc79372fdf7ef00e3876a88cc627740c20",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "cd968fe28a1454ed98525b0d1156685f"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_InvPotion.png",
+      "design_file": "assets/glyph-invpotion.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "4a6d89234cf1db7cba2b5ffa150212bfedfab13bdf04c7b6a56a55ffd073d345",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "141f9cd2b688541f7a6ec2e52cc5e736"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_ArrowLeft.png",
+      "design_file": "assets/glyph-arrowleft.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "a5337f7142043cf02e7ea836b7ad57a029d8deb23fd70262034ec4ef504750d5",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "6811affa4da564f59a4463c5af589a8f"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_ArrowRight.png",
+      "design_file": "assets/glyph-arrowright.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "9da052a906e703a749238d2f2c20c686a43781a35814f3a14cf1358144fd299d",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "88e01b918e6f74dc29d31ccf3e10e1b2"
+    },
+    {
+      "source": "Assets/Fantasy UI/Simple Vector Icons/128px/UI_Icon_Home.png",
+      "design_file": "assets/glyph-home.png",
+      "role": "Fantasy UI 现有符号，用于导航、槽位和临时技能符号",
+      "sha256": "e7f5f9661325c8115936e27f669550901e5c7b0e5f051c685e8fce0a243b4d20",
+      "size": [
+        128,
+        128
+      ],
+      "guid": "3605b5e1c95b84697933a2529b57de77"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_armor_shade.png",
+      "design_file": "assets/item-armor.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "03187b234050e1282ecc48f0ea706ca6a2d45e0f7dba59fcb04700717cf2a584",
+      "size": [
+        158,
+        168
+      ],
+      "guid": "555c3b578aa906646aac2da3546c8322"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_armor_beginner_shade.png",
+      "design_file": "assets/item-armor-basic.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "5f6e8d8ea6c82c98b79925ff7dd12c4ef789c0c0b4f6e6345fb42e804bc6a388",
+      "size": [
+        158,
+        168
+      ],
+      "guid": "97ced5c1f44a20844b47cb57a315189a"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_boots_shade.png",
+      "design_file": "assets/item-boots.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "4b310278ac19cf4f2b003872c5bb8da5b396f40fb1f975feb7db46b76a3a3edc",
+      "size": [
+        173,
+        158
+      ],
+      "guid": "b42d4ae25b3a0514aa02c950db8992da"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_boots_beginner_shade.png",
+      "design_file": "assets/item-boots-basic.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "802db55fb5e1753ee6363a93d474af4a8ee74afddf84218f6721e5434e69c484",
+      "size": [
+        173,
+        158
+      ],
+      "guid": "eee1864475230ac4d9d572f726b42b8d"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_ring_shade.png",
+      "design_file": "assets/item-ring.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "57eb63f98dd661a294b9923df1895e32c212f2d485b6bd2b481438f402607982",
+      "size": [
+        170,
+        162
+      ],
+      "guid": "4d52494e84ab247419902a7e3cb12ee7"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_sword2_shade.png",
+      "design_file": "assets/item-greatsword.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "b5a129bf9de1e7ae0d87628ec18fe3ea55ffca0342e7e50bc656a565517857ff",
+      "size": [
+        204,
+        193
+      ],
+      "guid": "0eb8c0dddce02e74b955d1892e38c36e"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_red_shade.png",
+      "design_file": "assets/item-potion-red.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "8f6be2e9296cf9eb71f5823e48d29744506e8ee59ec85472226365c6f2ba1685",
+      "size": [
+        161,
+        163
+      ],
+      "guid": "6b1dc85328663af43a174955fe2bb08b"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_blue_shade.png",
+      "design_file": "assets/item-potion-blue.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "90d2f530b8679c2d1021af2f27f26fb3496e49999df88c32966d67ced18b7577",
+      "size": [
+        163,
+        153
+      ],
+      "guid": "cbf89e4105ebc5b459dc6f92272371f1"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mana_green_shade.png",
+      "design_file": "assets/item-potion-green.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "b7c5474cbf138eb1c8c8ed79d3bf5b8a81af8376aa4b82f8ce8b231e8e168fb6",
+      "size": [
+        165,
+        153
+      ],
+      "guid": "b1159bd1bb5799e4d8a171d2289d6f9b"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_gold_shade.png",
+      "design_file": "assets/item-gold.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "dd6ede70d272ec228a380f1bd9c3c79702a8e04c7792b8b47c38c84dffac732c",
+      "size": [
+        200,
+        160
+      ],
+      "guid": "b7bd69f0b38883f41943b9e6d2cd11ab"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_mine_shade.png",
+      "design_file": "assets/item-ore.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "dd4822c727b1829ec9f46e2c208e5312bff75c273292d6daf6141f6c7b762305",
+      "size": [
+        199,
+        140
+      ],
+      "guid": "4618b0828f1b06e49939c7489ad2ea70"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_diamond.png",
+      "design_file": "assets/item-gem.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "1fa4f29d110449b2cbd26838b41d3da2606a9c6e377ed415411665f698ecb860",
+      "size": [
+        85,
+        77
+      ],
+      "guid": "0611e57a58b95dc4d9078f34b163e6c3"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/blue crystal.png",
+      "design_file": "assets/item-crystal.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "c9ab032e90069040d8beb623ecd421e4298a6cf7642594bfcc2158ff00ae1ac1",
+      "size": [
+        488,
+        411
+      ],
+      "guid": "5490e0034721ff049933b583fc0f251d"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/Red crystal.png",
+      "design_file": "assets/item-crystal-red.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "30034c25e4e143392e5585abf5181d3ac52403bba8306c39c1fcb8215ef9219c",
+      "size": [
+        490,
+        381
+      ],
+      "guid": "e88c91aafd42e8044a29d2e94ad3f29c"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_envelope_shade.png",
+      "design_file": "assets/item-letter.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "a2e40de4cef359a62891489e2e852613a6c3f8d50a21dc30e7290030e5c539e8",
+      "size": [
+        175,
+        169
+      ],
+      "guid": "f111dc548c7006c40a508241becc9ddb"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Shop/icon_KEY_shade.png",
+      "design_file": "assets/item-key.png",
+      "role": "Bamao 现有手绘物品图标，拟统一映射到对应物品类别",
+      "sha256": "ba5a4b01e922582025e825684c39e87f5fd179bb29d9fedeb87f160f4542e198",
+      "size": [
+        186,
+        175
+      ],
+      "guid": "d8ab87a2431f1ad4c9da3cba26efc9f4"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Equipment/E_magic book.png",
+      "design_file": "assets/item-book.png",
+      "role": "Bamao 现有魔法书图标",
+      "sha256": "0bfe67e9d690d90c373d477303a4d0fc4b0681dc0a9000643b0ff1b060089fe0",
+      "size": [
+        96,
+        106
+      ],
+      "guid": "11c5dfffd184d1a4cb06ebc0750788eb"
+    },
+    {
+      "source": "Assets/Bamao/BamaoUIPack/Sprites/Equipment/E_magic book 2.png",
+      "design_file": "assets/item-book-blue.png",
+      "role": "Bamao 现有魔法书图标",
+      "sha256": "c70d30e9aa3143576a1eb5601573110d4d925b8f779e11ef2522cc51fe64d85c",
+      "size": [
+        96,
+        106
+      ],
+      "guid": "c4f360a2a4ece9b4d9d9dcf2e7032e69"
+    },
+    {
+      "source": "Tools/Validation/Captures/adventure-training.png",
+      "design_file": "assets/world-training.png",
+      "role": "项目既有验证截图；仅用作设计场景底图参考",
+      "sha256": "de783f2c0698cb8c307e28537c0c533c938f9a13ea0605073c984f499e9f11ff",
+      "size": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_01.png",
+      "design_file": "assets/sy-panel.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "1eff3fd7549e967a900e10929ea55799479abf91f5211c9ec5e7036e560495f9",
+      "guid": "e8445c0388d79eb4d839db85ee21f319",
+      "sprite_border_LBRT": [
+        340,
+        340,
+        340,
+        340
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_08.png",
+      "design_file": "assets/sy-panel-plain.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "9b41eed980a8070a806a07242850935ac943ecca473e96f5aa4194083bfad827",
+      "guid": "dc783e6e2c71677408e77d28fc2ac712",
+      "sprite_border_LBRT": [
+        150,
+        300,
+        150,
+        150
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Box_Large_02.png",
+      "design_file": "assets/sy-panel-detail.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "aa92ab3db351dfb14460e2f66a0f38e3ee072f9fe16867928f96561f7754ce90",
+      "guid": "b71ee1d7918485a47b2be8561d9f6bb0",
+      "sprite_border_LBRT": [
+        380,
+        380,
+        380,
+        380
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_07_Frame.png",
+      "design_file": "assets/sy-button.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "db688d7e3e16f565cbba86b6041188f7b7502526ce9d904284e5a45cf8115559",
+      "guid": "d6e0d4102df65134080f8d017d58e31d",
+      "sprite_border_LBRT": [
+        450,
+        0,
+        450,
+        0
+      ],
+      "size": [
+        1024,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_05_Frame.png",
+      "design_file": "assets/sy-button-subtle.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "b7a752a75c46a362fefebe3011f780ab1a9236ad1229ded82f1610c244681883",
+      "guid": "9173fb8d3655dd04e8f922ecaed91f0f",
+      "sprite_border_LBRT": [
+        350,
+        0,
+        350,
+        0
+      ],
+      "size": [
+        1024,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Menu_Button_07_Background.png",
+      "design_file": "assets/sy-button-bg.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "6ae1a86b28da9f20650a873fcd1fe022869163c8deddee7ff25fffc83c8e6683",
+      "guid": "b4f513368f672be468d0004252b6e02a",
+      "sprite_border_LBRT": [
+        450,
+        0,
+        450,
+        0
+      ],
+      "size": [
+        1024,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Shield_01_Gold.png",
+      "design_file": "assets/sy-crest-shield.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "a0f4680238a400dd71aba4b8414bec5a716e72b08b32b66279e50c2c31f07d34",
+      "guid": "6d59434feaa45e84694be036c8d0e5d0",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Wings_05_Gold.png",
+      "design_file": "assets/sy-crest-wings.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "17b7518c02e6a535e5a8ff696c165113b2a519ed655d5b4a5af7452f549b928e",
+      "guid": "fc54cf88e5956a3418c1f17bc2913a81",
+      "sprite_border_LBRT": [
+        500,
+        0,
+        500,
+        0
+      ],
+      "size": [
+        1024,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Greeble_SwordsCrossed_01.png",
+      "design_file": "assets/sy-crest-swords.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "a3094db92a5ffcdb6524304838395eca1dd072a1cdf4f2f94781d9c1ee23d150",
+      "guid": "a62d3355f8a5f8440946e43de649f476",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Crests/SPR_FantasyMenus_Crest_Greeble_Dragonhead_01_Gold.png",
+      "design_file": "assets/sy-crest-dragon.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "e44a3d761033b20f41e3505e33f056cdec72947202fb0409e1819458af5b5ac2",
+      "guid": "c22acfe9d6f14c243834e30c7ba66443",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Greeble_Curlicue_04.png",
+      "design_file": "assets/sy-flourish.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "3eee9dd2eee26ff726eec3312bd4c6c7aa144c46b8cb8ca31b4adcc0e83f07bc",
+      "guid": "26ec0bf9cafc62940b6e3ef05af7b40b",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/FantasyMenus/SPR_FantasyMenus_Frame_Bar_07.png",
+      "design_file": "assets/sy-divider.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "8868eb4ac56086fa953827529a6197e99eec83bb72286e34f63c9581ad107077",
+      "guid": "de09c3367397c654685794df97e619b6",
+      "sprite_border_LBRT": [
+        50,
+        0,
+        50,
+        0
+      ],
+      "size": [
+        256,
+        128
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/General/SPR_FantasyMenus_Background_Pattern_01.png",
+      "design_file": "assets/sy-pattern.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "6e8cfe344ec74bddb2edf0083d3003fd87e531334a75b07be6f46290c7523aa1",
+      "guid": "9654b4e40726e2a4a8cc9c68aec14c0d",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Medal_01.png",
+      "design_file": "assets/sy-medal.png",
+      "role": "Synty Fantasy Menus：界面边框、菜单、徽章与装饰",
+      "sha256": "7ec7e6da060e4ed61b574c67f2523bd6809ecbe7898a7d025920f9d7520a9578",
+      "guid": "6e5a8dd6c8d178f469d526e468a30e09",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Frame_Box_Small_01.png",
+      "design_file": "assets/sy-slot.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "648aea6f0ae83bed5882fa30a663920dc9add0467883f2e14617fe817d04c0f3",
+      "guid": "171d3165e83936e47a7a9e983ced7594",
+      "sprite_border_LBRT": [
+        55,
+        55,
+        55,
+        55
+      ],
+      "size": [
+        128,
+        128
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Ring_Large_02_Clean.png",
+      "design_file": "assets/sy-map-ring.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "a62680c22291105778d5249914cf45acc019cea664947ad45b663bbc744eb62f",
+      "guid": "deb80a3827ad1794ab0b59db0180d781",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Ring_Large_01_Clean.png",
+      "design_file": "assets/sy-portrait-ring.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "870169aec96a037cb2c8ca7365e3f6cbdda76e1dcaf51bc9652512a1bc1d4225",
+      "guid": "c22958f78a144c745ba055da9c9bda34",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Map_Player_01_Clean.png",
+      "design_file": "assets/sy-map-player.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "a9751b3e03b8287411eed0104ca2b4da3a56523dd4c2cc884bb0b10990f3633f",
+      "guid": "41fdfaaa916db3e4586fe2c50b8854f9",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Tracery_FrameDetail_07.png",
+      "design_file": "assets/sy-boss-frame.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "0030f3da749d107fb27244d84d555e9b6ad17e4bb38eaa44df18330ce8dd7675",
+      "guid": "1e3fa5a026c471d49848be7c9402cda7",
+      "sprite_border_LBRT": [
+        150,
+        0,
+        150,
+        0
+      ],
+      "size": [
+        512,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/HUD/SPR_HUD_FantasyWarrior_Bar_Diamond_02.png",
+      "design_file": "assets/sy-gauge.png",
+      "role": "Synty Fantasy Warrior HUD：HUD、状态条、槽位与地图",
+      "sha256": "ce4db60654f95efe427fd34cab3c98a5e381133ebdae5b22b566f1022e1e739e",
+      "guid": "b6444a1973c814a4096ba108fc45e8c9",
+      "sprite_border_LBRT": [
+        110,
+        0,
+        110,
+        0
+      ],
+      "size": [
+        256,
+        64
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Backpack_01_Clean.png",
+      "design_file": "assets/glyph-bag1.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "3e70e5d6f1e398e0018121204a4dab540d148665e9f278892fa322f31eb259fb",
+      "guid": "cc190becc02f8594286d94b507bafa81",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Currency_01_Clean.png",
+      "design_file": "assets/glyph-coin.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "903bf21c0bfdee50c2534d6acdfc0ac35e7a13770e91b89dfd1a9bc1f8bd5483",
+      "guid": "451ff7c11f569644da48f8434d725dc1",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Crafting_01_Clean.png",
+      "design_file": "assets/glyph-hammer.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "de97ec98a3da49b430b704cc3eb7042108fbbd946d43b5d400f37596803b85ab",
+      "guid": "a5ff00d95ee9d0e45935cd7503dac06e",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Armor_01_Clean.png",
+      "design_file": "assets/glyph-invchest.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "12eb9e26d15caf47a6b02f4fa7da39f8f37cf00bd2814f67e2145ee03702420a",
+      "guid": "9714e3567cdcc2e40b2f41f4637748ad",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Inventory/ICON_FantasyWarrior_Inventory_Bows_01_Clean.png",
+      "design_file": "assets/glyph-archer.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "905ca8930de72d731fe90cd764943aae05ef34887f460bc75a5593ebacd3cf4f",
+      "guid": "ae2a881ff27d7c443acbbc4692748aad",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Elements/ICON_FantasyWarrior_Element_Fire_01_Clean.png",
+      "design_file": "assets/glyph-fire.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "d780a63e68cfce83d428f6e5538bb4e7fdbc37863a523b0fc3320dd54e3b85a8",
+      "guid": "e9d9f46f0cf03be4782ad85a3f8a2be6",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Status/ICON_FantasyWarrior_Status_Attack_01_Clean.png",
+      "design_file": "assets/glyph-attack.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "e65c8890dd485960166ed688f6d9cbf3722730aaee39959523b0f82a104d0952",
+      "guid": "e15984e5de343944092ab5c2fa78fdf6",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Book_01.png",
+      "design_file": "assets/glyph-book.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "ebb8bafbed2e3595952c0b245fbe5d3634b1f064293aaf7a03a9220191479c1a",
+      "guid": "b4fb47a3885599c4ca3e77810dfe1837",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Medal_01.png",
+      "design_file": "assets/glyph-award.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "7ec7e6da060e4ed61b574c67f2523bd6809ecbe7898a7d025920f9d7520a9578",
+      "guid": "6e5a8dd6c8d178f469d526e468a30e09",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Helmet_01.png",
+      "design_file": "assets/glyph-invhelmet.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "08da1514fb0d8ce96156886991795c6a489abdeed7466db8d8501991ce98e76c",
+      "guid": "582b8eafda7d494469dac3c39e2ad780",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Flag_01.png",
+      "design_file": "assets/glyph-flag.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "367156927f6a983a42572d459b9eaa0f62f9ad170bbe4400330d723f51774d90",
+      "guid": "b5e47b5537b82c14e923e6a94d713907",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Exit_01.png",
+      "design_file": "assets/glyph-exit.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "db72702ec364ef8e26bc2895cbdb25b4e3c0022588ede887acffd5eafdbe49d2",
+      "guid": "b2fba0e2a6f90d64785d5a4efd5b834e",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_FantasyMenus/SPR_FantasyMenus_Icon_Settings_01.png",
+      "design_file": "assets/glyph-settings.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "e7a121aa308789d9f4aa86981fac76f40884a7b391f56184e27ae7e4223dd397",
+      "guid": "d0453998da706944fb957a21ddb812b5",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        512,
+        512
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Sprites/Icons_Settings/ICON_FantasyMenus_Settings_Controls_01_Clean.png",
+      "design_file": "assets/glyph-target.png",
+      "role": "Synty 统一导航与状态图标",
+      "sha256": "33d4917ec4106f4e1872639385ae1388ab39299da9623e33eab0593ce6bd083b",
+      "guid": "f63fa08ffec99254c925fc5cd8abf104",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Fonts/Ortica/Ortica-Bold.otf",
+      "design_file": "assets/sy-title.otf",
+      "role": "Synty Menus 拉丁标题字体",
+      "sha256": "cad9ccaa090c692f676247a9e367eee2549743acb739ac8ba1afd7bf0b31f343",
+      "guid": "6f4d60d9b7ddbc947b7f0b00813a5822"
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Fonts/Ortica/OFL.txt",
+      "design_file": "assets/licenses/Ortica-OFL.txt",
+      "role": "Ortica 字体随附许可",
+      "sha256": "5e83794425e5648114d98e70717e75e264a4f46171ceb494cf8d2f35f1362262",
+      "guid": "dadc2a342e38c5a44afa80ff0f86c44d"
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonOffset.png",
+      "design_file": "assets/world-town.png",
+      "role": "现有资源包/项目中的干净场景底图，仅作设计示意，不表示实际关卡",
+      "sha256": "7c4a21b57c866c2eba29fe83c99ad054703b4f0670e96f45dc12ac7373cd652e",
+      "guid": "41493660fe3ccd04ab37d39f21f76bc9",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        5040,
+        2160
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonCentered.png",
+      "design_file": "assets/world-dungeon.png",
+      "role": "现有资源包/项目中的干净场景底图，仅作设计示意，不表示实际关卡",
+      "sha256": "5e0bcc5c17d4253fbb7ce7e7e53bbe64e05b29e119f1c72d20a186d7aed5084c",
+      "guid": "5200c0301b92b634fa4d24a26f094d95",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        5040,
+        2160
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyMenus/Samples/Sprites/SPR_FantasyMenus_Example_Image_Continue_01.png",
+      "design_file": "assets/sy-destination-forest.png",
+      "role": "现有资源包/项目中的干净场景底图，仅作设计示意，不表示实际关卡",
+      "sha256": "22d7f13598d705185797a7555c750784e872f9b80d977b72ef1f55e4421d4af9",
+      "guid": "f5e4d72d35134d84e93a70308a9344df",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        2048,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Resources/BG/SettingBG.png",
+      "design_file": "assets/sy-destination-crystal.png",
+      "role": "现有资源包/项目中的干净场景底图，仅作设计示意，不表示实际关卡",
+      "sha256": "9ad4e8c5baa53b340adfa4575ddcf6dab62dfd1c49313ed993ee55b4ee966400",
+      "guid": "84047c1f037b8614296fb17229ce4ca0",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Samples/Sprites/SPR_HUD_FantasyWarrior_ExampleScreenshot_3rdPersonOffset.png",
+      "design_file": "assets/sy-destination-training.png",
+      "role": "现有资源包/项目中的干净场景底图，仅作设计示意，不表示实际关卡",
+      "sha256": "7c4a21b57c866c2eba29fe83c99ad054703b4f0670e96f45dc12ac7373cd652e",
+      "guid": "41493660fe3ccd04ab37d39f21f76bc9",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        5040,
+        2160
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_SwordAttack.png",
+      "design_file": "assets/skill-swordsman-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "4b9ede384189a7579bea2133ff16f92657a4212547eeef9ffccaf9e0463cf1a8",
+      "guid": "0cd68d283806ee9409c19bdf7f799d26",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HardEarthHit.png",
+      "design_file": "assets/skill-swordsman-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "8fd10b1193e5e415c2ed8cac0edb29edac921b9bb1976f2d6faf3c9f1fe95213",
+      "guid": "e31ad33ec4a1a1a4cae4264f5fe50349",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/Bonus/SkillUpdate/Standart/AttackDoubleSword_1.png",
+      "design_file": "assets/skill-swordsman-3.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "e5178d7c8cdf0474a67cd0f3350164259fb13800c85bdcf00dd5582e1b032a38",
+      "guid": "7289b6576e24cc849a3b96d1c519e069",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_SwordSplash.png",
+      "design_file": "assets/skill-sword-saint-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "5400045d1d449018924beb35fa0c85b418d8ba179792f4a503c5be0f267bf20c",
+      "guid": "947a9865ac0fd5b4e809577727a166b9",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/Skillicons2/Skill_standart/swords_of_light.png",
+      "design_file": "assets/skill-sword-saint-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "3f4acfb334c9360c9cbd936f897307765fe381b893919b870216740b4ef575c4",
+      "guid": "30fac723439551a4f991d4ff81b79681",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HardAxeAttack.png",
+      "design_file": "assets/skill-berserker-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "da05111bbac59979207a1c09439b7e61e5827571e6591ff379625606e99cf4dc",
+      "guid": "f1462acb3b3f15546ae51c0bbbb76264",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_BattleCry.png",
+      "design_file": "assets/skill-berserker-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "aab451e4a0a635db2756be1fbbc2f79fc6b04fcea22bda3273c17f79b305de86",
+      "guid": "40b25827bb1d0dd4cb2c5718f59d51cb",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FireBall.png",
+      "design_file": "assets/skill-mage-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "713a7b92e78087751fc6652489896637a30dce0da7cb7945628c0fee39d3a663",
+      "guid": "3d64d6ae1778aa144aec249df09621c3",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FrostNova.png",
+      "design_file": "assets/skill-mage-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "0676d7ee6365870f4f3e1124d51dcd69cf342fe63646f05e9264c10c09475308",
+      "guid": "197c1421886fc6248a38fde7a5b4885d",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_LightningStrike.png",
+      "design_file": "assets/skill-mage-3.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "0aec5e74f3e3abadbff4268139a1655011e045aaaf0c1c179ccf28c9b051ce3d",
+      "guid": "05377917b66ee8c41b96c2f8cb365a69",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_LightningUltimate.png",
+      "design_file": "assets/skill-shaman-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "c9ba806b93361bd1e5fa2a19fe9a06ceaed3fcffda4869cddadfd6ef933ce360",
+      "guid": "8d9b31295fb106041a15c6f85db4fc59",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_EarthShock.png",
+      "design_file": "assets/skill-shaman-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "b3646885fbc94968e220e52070317e38af238d53fc6d4f55e6348fc51a76681b",
+      "guid": "d226db74f17e0054aa3f7f451c6df7b5",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_StrongArrowShoot.png",
+      "design_file": "assets/skill-ranger-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "53e4db34e2669cbedda4586b14585ff2fb55d1eaa1a2e3f0f264705427ca3db7",
+      "guid": "0589a2deae4483042b8bbd546dccce8e",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/Bonus/Skill1_Standart/Big_fire_arrow.png",
+      "design_file": "assets/skill-ranger-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "9413662b73469c099f356a5efcb7c4594d52981e8e23610e751a845a9533fad7",
+      "guid": "72cb0c66bee941547998aea126ec0d21",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_MeleeSplashCleave.png",
+      "design_file": "assets/skill-ranger-3.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "961d8c27598ec9ab4e5fb7901832867cff290203f13128c46e1de72f63eb26bc",
+      "guid": "75c70e4ddd031eb40b43557969245d90",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_FocusArrow.png",
+      "design_file": "assets/skill-sharpshooter-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "233242b31ab6c4a06f0d599803aa2390684abb998c50d76dbdd206e2f14fed18",
+      "guid": "178a5e88d1ce6704dbeb8762c102d817",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_RainOfArrows.png",
+      "design_file": "assets/skill-sharpshooter-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "043a62a41eeb5f9ae6a356225bbc95cb613e752da7582dd0081b7f1ec973e193",
+      "guid": "3e35525049d8a1c409249edddfefeb1a",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/Bonus/SkillUpdate/Standart/SummonPet_1.png",
+      "design_file": "assets/skill-beastmaster-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "e70a3c1868060768bab349298c0af28d32c045f0e82eb966b6aa23d1f396801f",
+      "guid": "c889f8b3d5510624a82bf0c162f77029",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_HoofStomp.png",
+      "design_file": "assets/skill-beastmaster-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "1af3452e9b36ed845f4c79d2a3a22beba6744cc0961a8c3c9675221875a37c3c",
+      "guid": "e6aa310c3c4c7fb488349b993e6fe411",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_ShadowDagger.png",
+      "design_file": "assets/skill-assassin-1.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "41f85db82f717a40dce296c3e57b31efd22ce9622b0d9726c7be65c7e08af235",
+      "guid": "83d30c5ed90248d4c9f6b237a6204d3e",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/6000FantasyIcons/SkillsIcons/SkillIcons3/SkillVol3/Skill_WhirlwindDaggers.png",
+      "design_file": "assets/skill-assassin-2.png",
+      "role": "PONETI 6000 Fantasy Icons：独立技能图标视觉建议",
+      "sha256": "211252de4d96e7a5f7115100f3dfca788b365f05e57c3bf1a6f82a6f7ec93ca5",
+      "guid": "09be85fdcfb7eb0479fb5cd2993de628",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        256,
+        256
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Sword_01.png",
+      "design_file": "assets/item-sword.png",
+      "role": "Synty POLYGON 风格武器物品图标",
+      "sha256": "c5eb6994c1b3688c7ff83fceaf2cc86e5ec17b90762b72fd0d93e6f31aaebffe",
+      "guid": "965129895f783004e928eb620f4d2820",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Sword_02.png",
+      "design_file": "assets/item-sword-rare.png",
+      "role": "Synty POLYGON 风格武器物品图标",
+      "sha256": "cea12005d845f2612c29c886423f694fae7f67ed61b6d1eb8c9d96653c4e01eb",
+      "guid": "3bf829056cb57434384863b58da1a63e",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "source": "Assets/Synty/InterfaceFantasyWarriorHUD/Sprites/Icons_Weapons/ICON_SM_Wep_Shield_01.png",
+      "design_file": "assets/item-shield.png",
+      "role": "Synty POLYGON 风格武器物品图标",
+      "sha256": "97429ccd3c2a83a175613c04e8e3ad65912c93a70ba52832faee91ea772234b0",
+      "guid": "739baa73cc8146d4c98ae5b4b6e79776",
+      "sprite_border_LBRT": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "derived_assets": [
+    {
+      "design_file": "assets/models/mage-female.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/mage-female.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "cd8570c83b0d7ff7c71bd377a0b56196b1fa69f0b7deb726e8112a188e1e56cf"
+    },
+    {
+      "design_file": "assets/models/mage-male.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/mage-male.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "7aee721dcd8a90b95fac305a4e82d72aa44eb34dd43ae6290894895b010f090b"
+    },
+    {
+      "design_file": "assets/models/ranger-female.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/ranger-female.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "1b84b1a4e889731c4d4a363dde8524d01b4daab1e51a8e5f7294f7011e1536d3"
+    },
+    {
+      "design_file": "assets/models/ranger-male.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/ranger-male.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "c5086a194a54a938b3ef762a4cae47bd94ed9203c01f876a5fa41c517752c8e3"
+    },
+    {
+      "design_file": "assets/models/swordsman-female.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/swordsman-female.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "b1e923bfd69c53556a505b3d340b5d6f595aadf3e863f1f8d04d8311ac49de1e"
+    },
+    {
+      "design_file": "assets/models/swordsman-male.png",
+      "source_prefab": "Assets/Prefabs/PlayerAppearances/swordsman-male.prefab",
+      "method": "Unity PreviewRenderUtility; existing class idle and starting weapon; RGBA PNG",
+      "sha256": "cadfcbd951e7ac59ad095e6b3548dd83d6a09ca5d5e57090ce03826d9522794a"
+    }
+  ],
+  "version": "Windworn V3",
+  "art_direction": "Moss leather, parchment notes, worn brass; asymmetric layouts and profession motifs."
+}

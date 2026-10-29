@@ -22,6 +22,7 @@ public class ScreenPage : MonoBehaviour
     {
         _screenService = screenService;
         _injected      = true;
+        if (isActiveAndEnabled) { RefreshUI(); _savedSnapshot = CloneSettings(_screenService.CurrentSettings); }
     }
 
     // ── UI 控件（在 Inspector 中绑定，或由代码查找）────────────────────────────
@@ -46,6 +47,7 @@ public class ScreenPage : MonoBehaviour
 
     // 暂存用户本次修改的设置（点 OK 才正式 Apply+Save）
     private ScreenSettings _pendingSettings;
+    private ScreenSettings _savedSnapshot;
 
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -59,6 +61,12 @@ public class ScreenPage : MonoBehaviour
     {
         if (!_injected) return;
         RefreshUI();
+        _savedSnapshot = CloneSettings(_screenService.CurrentSettings);
+    }
+
+    private void OnDisable()
+    {
+        if (_screenService != null && _savedSnapshot != null) _screenService.Apply(_savedSnapshot);
     }
 
     // ── 私有方法 ───────────────────────────────────────────────────────────────
@@ -90,7 +98,7 @@ public class ScreenPage : MonoBehaviour
         resolutionDropdown.ClearOptions();
         resolutionDropdown.AddOptions(
             new System.Collections.Generic.List<string>(_screenService.ResolutionOptions));
-        resolutionDropdown.value = _pendingSettings.ResolutionIndex;
+        resolutionDropdown.SetValueWithoutNotify(_pendingSettings.ResolutionIndex);
         resolutionDropdown.RefreshShownValue();
 
         resolutionDropdown.onValueChanged.RemoveAllListeners();
@@ -105,7 +113,7 @@ public class ScreenPage : MonoBehaviour
         qualityDropdown.ClearOptions();
         qualityDropdown.AddOptions(
             new System.Collections.Generic.List<string>(_screenService.QualityOptions));
-        qualityDropdown.value = _pendingSettings.QualityIndex;
+        qualityDropdown.SetValueWithoutNotify(_pendingSettings.QualityIndex);
         qualityDropdown.RefreshShownValue();
 
         qualityDropdown.onValueChanged.RemoveAllListeners();
@@ -117,7 +125,7 @@ public class ScreenPage : MonoBehaviour
     {
         if (fullscreenToggle == null) return;
 
-        fullscreenToggle.isOn = _pendingSettings.IsFullScreen;
+        fullscreenToggle.SetIsOnWithoutNotify(_pendingSettings.IsFullScreen);
 
         fullscreenToggle.onValueChanged.RemoveAllListeners();
         fullscreenToggle.onValueChanged.AddListener(value =>
@@ -130,11 +138,14 @@ public class ScreenPage : MonoBehaviour
 
         brightnessSlider.minValue = 0f;
         brightnessSlider.maxValue = 1f;
-        brightnessSlider.value    = _pendingSettings.Brightness;
+        brightnessSlider.SetValueWithoutNotify(_pendingSettings.Brightness);
 
         brightnessSlider.onValueChanged.RemoveAllListeners();
         brightnessSlider.onValueChanged.AddListener(value =>
-            _pendingSettings.Brightness = value);
+        {
+            _pendingSettings.Brightness = value;
+            _screenService.PreviewBrightness(value);
+        });
     }
 
     private void OnOKClicked()
@@ -143,15 +154,22 @@ public class ScreenPage : MonoBehaviour
 
         _screenService.Apply(_pendingSettings);
         _screenService.Save();
+        _savedSnapshot = CloneSettings(_pendingSettings);
         Debug.Log("[ScreenPage] 设置已应用并保存。");
     }
 
     private void OnResetClicked()
     {
         if (_screenService == null) return;
-        _screenService.Reset();
+        _screenService.Apply(_screenService.Defaults);
         RefreshUI();
     }
+
+    private static ScreenSettings CloneSettings(ScreenSettings source) => new ScreenSettings
+    {
+        ResolutionIndex = source.ResolutionIndex, IsFullScreen = source.IsFullScreen,
+        QualityIndex = source.QualityIndex, Brightness = source.Brightness
+    };
 
     // ── 工具方法：从子节点路径查找组件 ──────────────────────────────────────────
     private T FindInChildren<T>(string path) where T : Component

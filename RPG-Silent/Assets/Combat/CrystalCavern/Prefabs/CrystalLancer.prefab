@@ -4461,6 +4461,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Definition: {fileID: 11400000, guid: 7d2bcba31cdd4d84ebe310f795c35531, type: 2}
   MaxHealth: 90
+  CombatWarningMaterial: {fileID: 2100000, guid: f0d9b8bbdd938dc4099e54ea2067f343, type: 2}
   moveSpeed: 3
   turnSpeed: 8
   attackDistance: 2

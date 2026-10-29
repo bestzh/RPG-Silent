@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: commission-reclaimed-ore
+  m_EditorClassIdentifier:
+  Id: commission-reclaimed-ore
+  Title: "\u7089\u706B\u56DE\u6536\u59D4\u6258"
+  Description: "\u94C1\u5320\u9700\u8981\u7A33\u5B9A\u7684\u56DE\u6536\u6750\u6599\u6765\u7EF4\u62A4\u65E7\u8DEF\u3002\u4EA4\u4ED8\u540E\u589E\u52A0\u597D\u611F
+    2\uFF1B\u518D\u901A\u5173\u4E00\u8D9F\u6B63\u5F0F\u526F\u672C\u53EF\u5237\u65B0\u3002\u597D\u611F
+    40\uFF0F70 \u65F6\uFF0C\u8865\u7ED9\u5546\u54C1\u4F18\u60E0 10%\uFF0F15%\uFF0C\u56DE\u8D2D\u539F\u4EF7\u4E0D\u53D8\u3002"
+  Category: 4
+  Giver: 1
+  FamilyId:
+  RequiredClassId:
+  Chapter:
+  PrerequisiteId: side-forge
+  RequiredLevel: 6
+  Order: 540
+  Repeatable: 1
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u953B\u9020\u788E\u7247"
+    DungeonId: 0
+    ItemId: forge-shard
+    NpcRole: 0
+    Required: 4
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 2
+    Label: "\u4EA4\u4ED8\u6676\u6838\u788E\u7247"
+    DungeonId: 0
+    ItemId: crystal-shard
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 200
+  RewardExp: 220
+  Rewards: []

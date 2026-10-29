@@ -24,10 +24,10 @@ public sealed partial class PlayerProgressService
     {
         if (id == null) return null;
         if (items.TryGetValue(id, out var definition)) return definition;
-        var instance = inventory.bag.Concat(inventory.overflow).FirstOrDefault(x => x.Key == id);
+        var instance = inventory.bag.Concat(inventory.overflow).Concat(warehouse.items).FirstOrDefault(x => x.Key == id);
         return instance != null && items.TryGetValue(instance.itemId, out definition) ? definition : null;
     }
-    public ItemStackData FindInstance(string key) => inventory.bag.Concat(inventory.overflow).FirstOrDefault(x => x.Key == key)?.Copy();
+    public ItemStackData FindInstance(string key) => inventory.bag.Concat(inventory.overflow).Concat(warehouse.items).FirstOrDefault(x => x.Key == key)?.Copy();
     public int ItemStat(string key, ItemAffixStat stat) => EquipmentStats.Total(FindItem(key), FindInstance(key), stat) + ItemGemBonus(key, stat);
     public int ItemUpgradeBonus(string key, ItemAffixStat stat) => EquipmentStats.UpgradeBonus(FindItem(key), FindInstance(key)?.upgradeLevel ?? 0, stat);
     public string ResolveItemKey(string key)
@@ -58,10 +58,13 @@ public sealed partial class PlayerProgressService
         if (!attached || applying) return true;
         if (slot < 0 || slot >= PlayerWeaponEquipment.SlotCount || activeSlot < 0 || activeSlot >= PlayerWeaponEquipment.SlotCount || !CanEquipWeaponInstance(key)) return false;
         var data = Capture(); data.weaponInstanceIds[slot] = key ?? "";
+        if (!string.IsNullOrEmpty(key) && (weapons.GetInstanceId(slot) != key || weapons.ActiveSlot != activeSlot))
+            data.tutorial.Record(TutorialStep.EquipWeapon);
         data.weaponIds[slot] = FindItem(key)?.Id ?? ""; data.activeWeaponSlot = activeSlot;
         var active = FindItem(data.weaponInstanceIds[activeSlot]); data.stance = (int)(active?.Weapon != null ? active.Weapon.Stance : PlayerStance.Unarmed);
         if (!store.TrySave(data, newProfile, out string message))
         { StatusMessage = message; HasUnsavedChanges = true; Changed?.Invoke(); return false; }
+        tutorial = data.tutorial.Copy();
         newProfile = false; lastSavedPayload = JsonUtility.ToJson(data); HasUnsavedChanges = false; StatusMessage = "武器已装备并保存"; return true;
     }
     public bool OwnsWeapon(WeaponDefinition weapon) => weapon == null || inventory.Count(weapon.PersistentId) > 0;
@@ -85,14 +88,13 @@ public sealed partial class PlayerProgressService
                     (item.UseEffect == ConsumableEffect.Guard && (item.UseStatus == null || item.UseStatus.Kind != CombatStatusKind.Guard)))) ||
                 (item.Kind == ItemKind.Weapon && (item.Weapon == null || item.Weapon.PersistentId != item.Id)))
                 throw new InvalidOperationException("物品配置无效或重复：" + item.name);
+            if (!Enum.IsDefined(typeof(EquipmentSpecialEffect), item.SpecialEffect) || item.SpecialEffect != EquipmentSpecialEffect.None && EquipmentEffectRules.Level(item) == 0)
+                throw new InvalidOperationException("装备特殊效果配置无效：" + item.name);
         }
     }
     bool ValidInventoryContent(InventoryData data)
     {
-        if (data.bag.Concat(data.overflow).Any(x => !items.TryGetValue(x.itemId, out var item) ||
-            (item.IsStackable ? x.IsInstance : !x.IsInstance) ||
-            (item.IsStackable && x.upgradeLevel != 0) || x.affixes.Length > EquipmentInstances.AffixCount(item.Rarity) ||
-            (x.gemId.Length > 0 && (item.Kind != ItemKind.Equipment || !items.TryGetValue(x.gemId, out var gem) || !gem.IsGem)))) return false;
+        if (data.bag.Concat(data.overflow).Any(x => !ValidInventoryEntry(x))) return false;
         for (int i = 0; i < data.equipped.Length; i++)
         {
             var id = data.equipped[i]; if (id.Length == 0) continue;
@@ -101,7 +103,16 @@ public sealed partial class PlayerProgressService
         }
         return true;
     }
-    void ApplyEquipmentBonuses() => stats.SetEquipmentBonuses(EquipmentHealth, EquipmentEnergy, EquipmentDefensePercent);
+    bool ValidInventoryEntry(ItemStackData x) => items.TryGetValue(x.itemId, out var item) && !(
+            (item.IsStackable ? x.IsInstance : !x.IsInstance) ||
+            (item.IsStackable && x.upgradeLevel != 0) || x.affixes.Length > EquipmentInstances.AffixCount(item.Rarity) ||
+            (x.gemId.Length > 0 && (item.Kind != ItemKind.Equipment || !items.TryGetValue(x.gemId, out var gem) || !gem.IsGem)));
+    void ApplyEquipmentBonuses()
+    {
+        RefreshEquipmentEffectLevels();
+        weapons?.GetComponent<PlayerController>()?.EquipmentEffects?.EquipmentChanged();
+        stats.SetEquipmentBonuses(EquipmentHealth, EquipmentEnergy, EquipmentDefensePercent);
+    }
 
     public bool TryWearItem(string id, out string message)
     {
@@ -132,8 +143,8 @@ public sealed partial class PlayerProgressService
         if (inventory.Find(id).isLocked) { message = "装备已锁定，请先解除锁定。"; return false; }
         if (inventory.Find(id).gemId.Length > 0) { message = "请先在铁匠处拆下宝石，再出售装备。"; return false; }
         if (stats.Gold > int.MaxValue - item.SellPrice) { message = "金币已达上限。"; return false; }
-        var next = inventory.Copy(); if (!next.RemoveOne(id)) return false;
-        return CommitInventory(next, item.SellPrice, 0, $"已出售 {item.DisplayName}，获得 {item.SellPrice} 金币。", out message);
+        var selection = new[] { new InventorySelectionData { key = id, count = 1 } };
+        return TrySellItems(selection, InventoryBatchQuote(selection, false), out message);
     }
     public bool TryDismantleItem(string id, out string message)
     {
@@ -144,7 +155,8 @@ public sealed partial class PlayerProgressService
     public bool IsLastEquippedItem(string id)
     {
         id = ResolveItemKey(id);
-        return id != null && (inventory.equipped.Contains(id) || Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Any(i => weapons?.GetInstanceId(i) == id));
+        return id != null && (inventory.equipped.Contains(id) || Enumerable.Range(0, PlayerWeaponEquipment.SlotCount).Any(i =>
+            (weapons != null ? weapons.GetInstanceId(i) : pending?.weaponInstanceIds?[i]) == id));
     }
     public bool TryCollectOverflow(out string message)
     {
@@ -180,7 +192,9 @@ public sealed partial class PlayerProgressService
         if (!next.AddRewards(granted) || !ValidInventoryContent(next) || next.overflow.Sum(x => x.count) != inventory.overflow.Sum(x => x.count))
         { message = "背包已满，物品仍在地上。请整理背包后再拾取。"; return false; }
         next.lastRewardId = rewardId;
-        return CommitInventory(next, gold, exp, "拾取成功，已保存。", out message);
+        bool collected = CommitInventory(next, gold, exp, "拾取成功，已保存。", out message);
+        if (collected) WorldLootCollected?.Invoke(loot.Length > 0);
+        return collected;
     }
     bool CommitInventory(InventoryData next, int gold, int exp, string success, out string message)
     {

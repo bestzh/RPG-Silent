@@ -55,6 +55,8 @@ public class LoadingUI : UIBase
         _onReturn = args != null && args.Length > 2 ? args[2] as Action : null;
         _returnLabel = args != null && args.Length > 3 ? args[3] as string : null;
         _sourceScene = SceneManager.GetActiveScene();
+        _input.PauseTriggered -= OnBackTriggered;
+        _input.PauseTriggered += OnBackTriggered;
         _input.SetGameplayInputBlocked(this, true);
         _cursor.EnterUICursor();
         BeginLoad();
@@ -137,6 +139,11 @@ public class LoadingUI : UIBase
         BeginLoad();
     }
 
+    private void OnBackTriggered()
+    {
+        if (_isOpen && HasFailed && !IsLoading) ReturnFromFailure();
+    }
+
     public override void OnClose()
     {
         base.OnClose();
@@ -152,7 +159,11 @@ public class LoadingUI : UIBase
         IsLoading = false;
         HasFailed = false;
         _onReturn = null;
-        _input?.SetGameplayInputBlocked(this, false);
+        if (_input != null)
+        {
+            _input.PauseTriggered -= OnBackTriggered;
+            _input.SetGameplayInputBlocked(this, false);
+        }
         if (_input != null && _input.GameplayInputEnabled) _cursor.EnterGameplayCursor();
         else _cursor?.EnterUICursor();
     }

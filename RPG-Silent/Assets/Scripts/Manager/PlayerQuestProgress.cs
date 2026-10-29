@@ -12,7 +12,7 @@ public sealed partial class PlayerProgressService
     QuestJournalData journal = new();
     public QuestJournalData Journal => journal.Copy();
     public QuestDefinition TrackedQuest => FindQuest(journal.trackedId);
-    public IEnumerable<QuestDefinition> Quests => questCatalog.Values.Where(q => q.FamilyId.Length == 0 || q.FamilyId == CurrentClass?.FamilyId).OrderBy(q => q.Order).ThenBy(q => q.Id);
+    public IEnumerable<QuestDefinition> Quests => questCatalog.Values.Where(q => QuestClassMatches(q, CurrentClass?.Id)).OrderBy(q => q.Order).ThenBy(q => q.Id);
     public QuestDefinition FindQuest(string id) => id != null && questCatalog.TryGetValue(id, out var q) ? q : null;
     public QuestProgressData QuestRecord(string id) => journal.entries.FirstOrDefault(e => e.questId == id)?.Copy();
 
@@ -24,6 +24,8 @@ public sealed partial class PlayerProgressService
             if (string.IsNullOrEmpty(q.Id) || !questCatalog.TryAdd(q.Id, q) || string.IsNullOrEmpty(q.Title) ||
                 !Enum.IsDefined(typeof(QuestCategory), q.Category) || !Enum.IsDefined(typeof(TownNpcRole), q.Giver) ||
                 q.FamilyId == null || (q.FamilyId.Length > 0 && (!classes.TryGetValue(q.FamilyId, out var family) || family.IsAdvanced)) ||
+                q.RequiredClassId == null || q.Chapter == null || q.RequiredAffinity < 0 || q.RequiredAffinity > 100 ||
+                q.RequiredClassId.Length > 0 && (!classes.TryGetValue(q.RequiredClassId, out var exactClass) || exactClass.FamilyId != q.FamilyId) ||
                 q.PrerequisiteId == null || q.RequiredLevel < 1 || q.RequiredLevel > PlayerStats.LevelCap ||
                 q.Objectives == null || q.Objectives.Length == 0 || q.Objectives.Length > 8 || q.RewardGold < 0 || q.RewardExp < 0 ||
                 q.Rewards == null || q.Rewards.Any(x => !InventoryData.ValidItem(x) || x.IsInstance || x.legacyReserve || FindItem(x.itemId)?.Kind != ItemKind.Material))
@@ -34,6 +36,8 @@ public sealed partial class PlayerProgressService
                     (o.Kind == QuestObjectiveKind.TalkToNpc && (!Enum.IsDefined(typeof(TownNpcRole), o.NpcRole) || o.Required != 1)) ||
                     (o.Kind == QuestObjectiveKind.DeliverMaterial && FindItem(o.ItemId)?.Kind != ItemKind.Material) ||
                     (o.Kind == QuestObjectiveKind.ReachLevel && o.Required > PlayerStats.LevelCap) ||
+                    !Enum.IsDefined(typeof(ProfessionTrialKind), o.Trial) ||
+                    (o.Kind == QuestObjectiveKind.ProfessionTrial ? o.Trial == ProfessionTrialKind.None || o.Required != 1 || o.TrialRequired < 1 || o.TrialRequired > 9999 || q.FamilyId.Length == 0 || q.Repeatable : o.Trial != ProfessionTrialKind.None) ||
                     (o.Kind == QuestObjectiveKind.AdvanceClass && o.Required != 1))
                     throw new InvalidOperationException("任务目标无效：" + q.name);
             if (q.Objectives.Where(o => o.Kind == QuestObjectiveKind.DeliverMaterial).GroupBy(o => o.ItemId).Any(g => g.Count() > 1))
@@ -51,27 +55,29 @@ public sealed partial class PlayerProgressService
             }
         }
     }
-    bool ValidQuestContent(QuestJournalData data, string savedClass)
+    bool ValidQuestContent(QuestJournalData data, string savedClass, WorldProgressData savedWorld)
     {
         return data.entries.All(e => questCatalog.TryGetValue(e.questId, out var q) &&
-            (q.FamilyId.Length == 0 || q.FamilyId == classes[savedClass].FamilyId) && e.counts.Length == q.Objectives.Length &&
+            QuestClassMatches(q, savedClass) && e.counts.Length == q.Objectives.Length &&
+            (q.RequiredStoryId.Length == 0 || (q.RequiredChoiceId.Length == 0 ? savedWorld.Choice(q.RequiredStoryId).Length > 0 : savedWorld.Choice(q.RequiredStoryId) == q.RequiredChoiceId)) &&
             e.counts.Select((value, i) => q.Objectives[i].IsCounter ? value <= q.Objectives[i].Required : value == 0).All(x => x) &&
             (q.PrerequisiteId.Length == 0 || data.entries.Any(p => p.questId == q.PrerequisiteId && (p.rewarded || p.completedCount > 0))) &&
-            (q.Repeatable || e.completedCount <= 1) &&
+            (q.Repeatable || e.completedCount <= 1 && (e.rewarded || e.completedCount == 0)) &&
             (!e.rewarded || q.Objectives.Select((o, i) => !o.IsCounter || e.counts[i] == o.Required).All(x => x)));
     }
     public QuestStatus GetQuestStatus(string id)
     {
         var q = FindQuest(id);
-        if (q == null || (q.FamilyId.Length > 0 && q.FamilyId != CurrentClass?.FamilyId)) return QuestStatus.Locked;
+        if (q == null || !QuestClassMatches(q, CurrentClass?.Id)) return QuestStatus.Locked;
         var e = journal.entries.FirstOrDefault(x => x.questId == id);
+        if (e?.abandoned == true) return QuestUnlocked(q) && (!q.Repeatable || e.completedCount == 0 || world.completedRuns > e.lastTurnInRun) ? QuestStatus.Abandoned : QuestStatus.Locked;
         if (e != null) return e.rewarded ? q.Repeatable && world.completedRuns > e.lastTurnInRun ? QuestStatus.Available : QuestStatus.Rewarded : q.Objectives.Select((o, i) => ObjectiveCount(q, e, i) >= o.Required).All(x => x) ? QuestStatus.Ready : QuestStatus.Active;
-        return stats.Level >= q.RequiredLevel && (q.PrerequisiteId.Length == 0 || QuestWasCompleted(q.PrerequisiteId)) &&
-            (q.RequiredStoryId.Length == 0 || world.Choice(q.RequiredStoryId) == q.RequiredChoiceId) ? QuestStatus.Available : QuestStatus.Locked;
+        return QuestUnlocked(q) ? QuestStatus.Available : QuestStatus.Locked;
     }
     int ObjectiveCount(QuestDefinition q, QuestProgressData e, int i)
     {
         var o = q.Objectives[i];
+        if (e?.abandoned == true) return 0;
         int value = o.IsCounter ? e?.counts[i] ?? 0 : o.Kind switch
         {
             QuestObjectiveKind.DeliverMaterial => inventory.Count(o.ItemId),
@@ -97,8 +103,10 @@ public sealed partial class PlayerProgressService
     {
         var q = FindQuest(id); if (q == null) return "任务资源不可用。";
         return $"接取等级 Lv.{q.RequiredLevel}" + (q.PrerequisiteId.Length == 0 ? "" : " · 先提交「" + FindQuest(q.PrerequisiteId)?.Title + "」") +
-            (q.RequiredStoryId.Length == 0 ? "" : " · 剧情选择：" + (stories.TryGetValue(q.RequiredStoryId, out var s) ? s.Choices.FirstOrDefault(x => x.Id == q.RequiredChoiceId)?.Label : "")) +
-            (q.Repeatable ? "\n可重复 · 每次交付后再通关一趟副本刷新" : "");
+            (q.RequiredClassId.Length == 0 ? "" : " · 职业「" + classes[q.RequiredClassId].DisplayName + "」") +
+            (q.RequiredStoryId.Length == 0 ? "" : "\n剧情：" + (stories.TryGetValue(q.RequiredStoryId, out var s) ? s.Title + (q.RequiredChoiceId.Length == 0 ? "（任一决定）" : " · " + s.Choices.First(x => x.Id == q.RequiredChoiceId).Label) : "")) +
+            (q.RequiredAffinity == 0 ? "" : $" · 委托人好感 {NpcAffinity(q.Giver)}/{q.RequiredAffinity}") +
+            (q.Repeatable ? "\n可重复 · 每次交付后再通关一趟正式副本刷新；训练及长期挑战不刷新。" : "");
     }
     public string QuestGiverText(string id) => FindQuest(id)?.Giver switch
     {
@@ -116,7 +124,7 @@ public sealed partial class PlayerProgressService
             if (!QuestMatchesNpc(q.Id, npc)) continue;
             var state = GetQuestStatus(q.Id);
             if (state == QuestStatus.Ready) return "?";
-            if (state == QuestStatus.Available) available = true;
+            if (state == QuestStatus.Available || state == QuestStatus.Abandoned) available = true;
         }
         return available ? "!" : "";
     }
@@ -136,20 +144,21 @@ public sealed partial class PlayerProgressService
     public bool TryAcceptQuest(string id, TownNpc npc, out string message)
     {
         if (!CanTalkQuest(id, npc, out message)) return false;
-        if (GetQuestStatus(id) != QuestStatus.Available) { message = "任务已接取，或尚未满足前置条件。"; return false; }
+        if (GetQuestStatus(id) != QuestStatus.Available && GetQuestStatus(id) != QuestStatus.Abandoned) { message = "任务已接取，或尚未满足前置条件。"; return false; }
         var data = Capture(); var q = FindQuest(id);
         var prior = data.quests.entries.FirstOrDefault(x => x.questId == id);
-        if (prior != null) { prior.rewarded = false; prior.counts = new int[q.Objectives.Length]; }
+        if (prior != null) { prior.rewarded = prior.abandoned = false; prior.counts = new int[q.Objectives.Length]; }
         else data.quests.entries = data.quests.entries.Append(new QuestProgressData { questId = id, counts = new int[q.Objectives.Length] }).ToArray();
         observedObjectives.Remove(id); observedReady.Remove(id);
         data.quests.trackedId = id;
+        data.tutorial.Record(TutorialStep.AcceptQuest);
         bool ok = CommitQuest(data, 0, 0, "已接取并追踪「" + q.Title + "」。", out message);
         if (ok) Notify(message); return ok;
     }
     public bool TryTrackQuest(string id, out string message)
     {
         message = "请选择已接取且未提交的任务。";
-        if (!attached || stats.IsDead || id == null || (id.Length > 0 && !journal.entries.Any(e => e.questId == id && !e.rewarded))) return false;
+        if (!attached || stats.IsDead || id == null || (id.Length > 0 && !journal.entries.Any(e => e.questId == id && !e.rewarded && !e.abandoned))) return false;
         var data = Capture(); data.quests.trackedId = id;
         return CommitQuest(data, 0, 0, id.Length == 0 ? "已取消任务追踪。" : "已追踪「" + FindQuest(id).Title + "」。", out message);
     }
@@ -165,9 +174,10 @@ public sealed partial class PlayerProgressService
         completed.rewarded = true; completed.completedCount = Math.Min(1000000, completed.completedCount + 1); completed.lastTurnInRun = world.completedRuns;
         data.world.AddAffinity((int)q.Giver, q.Repeatable ? 2 : 5);
         if (q.Repeatable) data.world.Record(CollectionKind.Commission, id);
-        if (data.quests.trackedId == id) data.quests.trackedId = data.quests.entries.FirstOrDefault(x => !x.rewarded)?.questId ?? "";
+        if (data.quests.trackedId == id) data.quests.trackedId = data.quests.entries.FirstOrDefault(x => !x.rewarded && !x.abandoned)?.questId ?? "";
+        data.tutorial.Record(TutorialStep.TurnInQuest);
         bool ok = CommitQuest(data, q.RewardGold, q.RewardExp, "已完成「" + q.Title + "」，奖励已保存。满包物品可在背包待领取页领取。", out message);
-        if (ok) Notify("任务奖励 · " + q.Title + "\n" + QuestRewardText(id)); return ok;
+        if (ok) { Notify("任务奖励 · " + q.Title + "\n" + QuestRewardText(id)); QuestCompleted?.Invoke(); } return ok;
     }
     bool CommitQuest(PlayerProgressData data, int gold, int exp, string success, out string message)
     {
@@ -177,7 +187,7 @@ public sealed partial class PlayerProgressService
         applying = true;
         try
         {
-            journal = data.quests.Copy(); inventory = data.inventory.Copy(); world = data.world.Copy(); stats.AddReward(gold, exp);
+            journal = data.quests.Copy(); inventory = data.inventory.Copy(); world = data.world.Copy(); tutorial = data.tutorial.Copy(); stats.AddReward(gold, exp);
             newProfile = false; lastSavedPayload = JsonUtility.ToJson(data); HasUnsavedChanges = false; StatusMessage = message = success;
         }
         finally { applying = false; }
@@ -202,7 +212,7 @@ public sealed partial class PlayerProgressService
     {
         if (!attached) return;
         bool changed = false;
-        foreach (var e in journal.entries.Where(x => !x.rewarded))
+        foreach (var e in journal.entries.Where(x => !x.rewarded && !x.abandoned))
         {
             var q = FindQuest(e.questId);
             if (kind == QuestObjectiveKind.ClearDungeon && q.Objectives.Any(o => o.Kind == QuestObjectiveKind.AdvanceClass) && CurrentClass?.IsAdvanced != true) continue;

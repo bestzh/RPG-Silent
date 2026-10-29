@@ -20,13 +20,16 @@ MonoBehaviour:
   MaxRank: 5
   LevelsPerRank: 2
   DamagePerRank: 0.2
-  Icon: {fileID: 21300000, guid: 0d83a6988e9672344a37009a1cb16237, type: 3}
+  Icon: {fileID: 21300000, guid: 09be85fdcfb7eb0479fb5cd2993de628, type: 3}
   Animation: {fileID: 11400000, guid: dfdb00314d6845a44be112b18ec1f667, type: 2}
   CastTime: 0
   CooldownTime: 6
   EnergyCost: 23
   CanBeInterrupted: 1
   AttackProfile: {fileID: 11400000, guid: 5fac0260e15a5e548a40d4a8c9c56763, type: 2}
+  Element: 0
+  SummonPrefab: {fileID: 0}
+  SummonDuration: 20
   TriggerTiming: 2
   ReleaseNormalizedTime: 0.45
   EffectPrefab: {fileID: 9783306273693948, guid: 05ce920d629922a4eb4795ef7494ce5c, type: 3}

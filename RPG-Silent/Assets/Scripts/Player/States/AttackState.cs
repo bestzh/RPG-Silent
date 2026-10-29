@@ -97,6 +97,7 @@ public class AttackState : PlayerState
             : stance == PlayerStance.OneHandSword && comboIndex == 3 ? 1.8f : 1f;
         float projectileSpeed = stance == PlayerStance.TwoHandBow ? Mathf.Lerp(1f, 1.7f, charge) : 1f;
         attackExecutor?.SetNormalAttack(comboIndex, damage, stagger, projectileSpeed, staffFinisher ? 6f : 0f);
+        attackExecutor?.SetHeavyAttack((stance == PlayerStance.TwoHandSword || stance == PlayerStance.TwoHandAxe) && (charge >= .5f || comboIndex == maxCombo));
         string motion = dodgeFollowup ? "SwordDodgeAttack" : charge > 0 ? stance == PlayerStance.TwoHandBow ? "BowChargeShot" : "HeavyChargeStrike" : $"Attack_{comboIndex}";
         expectedAnimationHash = Animator.StringToHash(motion);
         currentProfile = attackExecutor != null ? attackExecutor.GetCurrentAttackProfile() : null;
@@ -120,6 +121,7 @@ public class AttackState : PlayerState
         {
             attackStarted = true;
             attackExecutor?.AttackStart();
+            player.Progress?.RecordTutorialAction(RPGSilent.Domain.TutorialStep.BasicAttack);
         }
 
         if (!attackReleased && normalizedTime >= currentProfile.ReleaseTime)

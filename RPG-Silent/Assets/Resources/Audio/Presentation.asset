@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b36a3f48e3a84544bb03609e277145ea, type: 3}
+  m_Name: Presentation
+  m_EditorClassIdentifier: 
+  Music: {fileID: -8949816340939540699, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
+  Effects: {fileID: 1621362853470245246, guid: 73c2b8ef81d1b854ca1805174e57f970, type: 2}
+  MenuMusic:
+    Clip: {fileID: 8300000, guid: 4166af2161a430d489b9eefcef2f6661, type: 3}
+    Gain: 1
+  ExplorationMusic:
+    Clip: {fileID: 8300000, guid: 7b1e6d51dd2d1a34b816debbb230ec6d, type: 3}
+    Gain: 0.21350414
+  BattleMusic:
+    Clip: {fileID: 8300000, guid: 4166af2161a430d489b9eefcef2f6661, type: 3}
+    Gain: 1
+  TownAmbience:
+    Clip: {fileID: 8300000, guid: ec518dbf935df1a4aac00ffec96a8a2e, type: 3}
+    Gain: 1
+  ForestAmbience:
+    Clip: {fileID: 8300000, guid: ce86545c5e93354468d142f17d3a5e7a, type: 3}
+    Gain: 1
+  CaveAmbience:
+    Clip: {fileID: 8300000, guid: f74f88345024980459383d789e8e51b0, type: 3}
+    Gain: 0.25293264
+  Sounds:
+  - Sound: 0
+    Audio:
+      Clip: {fileID: 8300000, guid: f348d88c6d9b3934e9a9370c56c6c863, type: 3}
+      Gain: 0.1419127
+  - Sound: 1
+    Audio:
+      Clip: {fileID: 8300000, guid: 47a994a603d384276b96fb3aacac53a9, type: 3}
+      Gain: 1
+  - Sound: 2
+    Audio:
+      Clip: {fileID: 8300000, guid: cde225fce4262e142ada522472ed80be, type: 3}
+      Gain: 0.30380824
+  - Sound: 3
+    Audio:
+      Clip: {fileID: 8300000, guid: 9f7de8398a26cff47809ecd32699c9ec, type: 3}
+      Gain: 0.78738934
+  - Sound: 4
+    Audio:
+      Clip: {fileID: 8300000, guid: 38095429df209384f88941cdd5e2083d, type: 3}
+      Gain: 0.285494
+  - Sound: 5
+    Audio:
+      Clip: {fileID: 8300000, guid: dc02db6883611fb4293c671ac076f043, type: 3}
+      Gain: 0.8648429
+  - Sound: 6
+    Audio:
+      Clip: {fileID: 8300000, guid: b54d9f975873656479fcedbba7042834, type: 3}
+      Gain: 0.66462
+  - Sound: 7
+    Audio:
+      Clip: {fileID: 8300000, guid: d1853dbf2037145bda2b7cff7f3e49d7, type: 3}
+      Gain: 0.75984514

@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // 保留旧枚举值，避免已有资产/工具将状态值解释成其他状态。
-public enum EnemyState { Idle, Chase, Attack, Hurt, Return, Dead, Retreat, PhaseTransition, Recover, Reposition }
+public enum EnemyState { Idle, Chase, Attack, Hurt, Return, Dead, Retreat, PhaseTransition, Recover, Reposition, Supporting }
 
 /// <summary>生命周期与动作状态；感知、导航、选招及命中交给独立能力。</summary>
-public class EnemyController : MonoBehaviour, IDamageable
+public partial class EnemyController : MonoBehaviour, IDamageable
 {
     static readonly HashSet<EnemyController> activeEnemies = new();
     public static IEnumerable<EnemyController> ActiveEnemies => activeEnemies;
@@ -22,11 +22,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     public bool HasAggro { get; private set; }
     public int RewardGold => rewardGold;
     public int RewardExp => rewardExp;
-    public string DisplayName => (IsCompanion ? "兽灵 · " : IsElite ? "精英 · " : "") + (Definition != null ? Definition.DisplayName : gameObject.name);
+    public string DisplayName => (IsCompanion ? "兽灵 · " : IsExpeditionPursuit ? "远征信使 · " : IsElite ? "精英 · " : "") + (Definition != null ? Definition.DisplayName : gameObject.name);
     public PlayerController CompanionOwner { get; private set; }
     public bool IsCompanion { get; private set; }
     public bool IsElite { get; private set; }
     public bool IsTrainingTarget { get; private set; }
+    public Material CombatWarningMaterial;
     public bool TrainingAttacks { get; private set; }
     float companionExpires;
     public bool IsBoss => phases != null;
@@ -35,6 +36,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public string PhaseHint => State == EnemyState.PhaseTransition ? "正在转阶段 · 拉开距离" :
         IsVulnerable ? "破绽出现 · 现在反击" : CurrentSkill != null ? CurrentSkill.DisplayName : phases != null ? phases.Hint : "";
     public EnemySkillData CurrentSkill => skills?.Current;
+    public string AttackWarningHint => skills?.WarningHint ?? string.Empty;
     public bool ReturningHome { get; private set; }
     public Transform Target => perception?.Target;
     public float DamageMultiplier { get; private set; } = 1f;
@@ -46,7 +48,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     public EnemyAttackSequence ActiveSequence { get; private set; }
     public int SequenceStep => sequenceStep + 1;
     public bool IsVulnerable => IsBoss && State == EnemyState.Recover && ActiveSequence == null;
-    public string CombatHint => State == EnemyState.PhaseTransition ? "阶段变化" : IsVulnerable ? "反击机会" : ActiveSequence != null ?
+    public string CombatHint => State == EnemyState.Supporting ? TraitHint : State == EnemyState.PhaseTransition ? "阶段变化" :
+        State == EnemyState.Recover ? "收招 · 可反击" : IsVulnerable ? "反击机会" : ActiveSequence != null ?
         $"连招 {SequenceStep}/{ActiveSequence.Steps.Length}" : string.Empty;
     public event System.Action<EnemyController> Died;
     public event System.Action<EnemyController> Changed;
@@ -96,8 +99,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     // Following owns locomotion while there is no usable combat target; the enemy tree must not reset its path to idle.
     bool ShouldFollowOwner => IsCompanion && CompanionOwner != null &&
         (!perception.IsAlive || Vector3.Distance(transform.position, CompanionOwner.transform.position) > 18f);
-    public bool CanDecide => !ShouldFollowOwner && (!IsTrainingTarget || TrainingAttacks) && initialized && isActiveAndEnabled && !IsDead && !combatLocked &&
-        State != EnemyState.Attack && State != EnemyState.Hurt && State != EnemyState.PhaseTransition && State != EnemyState.Recover;
+    public bool CanDecide => !IsExpeditionPursuit && !ShouldFollowOwner && (!IsTrainingTarget || TrainingAttacks) && initialized && isActiveAndEnabled && !IsDead && !combatLocked &&
+        State != EnemyState.Attack && State != EnemyState.Hurt && State != EnemyState.PhaseTransition && State != EnemyState.Recover && State != EnemyState.Supporting;
     public int DecisionCount { get; private set; }
 
     public bool WantsRetreat => Definition != null && Definition.RetreatDistance > 0f &&
@@ -130,6 +133,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         motor = new EnemyMotor(gameObject, useNavMeshAgent, moveSpeed, turnSpeed);
         perception = new EnemyPerception(transform);
         skills = new EnemySkillRunner(transform, executor);
+        skills.WarningMaterial = CombatWarningMaterial;
         availableSkills = Definition != null ? Definition.Skills : CreateLegacySkill();
         brain = GetComponent<Opsive.BehaviorDesigner.Runtime.BehaviorTree>();
         if (brain != null)
@@ -158,7 +162,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Start()
     {
-        if (IsCompanion || IsElite) gameObject.AddComponent<EnemyAllegianceLabel>();
+        EnsureAllegianceLabel();
         motor.Initialize();
         perception.Refresh();
         initialized = true;
@@ -183,7 +187,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         // 下一帧再创建 Pro 执行实体；不依赖 Game View 渲染，切到行为树窗口也能启动。
         yield return null;
-        if (!isActiveAndEnabled || IsDead || combatLocked) yield break;
+        if (!isActiveAndEnabled || IsDead || combatLocked || IsExpeditionPursuit) yield break;
         if (brain == null || brain.Subgraph == null)
         {
             Debug.LogError("敌人缺少 Behavior Designer Pro 行为树资源。", this);
@@ -220,13 +224,16 @@ public class EnemyController : MonoBehaviour, IDamageable
         dungeonConfigured = true;
         MaxHealth = Mathf.Max(1, Mathf.RoundToInt(MaxHealth * Mathf.Max(0.1f, tier.EnemyHealthMultiplier)));
         CurrentHealth = MaxHealth;
-        DamageMultiplier = Mathf.Max(0.1f, tier.EnemyDamageMultiplier);
+        traits.Reset(MaxHealth);
+        DamageMultiplier = Mathf.Max(0.1f, tier.EnemyDamageMultiplier) * (IsElite ? 1.25f : 1f);
         rewardGold = Mathf.Max(0, Mathf.RoundToInt(rewardGold * tier.RewardMultiplier));
         rewardExp = Mathf.Max(0, Mathf.RoundToInt(rewardExp * tier.RewardMultiplier));
     }
 
     public void ConfigureCompanion(PlayerController owner, float duration, float multiplier)
     {
+        ConfigurePresentation(owner != null ? owner.Audio : null, owner?.PresentationSettings);
+        ClearNonHostileTraits();
         IsCompanion = true; CompanionOwner = owner; companionExpires = Time.time + duration;
         dungeonConfigured = true; rewardGold = rewardExp = 0;
         DamageMultiplier = Mathf.Max(.1f, multiplier); MaxHealth *= 2; CurrentHealth = MaxHealth;
@@ -234,15 +241,22 @@ public class EnemyController : MonoBehaviour, IDamageable
         executor.ConfigureCompanionTargeting(); perception.ConfigureCompanion(owner);
         BindCombatGroup(null);
     }
+    public void ConfigurePresentation(GameAudioService audio, IGameSettingsService settings)
+    {
+        executor?.ConfigureAudio(audio);
+        GetComponent<EnemyHitFeedback>()?.ConfigurePresentation(audio, settings);
+    }
+
     public void ConfigureElite()
     {
-        if (IsElite) return;
+        if (IsElite || IsCompanion || IsTrainingTarget) return;
         IsElite = true; MaxHealth *= 2; CurrentHealth = MaxHealth;
         DamageMultiplier *= 1.25f; rewardGold *= 2; rewardExp *= 2;
         transform.localScale *= 1.15f;
     }
     public void ConfigureTraining(bool attacks)
     {
+        ClearNonHostileTraits();
         IsTrainingTarget = true; TrainingAttacks = attacks; dungeonConfigured = true;
         rewardGold = rewardExp = 0; MaxHealth = CurrentHealth = 1000000;
         DamageMultiplier = .25f;
@@ -280,9 +294,10 @@ public class EnemyController : MonoBehaviour, IDamageable
             motor.SetHome(CompanionOwner.transform.position);
         }
         perception.Refresh();
+        motor.Speed = moveSpeed * traits.MovementMultiplier;
         if (ShouldFollowOwner)
         {
-            CancelAction(); HasAggro = false; ReturningHome = false;
+            CancelAction(true); HasAggro = false; ReturningHome = false;
             if (Vector3.Distance(transform.position, motor.Home) > 2.5f) { EnterState(EnemyState.Chase); motor.MoveTo(motor.Home, 2); }
             else EnterState(EnemyState.Idle);
             return;
@@ -295,9 +310,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
         if (State == EnemyState.Hurt)
         {
-            if (stateElapsed >= Mathf.Max(hitStopDuration, 0.45f)) EnterState(EnemyState.Idle);
+            if (stateElapsed >= Mathf.Max(hitStopDuration, 0.45f) && Time.time >= traits.BrokenUntil) EnterState(EnemyState.Idle);
             return;
         }
+        if (IsExpeditionPursuit) { TickExpeditionPursuit(); return; }
         if (HasAggro && (!perception.IsAlive || Vector3.Distance(transform.position, motor.Home) > leashDistance ||
             Vector3.Distance(perception.Target.position, motor.Home) > leashDistance))
         {
@@ -322,6 +338,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             }
             return;
         }
+        if (State == EnemyState.Supporting && !ReturningHome) { TickMend(Time.deltaTime); return; }
         if (State == EnemyState.Recover)
         {
             if (ActiveSequence != null)
@@ -346,7 +363,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void BeginSkill(EnemySkillData skill)
     {
-        skills.Begin(skill, perception.Target, DamageMultiplier * (phases != null ? phases.DamageMultiplier : 1f));
+        skills.Begin(skill, perception.Target, DamageMultiplier * traits.DamageMultiplier * (phases != null ? phases.DamageMultiplier : 1f));
         EnterState(EnemyState.Attack, true);
     }
 
@@ -365,9 +382,11 @@ public class EnemyController : MonoBehaviour, IDamageable
         BeginRecovery(duration);
     }
 
-    private void CancelAction()
+    private void CancelAction(bool invalidate = false)
     {
         skills?.Cancel();
+        CancelMend();
+        if (invalidate) executor?.ResetCombat();
         CombatGroup?.ReleaseAttack(this);
         ActiveSequence = null;
         sequenceStep = 0;
@@ -410,6 +429,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         nextDecision = Time.time + 0.15f;
         if (!HasAggro && !ReturningHome && perception.Distance <= detectionDistance && perception.HasLineOfSight()) HasAggro = true;
         if (HasAggro && !ReturningHome) CombatGroup?.AlertAllies(this);
+        if (HasAggro && !ReturningHome && TryBeginMend()) return false;
         DecisionCount++;
         return true;
     }
@@ -431,12 +451,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (Vector3.Distance(transform.position, motor.Home) <= homeTolerance + 0.1f)
         {
-            if (ReturningHome && phases != null)
-            {
-                phases.ResetEncounter(); CurrentHealth = MaxHealth; staggerDamage = 0;
-                Statuses?.State.Clear(); skills.ResetCooldowns(); sequenceReadyAt.Clear(); executor.ResetCombat();
-                Changed?.Invoke(this);
-            }
+            if (ReturningHome) ResetEncounterHealth();
             ReturningHome = false;
             EnterState(EnemyState.Idle);
             return EnemyActionResult.Success;
@@ -526,7 +541,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         stateElapsed = 0f;
         bool moving = state == EnemyState.Chase || state == EnemyState.Return || state == EnemyState.Retreat || state == EnemyState.Reposition;
         if (!moving) motor.Stop();
-        string animation = moving ? "Chase" : state == EnemyState.Attack ? skills.Current.AnimationState :
+        string animation = moving ? "Chase" : state == EnemyState.Supporting ? "Attack" : state == EnemyState.Attack ? skills.Current.AnimationState :
             state == EnemyState.PhaseTransition ? phases.TransitionAnimation : state == EnemyState.Recover ? "Idle" : state.ToString();
         int hash = Animator.StringToHash("Base Layer." + animation);
         if (animator != null && animator.isActiveAndEnabled && animator.runtimeAnimatorController != null && animator.HasState(0, hash))
@@ -542,12 +557,24 @@ public class EnemyController : MonoBehaviour, IDamageable
     void ReceiveDamage(int amount, Vector3 source, bool periodic, float staggerMultiplier = 1f)
     {
         if (combatLocked || IsDead || amount <= 0) return;
+        bool hadShield = traits.Shield > 0;
+        amount = traits.Absorb(amount, Time.time, out int absorbed);
+        bool brokeShield = hadShield && traits.Shield == 0;
+        if (brokeShield)
+        { CancelAction(true); EnterState(EnemyState.Hurt, true); nextAttack = Mathf.Max(nextAttack, Time.time + 1.2f); }
+        if (amount == 0)
+        {
+            HasAggro = perception.IsAlive;
+            Damaged?.Invoke(new EnemyHit(0, brokeShield, !brokeShield, false, false, periodic, absorbed));
+            Changed?.Invoke(this); return;
+        }
         bool vulnerable = IsVulnerable;
         if (vulnerable && Definition != null) amount = Mathf.RoundToInt(amount * Definition.RecoveryDamageMultiplier);
         amount = Mathf.Min(CurrentHealth, amount);
         CurrentHealth = Mathf.Max(IsTrainingTarget ? 1 : 0, CurrentHealth - amount);
+        traits.UpdateFrenzy(CurrentHealth, MaxHealth);
         if (!periodic) EnemySkillRunner.SpawnEffect(hitEffectPrefab, transform.position + Vector3.up, Quaternion.identity, effectLifetime);
-        if (CurrentHealth == 0) { Die(); Damaged?.Invoke(new EnemyHit(amount, false, false, vulnerable, true, periodic)); return; }
+        if (CurrentHealth == 0) { Die(); Damaged?.Invoke(new EnemyHit(amount, false, false, vulnerable, true, periodic, absorbed)); return; }
         HasAggro = perception.IsAlive;
         lastDamageTime = Time.time;
         if (!periodic) staggerDamage += Mathf.RoundToInt(amount * Mathf.Max(0, staggerMultiplier));
@@ -557,12 +584,12 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (staggered)
         {
             staggerDamage = 0;
-            CancelAction();
+            CancelAction(true);
             EnterState(EnemyState.Hurt, true);
             nextAttack = Mathf.Max(nextAttack, Time.time + 0.6f);
             motor.Knockback(source, knockbackDistance);
         }
-        Damaged?.Invoke(new EnemyHit(amount, staggered, armor, vulnerable, false, periodic));
+        Damaged?.Invoke(new EnemyHit(amount, staggered, armor, vulnerable, false, periodic, absorbed));
         Changed?.Invoke(this);
     }
 
@@ -570,7 +597,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public bool ReceiveParry()
     {
         if (combatLocked || IsDead || IsBoss || State == EnemyState.PhaseTransition || skills.Current != null && skills.Current.SuperArmor) return false;
-        CancelAction(); staggerDamage = 0;
+        CancelAction(true); staggerDamage = 0;
         EnterState(EnemyState.Hurt, true);
         nextAttack = Mathf.Max(nextAttack, Time.time + .6f);
         Changed?.Invoke(this); return true;
