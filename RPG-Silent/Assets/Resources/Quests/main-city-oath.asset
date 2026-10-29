@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: main-city-oath
+  m_EditorClassIdentifier:
+  Id: main-city-oath
+  Title: "\u9759\u8C27\u4E4B\u7EA6"
+  Description: "\u9053\u8DEF\u91CD\u65B0\u8FDE\u8D77\u4E86\u68EE\u6797\u3001\u6D1E\u7A9F\u4E0E\u5E02\u96C6\u3002\u6700\u540E\u5DE1\u67E5\u4E24\u5730\uFF0C\u518D\u542C\u542C\u7F57\u838E\u5BF9\u65B0\u5546\u8DEF\u7684\u6253\u7B97\u3002\u963F\u767B\u4F1A\u628A\u4F60\u7684\u51B3\u5B9A\u8BB0\u5165\u4E3B\u57CE\u7684\u7EA6\u4E66\uFF1B\u6B64\u524D\u9009\u8FC7\u7684\u5206\u652F\u4E0D\u5FC5\u91CD\u505A\u3002"
+  Category: 0
+  Giver: 2
+  FamilyId:
+  RequiredClassId:
+  Chapter: "\u7EC8\u7AE0 \xB7 \u9759\u8C27\u4E4B\u7EA6"
+  PrerequisiteId: main-crystal-aftertone
+  RequiredLevel: 18
+  Order: 70
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 1
+    Label: "\u5DE1\u67E5\u5E76\u901A\u5173\u68EE\u6797"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 1
+    Label: "\u5DE1\u67E5\u5E76\u901A\u5173\u6D1E\u7A9F"
+    DungeonId: 1002
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 6
+    Label: "\u542C\u53D6\u7F57\u838E\u7684\u5546\u8DEF\u8BA1\u5212"
+    DungeonId: 0
+    ItemId:
+    NpcRole: 4
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 1200
+  RewardExp: 2000
+  Rewards: []

@@ -22,12 +22,17 @@ public sealed partial class PlayerProgressService
         for (int i = 0; i < counts.Length; i++) if (counts[i] < q.Objectives[i].Required) { index = i; break; }
         if (index < 0) return new QuestNavigation { Label = "目标已完成，请返回委托人" };
         var o = q.Objectives[index];
+        if (player.CombatAllowed && o.IsDungeonCounter && RPGSilent.Domain.LongChallengeRules.IsLong((int)DungeonLaunchContext.Challenge))
+            return new QuestNavigation { Label = "长期挑战不推进此目标；返回主城选择正式副本" };
+        bool exploration = o.Kind == QuestObjectiveKind.OpenChest || o.Kind == QuestObjectiveKind.DiscoverSecret;
+        if (player.CombatAllowed && exploration && DungeonLaunchContext.Challenge == DungeonChallenge.BossTrial)
+            return new QuestNavigation { Label = "首领试炼不开放探索节点；回城选择普通探索或限时挑战" };
         if (o.Kind == QuestObjectiveKind.TalkToNpc) return NpcDestination(player, o.NpcRole, o.Label);
         if (o.Kind == QuestObjectiveKind.LearnSkills || o.Kind == QuestObjectiveKind.AdvanceClass) return NpcDestination(player, TownNpcRole.Mentor, o.Label);
         if (navigationDatabase == null) navigationDatabase = Resources.Load<DungeonDatabase>("DungeonDatabase");
         int dungeon = o.DungeonId > 0 ? o.DungeonId : o.ItemId == "crystal-shard" ? 1002 : 1001;
         var destination = navigationDatabase?.GetById(dungeon);
-        string mode = o.Kind == QuestObjectiveKind.CompleteTimed ? " · 选择限时挑战" : o.Kind == QuestObjectiveKind.CompleteBossTrial ? " · 选择首领试炼" : "";
+        string mode = o.Kind == QuestObjectiveKind.CompleteTimed ? " · 选择限时挑战" : o.Kind == QuestObjectiveKind.CompleteBossTrial ? " · 选择首领试炼" : exploration ? " · 选择普通探索" : "";
         if (!player.CombatAllowed)
         {
             var portal = PortalTrigger.Active.FirstOrDefault(x => x != null && x.gameObject.scene == SceneManager.GetActiveScene());
@@ -37,6 +42,8 @@ public sealed partial class PlayerProgressService
             return new QuestNavigation { Label = "返回主城，前往" + destination?.DisplayName + mode };
         Transform target = null;
         string label = o.Label;
+        if (o.Kind == QuestObjectiveKind.ProfessionTrial)
+            label = $"职业考验 · 本趟 {ProfessionTrialCount(o.Trial, player.CombatRecord)}/{o.TrialRequired} · 仍需成功通关";
         if (o.Kind == QuestObjectiveKind.OpenChest || o.Kind == QuestObjectiveKind.DiscoverSecret || o.Kind == QuestObjectiveKind.DefeatElite)
         {
             var kind = o.Kind == QuestObjectiveKind.OpenChest ? ExplorationKind.Chest : o.Kind == QuestObjectiveKind.DiscoverSecret ? ExplorationKind.HiddenPassage : ExplorationKind.EliteEvent;
@@ -51,7 +58,7 @@ public sealed partial class PlayerProgressService
             var enemy = EnemyController.ActiveEnemies.Where(x => x != null && !x.IsDead && !x.IsCompanion && !x.CombatLocked &&
                 (o.Kind != QuestObjectiveKind.DefeatElite || x.IsElite && !x.IsBoss))
                 .OrderBy(x => (x.transform.position - player.transform.position).sqrMagnitude).FirstOrDefault();
-            if (enemy != null) { target = enemy.transform; label = enemy.DisplayName; }
+            if (enemy != null) { target = enemy.transform; if (o.Kind != QuestObjectiveKind.ProfessionTrial) label = enemy.DisplayName; }
             else label = o.Kind == QuestObjectiveKind.DefeatElite ? "本趟精英已清理，重进副本继续悬赏" : "继续副本目标，或重进副本收集";
         }
         return Destination(player, target, label + mode);

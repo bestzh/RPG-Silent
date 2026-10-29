@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: trial-swordsman
+  m_EditorClassIdentifier:
+  Id: trial-swordsman
+  Title: "\u5251\u950B\u7684\u5206\u5BF8"
+  Description: "\u5728\u540C\u4E00\u8D9F\u68EE\u6797\u5B8C\u6210 1 \u6B21\u7CBE\u51C6\u683C\u6321\u5E76\u6210\u529F\u901A\u5173\u3002\u6B7B\u4EA1\u3001\u9000\u51FA\u6216\u8BFB\u6863\u9700\u91CD\u65B0\u6311\u6218\uFF1B\u653E\u5F03\u53EF\u91CD\u63A5\uFF0C\u8F6C\u804C\u4E0E\u5BFC\u5E08\u5B66\u4E60\u6761\u4EF6\u4FDD\u7559\u3002"
+  Category: 2
+  Giver: 0
+  FamilyId: swordsman
+  RequiredClassId:
+  Chapter:
+  PrerequisiteId: career-swordsman
+  RequiredLevel: 6
+  Order: 320
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 12
+    Label: "\u540C\u4E00\u8D9F\u7CBE\u51C6\u683C\u6321 \xD71\uFF0C\u5E76\u6210\u529F\u901A\u5173"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 1
+    TrialRequired: 1
+  RewardGold: 350
+  RewardExp: 600
+  Rewards: []

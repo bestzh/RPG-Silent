@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: main-forest-afterglow
+  m_EditorClassIdentifier:
+  Id: main-forest-afterglow
+  Title: "\u4F59\u70EC\u56DE\u54CD"
+  Description: "\u77F3\u7891\u4ECD\u5728\u4F4E\u9E23\u3002\u4EE5\u666E\u901A\u63A2\u7D22\u91CD\u8BBF\u68EE\u6797\u652F\u8DEF\u5E76\u901A\u5173\uFF0C\u518D\u5411\u94C1\u5320\u8BF4\u660E\u60C5\u51B5\u3002\u5148\u4E0E\u7C73\u62C9\u9605\u8BFB\u2018\u6797\u5730\u4F59\u70EC\u2019\u5E76\u9009\u62E9\u884C\u52A8\uFF1B\u4E24\u6761\u5206\u652F\u5747\u53EF\u63A8\u8FDB\u672C\u7AE0\u3002"
+  Category: 0
+  Giver: 3
+  FamilyId:
+  RequiredClassId:
+  Chapter: "\u7B2C\u56DB\u7AE0 \xB7 \u4F59\u70EC\u56DE\u54CD"
+  PrerequisiteId: main-town-defense
+  RequiredLevel: 8
+  Order: 50
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId: forest-afterglow
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 7
+    Label: "\u91CD\u8BBF\u68EE\u6797\u9690\u85CF\u652F\u8DEF"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 1
+    Label: "\u6E05\u7406\u68EE\u6797\u4F59\u60A3\u5E76\u901A\u5173"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 6
+    Label: "\u5411\u94C1\u5320\u8BF4\u660E\u8DEF\u6807\u60C5\u51B5"
+    DungeonId: 0
+    ItemId:
+    NpcRole: 1
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 500
+  RewardExp: 800
+  Rewards: []

@@ -11,37 +11,49 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
   m_Name: main-town-defense
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: main-town-defense
   Title: "\u57CE\u5916\u7684\u6700\u540E\u5A01\u80C1"
   Description: "\u6C34\u6676\u6DF1\u5904\u7684\u8C03\u67E5\u544A\u4E00\u6BB5\u843D\u3002\u6267\u4E8B\u59D4\u6258\u4F60\u6E05\u7406\u68EE\u6797\u7CBE\u82F1\uFF0C\u5E76\u5728\u6676\u7A9F\u9996\u9886\u8BD5\u70BC\u4E2D\u51FB\u8D25\u5F3A\u5316\u9996\u9886\u3002"
   Category: 0
   Giver: 2
-  FamilyId: 
+  FamilyId:
+  RequiredClassId:
+  Chapter: "\u7B2C\u4E09\u7AE0 \xB7 \u57CE\u5916\u5A01\u80C1"
   PrerequisiteId: main-crystal
   RequiredLevel: 5
   Order: 30
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
   Objectives:
   - Kind: 8
     Label: "\u51FB\u8D25\u68EE\u6797\u7CBE\u82F1"
     DungeonId: 1001
-    ItemId: 
+    ItemId:
     NpcRole: 0
     Required: 2
+    Trial: 0
+    TrialRequired: 1
   - Kind: 10
     Label: "\u901A\u8FC7\u6676\u7A9F\u9996\u9886\u8BD5\u70BC"
     DungeonId: 1002
-    ItemId: 
+    ItemId:
     NpcRole: 0
     Required: 1
+    Trial: 0
+    TrialRequired: 1
   RewardGold: 650
   RewardExp: 800
   Rewards:
   - itemId: crystal-shard
     count: 4
-    instanceId: 
+    instanceId:
     upgradeLevel: 0
-    gemId: 
+    gemId:
     isLocked: 0
+    acquiredUtcTicks: 0
+    isNew: 0
     affixes: []
     legacyReserve: 0

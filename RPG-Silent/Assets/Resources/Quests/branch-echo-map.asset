@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: branch-echo-map
+  m_EditorClassIdentifier:
+  Id: branch-echo-map
+  Title: "\u56DE\u58F0\u52D8\u6D4B"
+  Description: "\u4F60\u9009\u62E9\u52D8\u6D4B\u56DE\u58F0\u3002\u4EE5\u666E\u901A\u63A2\u7D22\u91CD\u8BBF\u68EE\u6797\u652F\u8DEF\u5E76\u51FB\u8D25\u4E00\u540D\u7CBE\u82F1\uFF0C\u66FF\u7C73\u62C9\u786E\u8BA4\u5371\u9669\u3002\u53E6\u4E00\u6761\u4FEE\u590D\u59D4\u6258\u4E0D\u4F1A\u56E0\u653E\u5F03\u800C\u91CD\u65B0\u5F00\u653E\u3002"
+  Category: 1
+  Giver: 3
+  FamilyId:
+  RequiredClassId:
+  Chapter:
+  PrerequisiteId: main-town-defense
+  RequiredLevel: 8
+  Order: 411
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId: forest-afterglow
+  RequiredChoiceId: study
+  Objectives:
+  - Kind: 7
+    Label: "\u8BB0\u5F55\u68EE\u6797\u9690\u85CF\u652F\u8DEF"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 8
+    Label: "\u51FB\u8D25\u68EE\u6797\u7CBE\u82F1"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 340
+  RewardExp: 500
+  Rewards: []

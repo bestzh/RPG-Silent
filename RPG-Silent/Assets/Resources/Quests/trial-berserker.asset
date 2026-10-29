@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: trial-berserker
+  m_EditorClassIdentifier:
+  Id: trial-berserker
+  Title: "\u72C2\u6218\u58EB \xB7 \u7834\u9635\u4E4B\u8BC1"
+  Description: "\u5728\u540C\u4E00\u8D9F\u6D1E\u7A9F\u5B8C\u6210 6 \u6B21\u84C4\u529B\u91CD\u51FB\u6709\u6548\u547D\u4E2D\u5E76\u6210\u529F\u901A\u5173\u3002\u6B7B\u4EA1\u3001\u9000\u51FA\u6216\u8BFB\u6863\u9700\u91CD\u65B0\u6311\u6218\uFF1B\u653E\u5F03\u53EF\u91CD\u63A5\uFF0C\u8F6C\u804C\u4E0E\u5BFC\u5E08\u5B66\u4E60\u6761\u4EF6\u4FDD\u7559\u3002"
+  Category: 2
+  Giver: 0
+  FamilyId: swordsman
+  RequiredClassId: berserker
+  Chapter:
+  PrerequisiteId: career-swordsman-advanced
+  RequiredLevel: 12
+  Order: 330
+  Repeatable: 0
+  RequiredAffinity: 0
+  RequiredStoryId:
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 12
+    Label: "\u540C\u4E00\u8D9F\u84C4\u529B\u91CD\u51FB\u6709\u6548\u547D\u4E2D \xD76\uFF0C\u5E76\u6210\u529F\u901A\u5173"
+    DungeonId: 1002
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 4
+    TrialRequired: 6
+  RewardGold: 800
+  RewardExp: 1400
+  Rewards: []

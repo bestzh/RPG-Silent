@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b6452362f048b4a9f2b315482f25e6, type: 3}
+  m_Name: commission-city-watch
+  m_EditorClassIdentifier:
+  Id: commission-city-watch
+  Title: "\u4E24\u5730\u5DE1\u9632\u59D4\u6258"
+  Description: "\u963F\u767B\u4FE1\u4EFB\u4E0E\u4F60\u5408\u4F5C\u7684\u5DE1\u8DEF\u8005\u3002\u5206\u522B\u901A\u5173\u68EE\u6797\u4E0E\u6D1E\u7A9F\uFF0C\u518D\u628A\u5DE1\u9632\u7ED3\u679C\u4EA4\u56DE\u3002\u4EA4\u4ED8\u589E\u52A0\u597D\u611F
+    2\uFF1B\u6B63\u5F0F\u526F\u672C\u901A\u5173\u5237\u65B0\uFF0C\u8BAD\u7EC3\u548C\u957F\u671F\u6311\u6218\u4E0D\u5237\u65B0\u3002"
+  Category: 4
+  Giver: 2
+  FamilyId:
+  RequiredClassId:
+  Chapter:
+  PrerequisiteId: main-crystal-aftertone
+  RequiredLevel: 12
+  Order: 542
+  Repeatable: 1
+  RequiredAffinity: 30
+  RequiredStoryId:
+  RequiredChoiceId:
+  Objectives:
+  - Kind: 1
+    Label: "\u5DE1\u9632\u68EE\u6797\u5E76\u901A\u5173"
+    DungeonId: 1001
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  - Kind: 1
+    Label: "\u5DE1\u9632\u6D1E\u7A9F\u5E76\u901A\u5173"
+    DungeonId: 1002
+    ItemId:
+    NpcRole: 0
+    Required: 1
+    Trial: 0
+    TrialRequired: 1
+  RewardGold: 300
+  RewardExp: 400
+  Rewards: []
