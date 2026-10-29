@@ -23,6 +23,10 @@ namespace RPGSilent.Domain
         public QuestJournalData quests = new();
         public ConsumableLoadoutData consumables = new();
         public WorldProgressData world = new();
+        public WarehouseData warehouse = new();
+        public CommerceData commerce = new();
+        public TutorialData tutorial = new();
+        public SpecializationData specialization = new();
     }
 
     [Serializable]

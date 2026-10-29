@@ -79,6 +79,8 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterInstance(new ProgressSaveStore(saveDirectory));
         builder.Register<PlayerProgressService>(Lifetime.Singleton);
         builder.Register<PlayerSessionService>(Lifetime.Singleton);
+        var audio = GetComponent<GameAudioService>() ?? gameObject.AddComponent<GameAudioService>();
+        builder.RegisterComponent(audio);
 
         builder.Register<PlayerTakeDamageUseCase>(Lifetime.Singleton);
         builder.Register<PlayerAddRewardUseCase>(Lifetime.Singleton);
@@ -112,6 +114,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterBuildCallback(container =>
         {
             progress = container.Resolve<PlayerProgressService>();
+            container.Resolve<GameAudioService>();
             uiManager.SetGlobalResolver(container);
         });
     }

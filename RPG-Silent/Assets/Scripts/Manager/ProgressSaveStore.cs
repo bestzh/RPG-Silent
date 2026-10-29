@@ -19,7 +19,7 @@ public sealed class ProgressLoadResult
 /// <summary>Selected local character. Writes a flushed temporary file, then atomically replaces it.</summary>
 public sealed partial class ProgressSaveStore
 {
-    public const int CurrentVersion = 11;
+    public const int CurrentVersion = 19;
     private const int MaxFileBytes = 512 * 1024;
     private readonly string rootDirectory;
     private string directory;
@@ -120,11 +120,32 @@ public sealed partial class ProgressSaveStore
             stream.Write(bytes, 0, bytes.Length);
             stream.Flush(true);
         }
-        // Windows can fail with ERROR_UNABLE_TO_REMOVE_REPLACED (1175) when the
-        // backup argument is null. Keep the displaced file at a separate, bounded
-        // path: a corrupt primary must never replace the good recovery backup.
-        if (File.Exists(destination)) File.Replace(temporary, destination, backup ?? destination + ".replaced");
+        // Recovery displaces the corrupt primary separately from the known-good backup.
+        if (File.Exists(destination)) ReplaceFlushedFile(temporary, destination, backup ?? destination + ".replaced", bytes, File.Replace);
         else File.Move(temporary, destination);
+    }
+
+    internal static void ReplaceFlushedFile(string temporary, string destination, string backup, byte[] candidate,
+        Action<string, string, string> replace)
+    {
+        byte[] original = File.ReadAllBytes(destination);
+        for (int attempt = 0; ; attempt++)
+        {
+            try { replace(temporary, destination, backup); return; }
+            catch (IOException error) when ((error.HResult & 0xffff) == 1175 && attempt < 2)
+            {
+                // Windows 1175 retains both names. Local probes reproduced this with
+                // unchanged contents and immediate retry success. Never retry another
+                // error, or commit over files changed by another writer.
+                if (!FileContentMatches(destination, original) || !FileContentMatches(temporary, candidate)) throw;
+            }
+        }
+    }
+    static bool FileContentMatches(string path, byte[] expected)
+    {
+        try { return File.ReadAllBytes(path).SequenceEqual(expected); }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
     }
 
     private static ProgressLoadResult Read(string path)
@@ -170,6 +191,17 @@ public sealed partial class ProgressSaveStore
             if (data != null && envelope.version < 9) data.quests = new QuestJournalData();
             if (data != null && envelope.version < 10) data.consumables = new ConsumableLoadoutData();
             if (data != null && envelope.version < 11) data.world = new WorldProgressData();
+            if (data?.inventory != null && envelope.version < 12)
+                foreach (var item in (data.inventory.bag ?? Array.Empty<ItemStackData>()).Concat(data.inventory.overflow ?? Array.Empty<ItemStackData>()))
+                    if (item != null) { item.acquiredUtcTicks = 0; item.isNew = false; }
+            if (data != null && envelope.version < 13) data.warehouse = new WarehouseData();
+            if (data != null && envelope.version < 14) data.commerce = new CommerceData();
+            if (data != null && envelope.version < 15) data.tutorial = new TutorialData();
+            if (data != null && envelope.version < 16) data.specialization = new SpecializationData();
+            if (data?.world != null && envelope.version < 17) data.world.expedition = new ExpeditionData();
+            if (data?.world != null && envelope.version < 18) data.world.challenges = new ChallengeCareerData();
+            if (data?.quests?.entries != null && envelope.version < 19)
+                foreach (var entry in data.quests.entries) if (entry != null) entry.abandoned = false;
             Validate(data);
             return new ProgressLoadResult { Status = ProgressLoadStatus.Loaded, Data = data, Message = "继续游戏将返回主城，恢复成长、装备、技能与任务。" };
         }
@@ -212,8 +244,17 @@ public sealed partial class ProgressSaveStore
         QuestJournalData.Validate(data.quests);
         ConsumableLoadoutData.Validate(data.consumables);
         WorldProgressData.Validate(data.world);
+        WarehouseData.Validate(data.warehouse);
+        CommerceData.Validate(data.commerce);
+        TutorialData.Validate(data.tutorial);
+        SpecializationData.Validate(data.specialization);
+        if (data.specialization.rank > 0 && data.totalExp < PlayerStats.ExpAtLevel(SpecializationRules.RequiredLevel(data.specialization.rank)))
+            throw new InvalidDataException("专精等级超过角色解锁等级，原存档已保留。");
+        if (data.inventory.bag.Concat(data.inventory.overflow).Concat(data.warehouse.items).Concat(data.commerce.buyback.Select(x => x.item)).Where(x => x.IsInstance)
+            .GroupBy(x => x.instanceId).Any(x => x.Count() > 1))
+            throw new InvalidDataException("装备实例同时出现在多个存储位置，原存档已保留。");
         if (data.equipmentVersion < 0 || data.equipmentVersion > 1) throw new InvalidDataException("装备存档版本无效。");
-        if (data.equipmentVersion == 0 && (data.inventory.loadouts.Length > 0 || data.inventory.bag.Concat(data.inventory.overflow).Any(x => x.IsInstance)))
+        if (data.equipmentVersion == 0 && (data.inventory.loadouts.Length > 0 || data.inventory.bag.Concat(data.inventory.overflow).Concat(data.warehouse.items).Concat(data.commerce.buyback.Select(x => x.item)).Any(x => x.IsInstance)))
             throw new InvalidDataException("装备格式标记与实例记录不一致。");
         if (data.equipmentVersion == 1)
         {

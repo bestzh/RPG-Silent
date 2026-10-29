@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 public enum DungeonRunState { Inactive, Running, Succeeded, Failed, Leaving }
 
 /// <summary>Owns encounter outcome and scene-local drops; rewards commit only on manual pickup.</summary>
-public sealed class DungeonRunService : IDisposable
+public sealed partial class DungeonRunService : IDisposable
 {
     public const string UiKey = "UI/DungeonUI";
     private readonly PlayerStats stats;
@@ -18,6 +18,10 @@ public sealed class DungeonRunService : IDisposable
     private readonly ISceneLoader loader;
     private readonly PlayerSessionService session;
     private readonly PlayerProgressService progress;
+    private GameAudioService audio;
+    private IGameSettingsService presentationSettings;
+    public void ConfigurePresentation(GameAudioService sound, IGameSettingsService settings)
+    { audio = sound; presentationSettings = settings; }
     private readonly List<WorldLootPickup> drops = new();
     private readonly System.Random random = new();
     private DungeonLootTable lootTable;
@@ -34,7 +38,7 @@ public sealed class DungeonRunService : IDisposable
     private DungeonEncounter encounter;
     private DungeonDatabase.DifficultyTier difficultyTier;
     public EnemyController Boss { get; private set; }
-    public string Objective => encounter != null ? encounter.Objective : "清除敌人";
+    public string Objective => longChallenge != null ? longChallenge.Objective : encounter != null ? encounter.Objective : "清除敌人";
     public DungeonChallenge Challenge { get; private set; }
     float startedAt, finishedAt;
     readonly string challengeRewardId = Guid.NewGuid().ToString("N");
@@ -104,13 +108,14 @@ public sealed class DungeonRunService : IDisposable
         player?.CombatRecord.Reset();
         foreach (var root in scene.GetRootGameObjects())
             foreach (var node in root.GetComponentsInChildren<ExplorationNode>(true))
-            { node.Initialize(this); if (Challenge == DungeonChallenge.BossTrial) node.gameObject.SetActive(false); }
+            { node.Initialize(this); if (Challenge == DungeonChallenge.BossTrial || IsLongChallenge) node.gameObject.SetActive(false); }
         ui.OpenUI(UiKey);
         if (!Dungeon.IsEnabled || tier == null || player == null || lootTable == null || lootPresentation == null)
         {
             Finish(false, "副本配置不可用，请返回主城。");
             return;
         }
+        if (!IsLongChallenge) progress.RecordTutorialAction(TutorialStep.EnterDungeon);
 
         foreach (var root in scene.GetRootGameObjects())
         {
@@ -118,6 +123,12 @@ public sealed class DungeonRunService : IDisposable
             if (encounter != null) break;
         }
         stats.OnHealthChanged += OnHealthChanged;
+        if (!ConfigureExpedition(out var expeditionError)) { Finish(false, expeditionError); return; }
+        if (IsLongChallenge)
+        {
+            if (!ConfigureLongChallenge(out var longError)) Finish(false, longError);
+            return;
+        }
         if (encounter != null)
         {
             TotalEnemies = encounter.TotalEnemies;
@@ -146,7 +157,8 @@ public sealed class DungeonRunService : IDisposable
     private void RegisterEnemy(EnemyController enemy)
     {
         if (disposed || State != DungeonRunState.Running || !remaining.Add(enemy)) return;
-        enemy.ConfigureDungeon(difficultyTier);
+        enemy.ConfigureDungeon(IsLongChallenge && longChallenge != null ? longChallenge.EnemyTier : difficultyTier);
+        enemy.ConfigurePresentation(audio, presentationSettings);
         if (Challenge == DungeonChallenge.BossTrial && enemy.IsBoss) enemy.ConfigureElite();
         enemies.Add(enemy);
         enemy.Died += OnEnemyDied;
@@ -165,7 +177,7 @@ public sealed class DungeonRunService : IDisposable
     {
         if (State != DungeonRunState.Running) return;
         if (stats.IsDead) Finish(false, "角色已倒下。");
-        else if (remaining.Count == 0) Finish(true);
+        else TryCompleteRun();
     }
 
     private void OnEnemyDied(EnemyController enemy)
@@ -173,12 +185,13 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Running || !remaining.Remove(enemy)) return;
         enemy.Died -= OnEnemyDied;
         ++DefeatedEnemies;
+        if (IsLongChallenge) { longChallenge?.EnemyDefeated(enemy); Changed?.Invoke(); return; }
         progress.RecordEnemyDiscovery(enemy);
         progress.RecordQuestDungeonEvent(Dungeon.Id, false);
         if (enemy.IsElite && !enemy.IsBoss) progress.RecordQuestActivity(QuestObjectiveKind.DefeatElite, Dungeon.Id);
         SpawnDrops(enemy);
         if (stats.IsDead) Finish(false, "角色已倒下。");
-        else if ((encounter == null || encounter.IsComplete) && remaining.Count == 0) Finish(true);
+        else if ((encounter == null || encounter.IsComplete) && remaining.Count == 0) TryCompleteRun();
         else Changed?.Invoke();
     }
 
@@ -192,11 +205,18 @@ public sealed class DungeonRunService : IDisposable
         if (disposed || State != DungeonRunState.Running) return;
         finishedAt = Time.time;
         State = settledState = success ? DungeonRunState.Succeeded : DungeonRunState.Failed;
+        expeditionEvent?.OnRunFinished();
+        longChallenge?.OnRunFinished(success);
         ChallengeGold = DungeonChallengeRules.BonusGold(Challenge, ChallengeCompleted, difficultyTier?.RewardMultiplier ?? 1);
         ChallengeRewardPending = ChallengeGold > 0;
         if (ChallengeRewardPending) ClaimChallengeReward();
-        if (success) { progress.RecordQuestDungeonEvent(Dungeon.Id, true); progress.RecordCompletedRun(Dungeon.Id); }
-        if (success && ChallengeCompleted && Challenge != DungeonChallenge.Exploration)
+        if (success && !IsLongChallenge)
+        {
+            progress.RecordQuestDungeonEvent(Dungeon.Id, true); progress.RecordCompletedRun(Dungeon.Id);
+            var record = CombatRecord;
+            record?.WhenHitResolved(() => { if (!disposed && settledState == DungeonRunState.Succeeded) progress.RecordProfessionTrial(Dungeon.Id, record); });
+        }
+        if (success && ChallengeCompleted && (Challenge == DungeonChallenge.Timed || Challenge == DungeonChallenge.BossTrial))
             progress.RecordQuestActivity(Challenge == DungeonChallenge.Timed ? QuestObjectiveKind.CompleteTimed : QuestObjectiveKind.CompleteBossTrial, Dungeon.Id);
         player?.Statuses?.State.Clear();
         FailureReason = reason;
@@ -264,6 +284,7 @@ public sealed class DungeonRunService : IDisposable
     public void ContinueLooting()
     {
         if (!Succeeded || disposed || State == DungeonRunState.Leaving || stats.IsDead) return;
+        CancelLeave();
         ResultVisible = false; input.SetGameplayInputBlocked(this, false); ui.SetRaycastEnabled("UI/MainUI", true);
         if (input.GameplayInputEnabled) cursor.EnterGameplayCursor(); Changed?.Invoke();
     }
@@ -280,9 +301,15 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed || !HasResult || State == DungeonRunState.Leaving || loader.IsLoading ||
             ui.IsUIOpen("UI/LoadingUI") || string.IsNullOrEmpty(sceneKey)) return;
+        if (!AcceptLootDeparture(sceneKey)) return;
         if (!ClaimChallengeReward()) { TravelError = "挑战奖励尚未保存，请先重试领取。"; Changed?.Invoke(); return; }
+        if (!RetryExpeditionSave()) { TravelError = "远征事件尚未保存，请先重试保存。"; Changed?.Invoke(); return; }
+        if (!RetryLongChallengeSave()) { TravelError = "长期挑战记录尚未保存，请先重试。"; Changed?.Invoke(); return; }
+        if (sceneKey == Dungeon?.SceneKey && !PrepareExpeditionRetry(out var retryError)) { TravelError = retryError; Changed?.Invoke(); return; }
+        if (sceneKey == Dungeon?.SceneKey && !PrepareLongChallengeRetry(out var longRetryError)) { TravelError = longRetryError; Changed?.Invoke(); return; }
         if (!progress.Save()) { TravelError = "进度尚未保存，无法离开。请检查存储后再次点击重试或返回。"; Changed?.Invoke(); return; }
         TravelError = string.Empty;
+        ClearLeaveConfirmation();
         State = DungeonRunState.Leaving;
         ResultVisible = true;
         input.SetGameplayInputBlocked(this, true); cursor.EnterUICursor();
@@ -301,6 +328,8 @@ public sealed class DungeonRunService : IDisposable
     {
         if (disposed) return;
         disposed = true;
+        expeditionEvent?.Stop();
+        longChallenge?.Stop();
         if (encounter != null)
         {
             encounter.Stop();

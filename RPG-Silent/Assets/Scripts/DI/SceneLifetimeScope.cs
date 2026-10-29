@@ -39,6 +39,7 @@ public class SceneLifetimeScope : LifetimeScope
             _uiManager = uiService;
             uiService?.SetSceneResolver(container);
             _dungeonRun = container.Resolve<DungeonRunService>();
+            _dungeonRun.ConfigurePresentation(container.Resolve<GameAudioService>(), container.Resolve<IGameSettingsService>());
             _dungeonRun.Changed += OnDungeonChanged;
 
             // 解析后订阅 ESC，并预加载 PauseUI，避免首次按键异步加载导致状态错乱
