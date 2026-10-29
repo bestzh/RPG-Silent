@@ -1,11 +1,12 @@
 using RPGSilent.Domain;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 
 /// <summary>Manual, nearby, visible pickups share the existing rebindable interaction action.</summary>
-public sealed class PlayerLootInteraction : MonoBehaviour
+public sealed partial class PlayerLootInteraction : MonoBehaviour
 {
     static readonly HashSet<PlayerLootInteraction> active = new();
     public static IEnumerable<PlayerLootInteraction> Active => active;
@@ -13,6 +14,7 @@ public sealed class PlayerLootInteraction : MonoBehaviour
     [Inject] IPlayerInputActions input;
     [Inject] PlayerProgressService progress;
     [Inject] IUIService ui;
+    [Inject] ICursorService cursor;
     PlayerController player;
     readonly RaycastHit[] hits = new RaycastHit[32];
     WorldLootPickup target;
@@ -23,22 +25,29 @@ public sealed class PlayerLootInteraction : MonoBehaviour
         ui != null && !ui.IsUIOpen("UI/LoadingUI");
     public Vector3 AttractionPoint => transform.position + Vector3.up * .9f;
     public string Prompt => Time.unscaledTime < feedbackUntil ? feedback : target != null && CanInteract
-        ? $"[{input.GetDisplayString(input.Interact, 0)}] 拾取 {target.ColoredName}" : string.Empty;
-    bool CanInteract => input != null && input.GameplayInputEnabled && player != null && player.CanChangeEquipment;
+        ? $"[{input.GetDisplayString(input.Interact, 0)}] 拾取 {target.ColoredName}  ·  [↑/↓] 切换  ·  [{input.GetDisplayString(input.LootList, 0)}] 附近掉落" : string.Empty;
+    bool CanInteract => input != null && player != null && !player.IsDead &&
+        (input.GameplayInputEnabled && player.CanChangeEquipment || IsListOpen && !input.IsGameplayBlockedExcept(this) && progress.CanManageInventory);
     void Awake() => player = GetComponent<PlayerController>();
-    void OnEnable() { active.Add(this); if (input != null) input.InteractTriggered += Interact; }
-    void OnDisable() { active.Remove(this); if (input != null) input.InteractTriggered -= Interact; target = null; }
+    void OnEnable()
+    {
+        active.Add(this); SceneManager.activeSceneChanged += SceneChanged;
+        if (input == null) return;
+        input.InteractTriggered += Interact; input.LootListTriggered += ToggleList;
+        input.LootCycleTriggered += CycleTarget; input.LootPickupTriggered += PickupPresented;
+    }
+    void OnDisable()
+    {
+        CloseList(); active.Remove(this); SceneManager.activeSceneChanged -= SceneChanged;
+        if (input != null) { input.InteractTriggered -= Interact; input.LootListTriggered -= ToggleList;
+            input.LootCycleTriggered -= CycleTarget; input.LootPickupTriggered -= PickupPresented; }
+        target = null;
+    }
     void Update()
     {
-        target = null; if (!CanInteract) return;
-        float closest = float.PositiveInfinity;
-        foreach (var pickup in WorldLootPickup.Active)
-        {
-            if (pickup.Item == null) continue;
-            if (!CanReach(pickup)) continue;
-            float distance = (pickup.transform.position - transform.position).sqrMagnitude;
-            if (distance < closest) { target = pickup; closest = distance; }
-        }
+        if (IsListOpen && (!CanInteract || OtherModal)) CloseList();
+        if (Time.unscaledTime < nextNearbyRefresh) return;
+        nextNearbyRefresh = Time.unscaledTime + .1f; RefreshNearby();
     }
     public bool CanReach(WorldLootPickup pickup)
     {
@@ -55,11 +64,7 @@ public sealed class PlayerLootInteraction : MonoBehaviour
     }
     public void Interact()
     {
-        if (!CanReach(target)) return;
-        var item = target;
-        if (item.TryCollect(this, progress, out string message)) { feedback = "已拾取 " + item.ColoredName; target = null; }
-        else feedback = message;
-        feedbackUntil = Time.unscaledTime + 1.5f;
+        if (!IsListOpen) TryCollectTarget(target, out _);
     }
     public bool ReceiveCurrency(WorldLootPickup pickup, out string message)
     {
