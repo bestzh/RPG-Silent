@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-29",
+  "version": "Layout study V4",
+  "scope": "6 key page concepts + design rationale; not a complete UI revision",
+  "artboard": [
+    1920,
+    1080
+  ],
+  "screens": [
+    {
+      "id": "direction",
+      "title": "方向判断",
+      "file": "00-direction.png",
+      "description": "推荐轻史诗奇幻。让角色、场景与信息重心组织页面；保留有用的网格和对齐，去掉包住整页的容器。"
+    },
+    {
+      "id": "start",
+      "title": "开始 · 场景",
+      "file": "01-start.png",
+      "description": "以完整场景和大角色为主视觉，菜单直接放在留白中。界面有明确重心和轻微非对称，不靠连续的矩形按钮分割画面。"
+    },
+    {
+      "id": "inventory",
+      "title": "行囊 · 人物",
+      "file": "02-inventory.png",
+      "description": "装备围绕人物分布，物品保留方便扫描的 24 格网格。移除三栏大面板；当前物品以一条紧凑说明和即时对比收尾，选中轮廓同时使用形状、文字和颜色。"
+    },
+    {
+      "id": "mentor",
+      "title": "技能 · 徽记",
+      "file": "03-mentor.png",
+      "description": "三个独立技能用徽记组成一条开放圆弧，所选技能突出并在下方解释。弧线只负责视觉分组，不表示技能前置关系。十个装配位置保持固定顺序。"
+    },
+    {
+      "id": "travel",
+      "title": "远行 · 路线",
+      "file": "04-travel.png",
+      "description": "用一条弯曲的旅程线组织两个副本与训练场，所选目的地占据画面。难度与模式以开放文字行排列，不再给每个目的地套一张卡片。线路表达选择关系，不代表实际无缝地图。"
+    },
+    {
+      "id": "combat",
+      "title": "战斗 · 边缘",
+      "file": "05-combat.png",
+      "description": "保持中央战斗视野。生命、能量、首领状态、地图与任务位于固定边缘区域；技能键位沿固定水平线，减少装饰与上下跳动。示例底图来自已导入 Synty 包，不代表实际关卡或 Boss。"
+    },
+    {
+      "id": "settings",
+      "title": "设置 · 开放列表",
+      "file": "06-settings.png",
+      "description": "设置仍采用整齐的列表和对齐控件，减少学习成本。使用渐变保证文字对比；页面依靠留白和细线组织，不需要再叠一个完整大窗口。"
+    }
+  ]
+}

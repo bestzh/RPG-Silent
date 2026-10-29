@@ -1,0 +1,19 @@
+/* Refinements after reviewing the exported artboards. */
+.v2-guide-columns>.frame{height:420px}
+.hud-map::after,.v2-hud-portrait .portrait-ring,.skill-slot::after{filter:brightness(0) saturate(100%) invert(75%) sepia(28%) saturate(531%) hue-rotate(357deg) brightness(92%) contrast(85%)}
+.hud-map{box-shadow:none}
+.hud-map::after{opacity:.9}
+.boss-hud::before{inset:5px 10px -3px;opacity:.28;filter:brightness(0) saturate(100%) invert(75%) sepia(28%) saturate(531%) hue-rotate(357deg) brightness(92%) contrast(85%)}
+.skill-slot.empty::after{opacity:.23}
+.bag-cell,.equip-slot,.mini-slot,.gem-socket{border-image:none;border-color:#718a9b66}
+.bag-cell{border-color:var(--quality,#718a9b66)}
+.bag-cell.empty{border-color:#62798a47;background:#0d1f2d77}
+.bag-cell.selected{border-color:#dcc083}
+.paper>div:first-child{color:#dbc38c!important}
+.canvas[data-screen="hud-dungeon"] .combat-feedback{left:730px;top:720px;width:490px;text-align:center;height:148px;padding:23px 20px 50px;background:linear-gradient(90deg,transparent,#112537e8 15%,#112537e8 85%,transparent);border-bottom:1px solid #c8ab6e5c;font-size:30px;letter-spacing:5px}
+.canvas[data-screen="hud-dungeon"] .combat-feedback::after{content:'破绽已现 · 把握反击时机';display:block;font-size:15px;letter-spacing:2px;color:#bbcdd8;margin-top:13px}
+.gem-card{padding:14px 16px}
+.canvas[data-screen="gem-socket"] .service-note{margin-top:14px;padding-top:14px;font-size:18px;line-height:1.65}
+.canvas[data-screen="gem-socket"] .service-note .small-button{min-height:44px;font-size:17px}
+.world-background.dungeon img{position:static;width:100%;height:100%;left:auto;top:auto;max-width:none;object-fit:cover;object-position:center}
+.canvas[data-screen="hud-dungeon"] .combat-feedback{top:705px;height:112px;padding:13px 20px 20px;background:linear-gradient(90deg,transparent,#112537a8 20%,#112537a8 80%,transparent)}

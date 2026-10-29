@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-29",
+  "version": "Synty V2",
+  "game_pages_and_states": 40,
+  "reference_sheets": 2,
+  "png_count": 42,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "broken_images": 0,
+  "canvas_overflow": 0,
+  "panel_overflow": 0,
+  "gallery_checks_passed": true,
+  "distinct_skill_icons": 21,
+  "game_code_modified": false,
+  "scene_and_prefab_modified": false,
+  "scene_plate_note": "HUD and some destination previews use imported Synty sample images, not actual game-level captures."
+}
